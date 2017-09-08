@@ -88,6 +88,13 @@ def period(positions):
 def freqs(text):
     return collections.Counter(text)
 
+def relfreqs(text):
+    f = freqs(text)
+    out = {}
+    for char, count in f.items():
+        out[char] = float(count)/float(len(text))
+    return out
+
 if __name__ == "__main__":
     encrypted = read_file("cipher.txt")
 
@@ -98,7 +105,7 @@ if __name__ == "__main__":
     # Find repetitions in the text. Focus on the ones who are a specific period
     # apart.
 
-    good = []
+    good = set()
     for length in range(3, len(encrypted)//2):
         start = 0
         while start+length < len(encrypted):
@@ -123,9 +130,12 @@ if __name__ == "__main__":
                 continue
             text = encrypted[pos:pos+per]
             print(text)
-            f = freqs(text)
+            f = relfreqs(text)
             f = map(lambda (a,b): (b,a), f.items())
             f = sorted(f, reverse=True)
+            print("Relative freqs:")
+            for cnt, ch in f:
+                print("  %s  %f" % (ch, cnt))
             #print(f)
             table = {}
             # most frequent letter in english decreasingo rder
@@ -139,8 +149,11 @@ if __name__ == "__main__":
             for ciph, plain in table.items():
                 text = text.replace(ciph, plain)
             print("Decrypted: %s" % text)
-            if "the" in text:
-                good.append(text)
+            for word in ["the", "and", "for", "are", "but", "not", "you",
+                    "all", "any", "can", "her", "was"]:
+                if word in text:
+                    good.add(text)
+                    break
     print("Candidates:")
     for t in good:
         print(t)
