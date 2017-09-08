@@ -152,6 +152,10 @@ if __name__ == "__main__":
             dec = letters()
             # TODO: Rather look up with most common 2 and 3 letter words and
             # start from there
+
+            # in this text, find two-letter and three-letter combos, then try
+            # to map those with most common words
+
             for no, (count, char) in enumerate(f):
                 if no >= len(dec):
                     break
