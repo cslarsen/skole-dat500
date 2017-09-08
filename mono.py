@@ -146,6 +146,12 @@ def analyse(text):
         for ngram, count in ngrams(text, n=n, relative="both", minimum=cutoff):
             print("  %s %3d %5.2f" % (ngram, count[0], count[1]))
 
+    def decr(txt, tbl):
+        out = ""
+        for ch in txt:
+            out += tbl.get(ch, ".")
+        return out
+
     for tgrams in map_ngrams(ngrams(text, 3, 2, relative="both")):
         table = {}
         for (ours, theirs) in tgrams:
@@ -155,21 +161,17 @@ def analyse(text):
                     continue
                 table[l] = r
 
-        def decr(txt, tbl):
-            out = ""
-            for ch in txt:
-                out += tbl.get(ch, ".")
-            return out
-
-        # Try to decrypt with the table
-        plain = decr(text, table)
-        if is_english(plain) > 0.1:
-            print(plain)
-
         #for dgrams in map_ngrams(ngrams(text, 2, 2, relative="both")):
             # assign one unique english trigram to each, all combos
             #for monogram in ngrams(text, 1, 8, relative="both"):
             #pass
+
+        # Try to decrypt with the table
+        plain = decr(text, table)
+        corr = is_english(plain)
+        if corr > 0.1:
+            print("%.4f %s" % (corr, plain))
+
 
     # Proceed like this:
     #
