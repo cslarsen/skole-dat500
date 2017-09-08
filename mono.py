@@ -88,8 +88,16 @@ def analyse(text):
     cutoff = 2
     for n in (1, 2, 3):
         print("%d-gram relative frequencies (cutoff=%d):" % (n, cutoff))
-        for ngram, count in ngrams(text, n=n, relative=True, minimum=cutoff):
-            print("  %s %5.2f" % (ngram, count))
+        for ngram, count in ngrams(text, n=n, relative="both", minimum=cutoff):
+            print("  %s %3d %5.2f" % (ngram, count[0], count[1]))
+
+    table = {}
+    for trigam in ngrams(text, 3, 2, relative="both"):
+        # assign one unique English trigram to each, all combos
+        for digram in ngrams(text, 2, 2, relative="both"):
+            # assign one unique english trigram to each, all combos
+            for monogram in ngrams(text, 1, 8, relative="both"):
+                pass
 
     # Proceed like this:
     #

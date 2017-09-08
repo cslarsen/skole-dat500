@@ -2,6 +2,17 @@ import collections
 import sys
 import zlib
 
+# List of English words
+_words = None
+
+def get_words(filename="words.txt.gz"):
+    """Returns a list of 230k English words."""
+    global _words
+    if _words is None:
+        _words = read_wordlist(filename)
+        _words = set(map(lambda x: x.lower(), _words))
+    return _words
+
 def normalize(s):
     """Removes whitespace from string and makes it uppercase."""
     out = ""
@@ -59,6 +70,32 @@ def all_ngrams(text, n):
     for s in range(len(text)-n+1):
         yield text[s:s+n]
 
+def snippets(s, minimum=1):
+    """Yields all ngrams in text."""
+    for start in range(len(s)):
+        for length in range(len(s)-start+1):
+            snippet = s[start:start+length]
+            if len(snippet) >= minimum:
+                yield s[start:start+length]
+
+def is_english(text):
+    """Attempts to guess if the text is English.
+
+    Returns a number between 0=nope, 1=most likely.
+    """
+    # Remove non-alphas
+    text = "".join(map(lambda x: x if x.isalpha() else "", text.lower()))
+
+    words = get_words()
+    snips = list(snippets(text, 2))
+
+    count = 0
+    for snip in snips:
+        if snip in words:
+            count += 1
+
+    return count / float(len(snips))
+
 def ngrams(text, n=1, minimum=0, relative=False):
     """Returns (n-grams, count) that appear a minimum times in the text."""
     counts = collections.defaultdict(int)
@@ -71,8 +108,10 @@ def ngrams(text, n=1, minimum=0, relative=False):
 
     for gram, count in sorted(counts.items(), reverse=True):
         if count >= minimum:
-            if relative:
+            if relative == True:
                 count /= float(total)
+            elif relative == "both":
+                count = (count, count / float(total))
             out.append((gram, count))
 
     def sort_by_count(gram_count):
