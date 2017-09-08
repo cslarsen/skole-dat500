@@ -9,7 +9,7 @@ import sys
 alphabet = "abcdefghijklmnopqrstuvwxyz"
 
 # Cornell
-letters = {
+en_letters = {
     "e": 12.02,
     "t": 9.10,
     "a": 8.12,
@@ -39,10 +39,10 @@ letters = {
 }
 
 # Cornell: Common English double letters
-doubles = ["s", "l", "o", "e", "n", "p"]
+en_doubles = ["s", "l", "o", "e", "n", "p"]
 
 # Cornell
-digrams = {
+en_digrams = {
     "th": 1.52,
     "he": 1.28,
     "in": 0.94,
@@ -84,6 +84,45 @@ digrams = {
     "ur": 0.02,
 }
 
+# Trigrams from
+# http://practicalcryptography.com/cryptanalysis/letter-frequencies-various-languages/english-letter-frequencies/
+en_trigrams = {
+    "THE": 1.81,
+    "AND": 0.73,
+    "ING": 0.72,
+    "ENT": 0.42,
+    "ION": 0.42,
+    "HER": 0.36,
+    "FOR": 0.34,
+    "THA": 0.33,
+    "NTH": 0.33,
+    "INT": 0.32,
+    "ERE": 0.31,
+    "TIO": 0.31,
+    "TER": 0.30,
+    "ERS": 0.28,
+    "EST": 0.28,
+    "ATI": 0.26,
+    "HAT": 0.26,
+    "ALL": 0.25,
+    "ATE": 0.25,
+    "ETH": 0.24,
+    "HES": 0.24,
+    "HIS": 0.24,
+    "VER": 0.24,
+    "OFT": 0.22,
+    "FTH": 0.21,
+    "ITH": 0.21,
+    "OTH": 0.21,
+    "RES": 0.21,
+    "STH": 0.21,
+    "ONT": 0.20,
+}
+
+def map_ngrams(grams):
+    """Try to map an n-gram with an English one."""
+    import pdb; pdb.set_trace()
+
 def analyse(text):
     cutoff = 2
     for n in (1, 2, 3):
@@ -92,12 +131,11 @@ def analyse(text):
             print("  %s %3d %5.2f" % (ngram, count[0], count[1]))
 
     table = {}
-    for trigam in ngrams(text, 3, 2, relative="both"):
-        # assign one unique English trigram to each, all combos
-        for digram in ngrams(text, 2, 2, relative="both"):
+    for trigram in map_ngrams(ngrams(text, 3, 2, relative="both")):
+        for digram in map_ngrams(ngrams(text, 2, 2, relative="both")):
             # assign one unique english trigram to each, all combos
-            for monogram in ngrams(text, 1, 8, relative="both"):
-                pass
+            #for monogram in ngrams(text, 1, 8, relative="both"):
+                #pass
 
     # Proceed like this:
     #
