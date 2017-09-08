@@ -36,6 +36,11 @@ words3 = ["the", "and", "for", "are", "but", "not", "you", "all", "any", "can",
         "her", "was"]
 
 def letters():
+    #return "etrnioas" # lecture
+    return "etaoinsrhldcumfpgwybvkxjqz" # exact
+    return "eariotnslcudpmhgbfywkvxzjq" # oxford
+
+    # use the list, i don't think it may be right
     return "".join(map(lambda (a,b): b, sorted(map(lambda (a,b): (b,a),
         english.items()), reverse=True)))
 
@@ -110,6 +115,7 @@ if __name__ == "__main__":
     # apart.
 
     good = set()
+    tables = {}
     for length in range(3, len(encrypted)//2):
         start = 0
         while start+length < len(encrypted):
@@ -144,6 +150,8 @@ if __name__ == "__main__":
             table = {}
             # most frequent letter in english decreasingo rder
             dec = letters()
+            # TODO: Rather look up with most common 2 and 3 letter words and
+            # start from there
             for no, (count, char) in enumerate(f):
                 if no >= len(dec):
                     break
@@ -156,9 +164,11 @@ if __name__ == "__main__":
             for word in words3:
                 if word in text:
                     good.add(text)
+                    tables[text] = table
                     break
     print("\nCandidates:\n")
     for t in good:
+        table = tables[t]
         for w in words3:
             t = t.replace(w, " %s " % w.upper())
         while t.find("  ") != -1:
