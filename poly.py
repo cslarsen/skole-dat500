@@ -61,10 +61,7 @@ if __name__ == "__main__":
     # Find repetitions in the text. Focus on the ones who are a specific period
     # apart.
 
-    seen = set()
-    kseen = set()
-    for length in range(3, 10):
-        print("length %d" % length)
+    for length in range(3, len(encrypted)//2):
         start = 0
         while start+length < len(encrypted):
             key = encrypted[start:start+length]
@@ -78,9 +75,5 @@ if __name__ == "__main__":
                 start += 1
                 continue
             per = per[0]
-            if per not in seen:
-                seen.add(per)
-            if key not in kseen:
-                print("key: %r, period: %d, times: %d" % (key, per, times))
-                kseen.add(key)
+            print("length %3d, key: %r, period: %3d, times: %d" % (length, key, per, times))
             start += 1
