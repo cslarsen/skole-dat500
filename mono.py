@@ -121,7 +121,7 @@ def decrypt(text):
     print("")
     print("Relative letter frequencies vs English")
     print("    Cipher       English")
-    freqs = sorted(relative_freqs(text), reverse=True)
+    freqs = sorted(relfreq(text), reverse=True)
     for i in range(26):
         try:
             cfreq, cchar = freqs[i]
@@ -135,7 +135,7 @@ def decrypt(text):
     return ""
 
 def main():
-    cipher = read_file("cipher-mono.txt").lower()
+    cipher = readfile("cipher-mono.txt").lower()
 
     print("Ciphertext:\n")
     block_print(cipher)

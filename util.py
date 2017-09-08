@@ -14,15 +14,17 @@ def reverse_pairs(pairs):
     for a, b in pairs:
         yield (b, a)
 
-def subst(cipher, table):
-    return "".join(table[c] for c in cipher)
+def subst(text, table):
+    """Translates each character according to table."""
+    return "".join(table[c] for c in text)
 
-
-def read_file(filename="cipher.txt"):
+def readfile(filename):
+    """Returns normalized text in file."""
     with open(filename, "rt") as f:
         return normalize(f.read())
 
-def relative_freqs(text):
+def relfreq(text):
+    """Returns relative frequencies for each letter in text."""
     freqs = collections.Counter(text)
 
     for char, count in freqs.items():
