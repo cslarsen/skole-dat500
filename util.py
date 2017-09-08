@@ -23,12 +23,20 @@ def readfile(filename):
     with open(filename, "rt") as f:
         return normalize(f.read())
 
-def relfreq(text):
-    """Returns relative frequencies for each letter in text."""
-    freqs = collections.Counter(text)
+def relfreq(text, n=1, minimum=0):
+    """Finds relative frequency counts of n-grams in text.
 
-    for char, count in freqs.items():
-        yield (float(count) / len(text), char)
+    Returns:
+        For  a digram, for example [(0.112, "XY"), ...]
+    """
+    grams = list(ngrams(text, n, minimum))
+    total = sum(map(lambda (char, count): count, grams))
+
+    out = []
+    for char, count in grams:
+        out.append((float(count) / total, char))
+
+    return sorted(out, reverse=True)
 
 def split_string(string, length, start=0, tail=True):
     while start + length < len(string):
@@ -52,22 +60,26 @@ def all_ngrams(text, n):
     for s in range(len(text)-n+1):
         yield text[s:s+n]
 
-def ngrams(text, n=2, minimum=2):
+def ngrams(text, n=1, minimum=0):
     """Returns (n-grams, count) that appear a minimum times in the text."""
     counts = collections.defaultdict(int)
 
     for gram in all_ngrams(text, n):
         counts[gram] += 1
 
+    out = []
+
     for gram, count in sorted(counts.items(), reverse=True):
         if count >= minimum:
-            yield gram, count
+            out.append((gram, count))
 
-def digrams(text, minimum=2):
+    return sorted(out, reverse=True)
+
+def digrams(text, minimum=0):
     return ngrams(text, 2, minimum)
 
-def trigrams(text, minimum=2):
+def trigrams(text, minimum=0):
     return ngrams(text, 3, minimum)
 
-def quadgrams(text, minimum=2):
+def quadgrams(text, minimum=0):
     return ngrams(text, 4, minimum)
