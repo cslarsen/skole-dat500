@@ -135,7 +135,7 @@ def analyse(text):
         for digram in map_ngrams(ngrams(text, 2, 2, relative="both")):
             # assign one unique english trigram to each, all combos
             #for monogram in ngrams(text, 1, 8, relative="both"):
-                #pass
+            pass
 
     # Proceed like this:
     #
@@ -151,6 +151,7 @@ def analyse(text):
     #
     #               Decrypt and detect relative number of english words. over a
     #               given threshold, print the message.
+    pass
 
 def main(filename):
     cipher = readfile(filename).lower()
