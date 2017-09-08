@@ -76,6 +76,6 @@ if __name__ == "__main__":
                 continue
             per = per[0]
             pos = encrypted.find(key)
-            print("len=%-3d key=%-15r pos=%-3d period=%-3d x %d" % (
-                length, key, pos, per, times))
+            print("len=%-3d pos=%-3d period=%-3dx%d key=%r" % (
+                length, pos, per, times, key))
             start += 1
