@@ -1,5 +1,6 @@
 import collections
 import sys
+import zlib
 
 def normalize(s):
     """Removes whitespace from string and makes it uppercase."""
@@ -8,6 +9,19 @@ def normalize(s):
         if not ch.isspace():
             out += ch
     return out.upper()
+
+def read_wordlist(filename="words.txt.gz"):
+    """Reads a (optionally gzipped) wordlist, one word per line.
+
+    Typically, you can use /usr/share/dict/words.
+    """
+    with open(filename, "rb") as f:
+        data = f.read()
+        if filename.endswith(".gz"):
+            decoder = zlib.decompressobj(16 + zlib.MAX_WBITS) # gzip support
+            data = decoder.decompress(data)
+        data = str(data.decode("ascii"))
+        return data.split()
 
 def reverse_pairs(pairs):
     """Reverses pairs in an iterable."""
@@ -61,7 +75,11 @@ def ngrams(text, n=1, minimum=0, relative=False):
                 count /= float(total)
             out.append((gram, count))
 
-    return sorted(out, reverse=True, key=lambda (gram, count): (count, gram))
+    def sort_by_count(gram_count):
+        gram, count = gram_count
+        return (count, gram)
+
+    return sorted(out, reverse=True, key=sort_by_count)
 
 def digrams(text, **kw):
     """Wrapper around ngrams(text, 2, ...)"""

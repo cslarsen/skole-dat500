@@ -3,6 +3,10 @@ Coursework for DAT-500
 
 Private repository for Christian Stigen Larsen.
 
+Requirements
+============
+
+Python 2.7 or 3.3+ with standard libraries such as zlib.
 
 References
 ----------
