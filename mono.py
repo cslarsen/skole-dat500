@@ -3,7 +3,10 @@ Mono-alphabetic deciphering.
 """
 
 from util import *
+import collections
 import sys
+
+alphabet = "abcdefghijklmnopqrstuvwxyz"
 
 # Cornell
 letters = {
@@ -36,7 +39,7 @@ letters = {
 }
 
 # Cornell: Common English double letters
-doubles = ["ss", "ll", "oo", "ee", "nn", "pp"]
+doubles = ["s", "l", "o", "e", "n", "p"]
 
 # Cornell
 digrams = {
@@ -81,29 +84,66 @@ digrams = {
     "ur": 0.02,
 }
 
+def find_double_letters(text):
+    for char in alphabet:
+        if text.find(char + char) != -1:
+            yield char
+
+def show_candidates(cands):
+    """Prints determined candidates."""
+    for char, alts in sorted(cands.items()):
+        if len(alts) == 1:
+            print("** Determined that %c maps to %c" % (char, alts[0]))
+        elif len(alts) == 2:
+            print("Character %c may be either %c or %c" % (char, min(alts),
+                max(alts)))
+
 def decrypt(text):
+    # Use the method of elimination: For each input letter, keep a list of
+    # possible output letters. Initialize with all possibilities. We'll
+    # eliminate as we go.
+    cands = collections.defaultdict(list)
+    for char in alphabet:
+        cands[char] = list(alphabet)
+
+    for char in find_double_letters(text):
+        # Found a double letter. This means those can only be one of a few
+        # possible values.
+        cands[char] = doubles
+        print("Double letter '%c%c' can be any of %s" % (
+            char, char, ", ".join(sorted(doubles))))
+
+    show_candidates(cands)
+
+    print("")
+    print("Relative letter frequencies vs English")
+    print("    Cipher       English")
     freqs = sorted(relative_freqs(text), reverse=True)
+    for i in range(26):
+        try:
+            cfreq, cchar = freqs[i]
+        except IndexError:
+            cfreq, cchar = 0, "-"
 
-    table = {}
-    for no, (count, char) in enumerate(freqs):
-        table[char] = sorted(reverse_pairs(letters.items()))[no][1]
-        print(count, char)
-        if no > 3:
-            break
+        efreq, echar = list(sorted(reverse_pairs(letters.items()),
+            reverse=True))[i]
+        print("    %c %7.4f    %c %7.4f" % (cchar, cfreq, echar, efreq))
 
-    return "".join(table.get(c, c.upper()) for c in text)
+    return ""
 
 def main():
     cipher = read_file("cipher-mono.txt").lower()
 
     print("Ciphertext:\n")
     block_print(cipher)
-    print("\n")
+    print("")
 
-    print("Plaintext:\n")
+    print("Analysis:\n")
     plain = decrypt(cipher)
     print("")
+    print("Plaintext:\n")
     block_print(plain)
+    print("")
 
 if __name__ == "__main__":
     main()

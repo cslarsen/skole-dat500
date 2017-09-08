@@ -20,10 +20,10 @@ def read_file(filename="cipher.txt"):
         return normalize(f.read())
 
 def relative_freqs(text):
-    frequencies = collections.Counter(text)
+    freqs = collections.Counter(text)
 
-    for character, count in frequencies.items():
-        yield (float(count) / len(text), character)
+    for char, count in freqs.items():
+        yield (float(count) / len(text), char)
 
 def split_string(string, length, start=0, tail=True):
     while start + length < len(string):
