@@ -12,3 +12,4 @@ References
 ----------
 
   * (Cornell Cryptography)[https://www.math.cornell.edu/~mec/2003-2004/cryptography/subs/hints.html}
+  * (Google 10000 English Words)[https://github.com/first20hours/google-10000-english]

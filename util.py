@@ -5,7 +5,7 @@ import zlib
 # List of English words
 _words = None
 
-def get_words(filename="words.txt.gz"):
+def get_words(filename="google-10000-english.txt"):
     """Returns a list of 230k English words."""
     global _words
     if _words is None:

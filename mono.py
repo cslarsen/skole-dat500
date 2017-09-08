@@ -171,14 +171,19 @@ def analyse(text):
     #dd = dd[:5]
     table = {}
     bestcorr = 0
+    skip = False
     for dgrams in map_ngrams(dd):
         dtable = dict(table) # keep original table
-        for (ours, theirs) in dgrams:
-            for l, r in zip(ours[0], theirs[0]):
-                if l in dtable:
-                    # Actually, we should jump right to the next tgram here
-                    continue
-                dtable[l] = r
+        try:
+            for (ours, theirs) in dgrams:
+                for l, r in zip(ours[0], theirs[0]):
+                    if l in dtable:
+                        # Actually, we should jump right to the next tgram here
+                        raise IndexError()
+                        continue
+                    dtable[l] = r
+        except IndexError:
+            continue
 
         # Try to decrypt with the table
         plain = decr(text, dtable)
