@@ -48,41 +48,41 @@ en_digrams = {
     "he": 1.28,
     "in": 0.94,
     "er": 0.94,
-    #"an": 0.82,
-    #"re": 0.68,
-    #"nd": 0.63,
-    #"at": 0.59,
-    #"on": 0.57,
-    #"nt": 0.56,
-    #"ha": 0.56,
-    #"es": 0.56,
-    #"st": 0.55,
-    #"en": 0.55,
-    #"ed": 0.53,
-    #"to": 0.52,
-    #"it": 0.50,
-    #"ou": 0.50,
-    #"ea": 0.47, # cutoff to save time
-    #"hi": 0.46,
-    #"is": 0.46,
-    #"or": 0.43,
-    #"ti": 0.34,
-    #"as": 0.33,
-    #"te": 0.27,
-    #"et": 0.19,
-    #"ng": 0.18,
-    #"of": 0.16,
-    #"al": 0.09,
-    #"de": 0.09,
-    #"se": 0.08,
-    #"le": 0.08,
-    #"sa": 0.06,
-    #"si": 0.05,
-    #"ar": 0.04,
-    #"ve": 0.04,
-    #"ra": 0.04,
-    #"ld": 0.02,
-    #"ur": 0.02,
+    "an": 0.82,
+    "re": 0.68,
+    "nd": 0.63,
+    "at": 0.59,
+    "on": 0.57,
+    "nt": 0.56,
+    "ha": 0.56,
+    "es": 0.56,
+    "st": 0.55,
+    "en": 0.55,
+    "ed": 0.53,
+    "to": 0.52,
+    "it": 0.50,
+    "ou": 0.50,
+    "ea": 0.47, # cutoff to save time
+    "hi": 0.46,
+    "is": 0.46,
+    "or": 0.43,
+    "ti": 0.34,
+    "as": 0.33,
+    "te": 0.27,
+    "et": 0.19,
+    "ng": 0.18,
+    "of": 0.16,
+    "al": 0.09,
+    "de": 0.09,
+    "se": 0.08,
+    "le": 0.08,
+    "sa": 0.06,
+    "si": 0.05,
+    "ar": 0.04,
+    "ve": 0.04,
+    "ra": 0.04,
+    "ld": 0.02,
+    "ur": 0.02,
 }
 
 # Trigrams from
@@ -168,8 +168,9 @@ def analyse(text):
                 print("%.4f %s" % (corr, plain))
 
     dd = ngrams(text, 2, 3, relative="both")
-    dd = dd[:4]
+    #dd = dd[:5]
     table = {}
+    bestcorr = 0
     for dgrams in map_ngrams(dd):
         dtable = dict(table) # keep original table
         for (ours, theirs) in dgrams:
@@ -182,8 +183,9 @@ def analyse(text):
         # Try to decrypt with the table
         plain = decr(text, dtable)
         corr = is_english(plain)
-        if corr > 0.0:
-            print("       %s" % text)
+        if corr > bestcorr:
+            bestcorr = corr
+            #print("       %s" % text)
             print("%6.4f %s" % (corr, plain))
         #for monogram in ngrams(text, 1, 8, relative="both"):
         #pass

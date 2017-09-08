@@ -84,17 +84,18 @@ def is_english(text):
     Returns a number between 0=nope, 1=most likely.
     """
     # Remove non-alphas
-    text = "".join(map(lambda x: x if x.isalpha() else "", text.lower()))
+    #text = "".join(map(lambda x: x if x.isalpha() else "", text.lower()))
 
     words = get_words()
-    snips = list(snippets(text, 2))
+    snips = list(snippets(text, 3))
 
     count = 0
     for snip in snips:
         if snip in words:
             count += 1
 
-    return count / float(len(snips))
+    #return count / float(len(snips))
+    return count
 
 def ngrams(text, n=1, minimum=0, relative=False):
     """Returns (n-grams, count) that appear a minimum times in the text."""
