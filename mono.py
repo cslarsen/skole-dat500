@@ -91,6 +91,21 @@ def analyse(text):
         for ngram, count in ngrams(text, n=n, relative=True, minimum=cutoff):
             print("  %s %5.2f" % (ngram, count))
 
+    # Proceed like this:
+    #
+    # for each trigram:
+    #   Assign one unique English trigram to each, all combos.
+    #   for each digram:
+    #       Assign one unique English digram to each, all combos.
+    #       If they contradict the above trigrams, skip.
+    #           for each monogram:
+    #               Assign one unique English monogram to each, all combos ---
+    #               at this point, there should be considerably less than 26!
+    #               combos, else give a user warning
+    #
+    #               Decrypt and detect relative number of english words. over a
+    #               given threshold, print the message.
+
 def main(filename):
     cipher = readfile(filename).lower()
 
