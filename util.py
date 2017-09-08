@@ -2,18 +2,21 @@ import collections
 import sys
 
 def normalize(s):
-    s = s.replace(" ", "")
-    s = s.replace("\n", "")
-    s = s.replace("\r", "")
-    s = s.strip().upper()
-    return s
+    """Removes whitespace from string and makes it uppercase."""
+    out = ""
+    for ch in s:
+        if not ch.isspace():
+            out += ch
+    return out.upper()
 
 def reverse_pairs(pairs):
+    """Reverses pairs in an iterable."""
     for a, b in pairs:
         yield (b, a)
 
-def encrypt(key, text):
-    pass
+def subst(cipher, table):
+    return "".join(table[c] for c in cipher)
+
 
 def read_file(filename="cipher.txt"):
     with open(filename, "rt") as f:
@@ -41,3 +44,28 @@ def block_print(text, width=8, columns=4):
 
     if (i % columns) != (columns - 1):
         sys.stdout.write("\n")
+
+def all_ngrams(text, n):
+    """Yields all n-grams in the text."""
+    for s in range(len(text)-n+1):
+        yield text[s:s+n]
+
+def ngrams(text, n=2, minimum=2):
+    """Returns (n-grams, count) that appear a minimum times in the text."""
+    counts = collections.defaultdict(int)
+
+    for gram in all_ngrams(text, n):
+        counts[gram] += 1
+
+    for gram, count in sorted(counts.items(), reverse=True):
+        if count >= minimum:
+            yield gram, count
+
+def digrams(text, minimum=2):
+    return ngrams(text, 2, minimum)
+
+def trigrams(text, minimum=2):
+    return ngrams(text, 3, minimum)
+
+def quadgrams(text, minimum=2):
+    return ngrams(text, 4, minimum)
