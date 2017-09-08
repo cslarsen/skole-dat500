@@ -48,20 +48,20 @@ en_digrams = {
     "he": 1.28,
     "in": 0.94,
     "er": 0.94,
-    "an": 0.82,
-    "re": 0.68,
-    "nd": 0.63,
-    "at": 0.59,
-    "on": 0.57,
-    "nt": 0.56,
-    "ha": 0.56,
-    "es": 0.56,
-    "st": 0.55,
-    "en": 0.55,
-    "ed": 0.53,
-    "to": 0.52,
-    "it": 0.50,
-    "ou": 0.50,
+    #"an": 0.82,
+    #"re": 0.68,
+    #"nd": 0.63,
+    #"at": 0.59,
+    #"on": 0.57,
+    #"nt": 0.56,
+    #"ha": 0.56,
+    #"es": 0.56,
+    #"st": 0.55,
+    #"en": 0.55,
+    #"ed": 0.53,
+    #"to": 0.52,
+    #"it": 0.50,
+    #"ou": 0.50,
     #"ea": 0.47, # cutoff to save time
     #"hi": 0.46,
     #"is": 0.46,
@@ -88,36 +88,36 @@ en_digrams = {
 # Trigrams from
 # http://practicalcryptography.com/cryptanalysis/letter-frequencies-various-languages/english-letter-frequencies/
 en_trigrams = {
-    "THE": 1.81,
-    "AND": 0.73,
-    "ING": 0.72,
-    "ENT": 0.42,
-    "ION": 0.42,
-    "HER": 0.36,
-    "FOR": 0.34,
-    "THA": 0.33,
-    "NTH": 0.33,
-    "INT": 0.32,
-    "ERE": 0.31,
-    #"TIO": 0.31, # cutoff to save time
-    #"TER": 0.30,
-    #"ERS": 0.28,
-    #"EST": 0.28,
-    #"ATI": 0.26,
-    #"HAT": 0.26,
-    #"ALL": 0.25,
-    #"ATE": 0.25,
-    #"ETH": 0.24,
-    #"HES": 0.24,
-    #"HIS": 0.24,
-    #"VER": 0.24,
-    #"OFT": 0.22,
-    #"FTH": 0.21,
-    #"ITH": 0.21,
-    #"OTH": 0.21,
-    #"RES": 0.21,
-    #"STH": 0.21,
-    #"ONT": 0.20,
+    "the": 1.81,
+    "and": 0.73,
+    "ing": 0.72,
+    "ent": 0.42,
+    "ion": 0.42,
+    "her": 0.36,
+    "for": 0.34,
+    "tha": 0.33,
+    "nth": 0.33,
+    "int": 0.32,
+    "ere": 0.31,
+    "tio": 0.31, # cutoff to save time
+    "ter": 0.30,
+    "ers": 0.28,
+    "est": 0.28,
+    "ati": 0.26,
+    "hat": 0.26,
+    "all": 0.25,
+    "ate": 0.25,
+    "eth": 0.24,
+    "hes": 0.24,
+    "his": 0.24,
+    "ver": 0.24,
+    "oft": 0.22,
+    "fth": 0.21,
+    "ith": 0.21,
+    "oth": 0.21,
+    "res": 0.21,
+    "sth": 0.21,
+    "ont": 0.20,
 }
 
 def map_ngrams(grams):
@@ -134,7 +134,7 @@ def map_ngrams(grams):
     else:
         raise ValueError(str(n))
 
-    for combo in itertools.permutations(actual, len(grams)):
+    for combo in itertools.permutations(actual.keys(), len(grams)):
         combo = list(map(lambda x: x.lower(), combo))
         # Matches an n-gram with an English n-gram
         yield zip(grams, combo)
@@ -152,25 +152,42 @@ def analyse(text):
             out += tbl.get(ch, ".")
         return out
 
-    for tgrams in map_ngrams(ngrams(text, 3, 2, relative="both")):
-        table = {}
-        for (ours, theirs) in tgrams:
+    if False:
+        for tgrams in map_ngrams(ngrams(text, 3, 2, relative="both")):
+            table = {}
+            for (ours, theirs) in tgrams:
+                for l, r in zip(ours[0], theirs[0]):
+                    if l in table:
+                        # Actually, we should jump right to the next tgram here
+                        continue
+                    table[l] = r
+
+            plain = decr(text, table)
+            corr = is_english(plain)
+            if corr > 0.1:
+                print("%.4f %s" % (corr, plain))
+
+    dd = ngrams(text, 2, 3, relative="both")
+    dd = dd[:4]
+    table = {}
+    for dgrams in map_ngrams(dd):
+        dtable = dict(table) # keep original table
+        for (ours, theirs) in dgrams:
             for l, r in zip(ours[0], theirs[0]):
-                if l in table:
+                if l in dtable:
                     # Actually, we should jump right to the next tgram here
                     continue
-                table[l] = r
-
-        #for dgrams in map_ngrams(ngrams(text, 2, 2, relative="both")):
-            # assign one unique english trigram to each, all combos
-            #for monogram in ngrams(text, 1, 8, relative="both"):
-            #pass
+                dtable[l] = r
 
         # Try to decrypt with the table
-        plain = decr(text, table)
+        plain = decr(text, dtable)
         corr = is_english(plain)
-        if corr > 0.1:
-            print("%.4f %s" % (corr, plain))
+        if corr > 0.0:
+            print("       %s" % text)
+            print("%6.4f %s" % (corr, plain))
+        #for monogram in ngrams(text, 1, 8, relative="both"):
+        #pass
+
 
 
     # Proceed like this:
