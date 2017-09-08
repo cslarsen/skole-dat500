@@ -31,6 +31,10 @@ english = {
     "z": 0.074,
 }
 
+# common 3-letter words
+words3 = ["the", "and", "for", "are", "but", "not", "you", "all", "any", "can",
+        "her", "was"]
+
 def letters():
     return "".join(map(lambda (a,b): b, sorted(map(lambda (a,b): (b,a),
         english.items()), reverse=True)))
@@ -126,8 +130,8 @@ if __name__ == "__main__":
             start += 1
 
             # Get excerpt
-            if per > 100:
-                continue
+            #if per > 100:
+                #continue
             text = encrypted[pos:pos+per]
             print(text)
             f = relfreqs(text)
@@ -149,11 +153,15 @@ if __name__ == "__main__":
             for ciph, plain in table.items():
                 text = text.replace(ciph, plain)
             print("Decrypted: %s" % text)
-            for word in ["the", "and", "for", "are", "but", "not", "you",
-                    "all", "any", "can", "her", "was"]:
+            for word in words3:
                 if word in text:
                     good.add(text)
                     break
     print("Candidates:")
     for t in good:
+        for w in words3:
+            t = t.replace(w, " %s " % w.upper())
+        while t.find("  ") != -1:
+            t = t.replace("  ", " ")
+        # make it readable
         print(t)
