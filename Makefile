@@ -1,2 +1,2 @@
 run:
-	python poly.py
+	pypy mono.py cipher-mono.txt

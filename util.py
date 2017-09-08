@@ -39,7 +39,7 @@ def reverse_pairs(pairs):
     for a, b in pairs:
         yield (b, a)
 
-def subst(text, table):
+def subst(text, table, default=""):
     """Translates each character according to table."""
     return "".join(table[c] for c in text)
 
