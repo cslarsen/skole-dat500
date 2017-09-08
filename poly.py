@@ -157,7 +157,7 @@ if __name__ == "__main__":
                 if word in text:
                     good.add(text)
                     break
-    print("Candidates:")
+    print("\nCandidates:\n")
     for t in good:
         for w in words3:
             t = t.replace(w, " %s " % w.upper())
