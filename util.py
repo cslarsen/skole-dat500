@@ -1,4 +1,5 @@
 import collections
+import sys
 
 def normalize(s):
     s = s.replace(" ", "")
@@ -31,3 +32,12 @@ def split_string(string, length, start=0, tail=True):
 
     if tail:
         yield string[start:]
+
+def block_print(text, width=8, columns=4):
+    for i, part in enumerate(split_string(text, width)):
+        sys.stdout.write("  %s" % part)
+        if (i % columns) == (columns - 1):
+            sys.stdout.write("\n")
+
+    if (i % columns) != (columns - 1):
+        sys.stdout.write("\n")

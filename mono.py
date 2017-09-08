@@ -91,21 +91,19 @@ def decrypt(text):
         if no > 3:
             break
 
-    print(table)
-    out = "".join(table.get(c.upper(), c.upper) for c in text)
-    print(out)
+    return "".join(table.get(c, c.upper()) for c in text)
 
 def main():
     cipher = read_file("cipher-mono.txt").lower()
 
     print("Ciphertext:\n")
-    for i, part in enumerate(split_string(cipher, 8)):
-        sys.stdout.write("  %s" % part)
-        if (i % 4) == 3:
-            sys.stdout.write("\n")
-    print("")
+    block_print(cipher)
+    print("\n")
 
+    print("Plaintext:\n")
     plain = decrypt(cipher)
+    print("")
+    block_print(plain)
 
 if __name__ == "__main__":
     main()
