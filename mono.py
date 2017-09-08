@@ -6,6 +6,9 @@ from util import *
 import collections
 import sys
 
+def subst(cipher, table):
+    return "".join(table[c] for c in cipher)
+
 alphabet = "abcdefghijklmnopqrstuvwxyz"
 
 # Cornell
