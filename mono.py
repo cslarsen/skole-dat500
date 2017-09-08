@@ -3,11 +3,8 @@ Mono-alphabetic deciphering.
 """
 
 from util import *
-import collections
+import argparse
 import sys
-
-def subst(cipher, table):
-    return "".join(table[c] for c in cipher)
 
 alphabet = "abcdefghijklmnopqrstuvwxyz"
 
@@ -87,66 +84,29 @@ digrams = {
     "ur": 0.02,
 }
 
-def find_double_letters(text):
-    for char in alphabet:
-        if text.find(char + char) != -1:
-            yield char
+def analyse(text):
+    cutoff = 2
+    for n in (1, 2, 3):
+        print("%d-gram relative frequencies (cutoff=%d):" % (n, cutoff))
+        for ngram, count in ngrams(text, n=n, relative=True, minimum=cutoff):
+            print("  %s %5.2f" % (ngram, count))
 
-def show_candidates(cands):
-    """Prints determined candidates."""
-    for char, alts in sorted(cands.items()):
-        if len(alts) == 1:
-            print("** Determined that %c maps to %c" % (char, alts[0]))
-        elif len(alts) == 2:
-            print("Character %c may be either %c or %c" % (char, min(alts),
-                max(alts)))
+def main(filename):
+    cipher = readfile(filename).lower()
 
-def decrypt(text):
-    # Use the method of elimination: For each input letter, keep a list of
-    # possible output letters. Initialize with all possibilities. We'll
-    # eliminate as we go.
-    cands = collections.defaultdict(list)
-    for char in alphabet:
-        cands[char] = list(alphabet)
-
-    for char in find_double_letters(text):
-        # Found a double letter. This means those can only be one of a few
-        # possible values.
-        cands[char] = doubles
-        print("Double letter '%c%c' can be any of %s" % (
-            char, char, ", ".join(sorted(doubles))))
-
-    show_candidates(cands)
-
-    print("")
-    print("Relative letter frequencies vs English")
-    print("    Cipher       English")
-    freqs = sorted(relfreq(text), reverse=True)
-    for i in range(26):
-        try:
-            cfreq, cchar = freqs[i]
-        except IndexError:
-            cfreq, cchar = 0, "-"
-
-        efreq, echar = list(sorted(reverse_pairs(letters.items()),
-            reverse=True))[i]
-        print("    %c %7.4f    %c %7.4f" % (cchar, cfreq, echar, efreq))
-
-    return ""
-
-def main():
-    cipher = readfile("cipher-mono.txt").lower()
-
-    print("Ciphertext:\n")
+    print("Ciphertext:")
     block_print(cipher)
-    print("")
 
-    print("Analysis:\n")
-    plain = decrypt(cipher)
-    print("")
-    print("Plaintext:\n")
-    block_print(plain)
-    print("")
+    print("Analysis:")
+    analyse(cipher)
 
 if __name__ == "__main__":
-    main()
+    p = argparse.ArgumentParser()
+
+    p.add_argument("files", nargs="+", default="cipher-mono.txt",
+            help="File to attempt to mono-alpha decrypt")
+
+    opt = p.parse_args()
+
+    for filename in opt.files:
+        main(filename)
