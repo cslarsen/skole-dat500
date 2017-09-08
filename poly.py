@@ -1,6 +1,40 @@
 import collections
 import sys
 
+# english letters relative freqs
+english = {
+    "a": 8.167,
+    "b": 1.492,
+    "c": 2.782,
+    "d": 4.253,
+    "e": 12.702,
+    "f": 2.228,
+    "g": 2.015,
+    "h": 6.094,
+    "i": 6.996,
+    "j": 0.153,
+    "k": 0.772,
+    "l": 4.025,
+    "m": 2.406,
+    "n": 6.749,
+    "o": 7.507,
+    "p": 1.929,
+    "q": 0.095,
+    "r": 5.987,
+    "s": 6.327,
+    "t": 9.056,
+    "u": 2.758,
+    "v": 0.978,
+    "w": 2.360,
+    "x": 0.150,
+    "y": 1.974,
+    "z": 0.074,
+}
+
+def letters():
+    return "".join(map(lambda (a,b): b, sorted(map(lambda (a,b): (b,a),
+        english.items()), reverse=True)))
+
 def normalize(s):
     s = s.replace(" ", "")
     s = s.replace("\n", "")
@@ -51,6 +85,9 @@ def find_all(haystack, needle):
 def period(positions):
     return list(map(lambda (a,b): b-a, zip(positions, positions[1:])))
 
+def freqs(text):
+    return collections.Counter(text)
+
 if __name__ == "__main__":
     encrypted = read_file("cipher.txt")
 
@@ -61,6 +98,7 @@ if __name__ == "__main__":
     # Find repetitions in the text. Focus on the ones who are a specific period
     # apart.
 
+    good = []
     for length in range(3, len(encrypted)//2):
         start = 0
         while start+length < len(encrypted):
@@ -79,3 +117,30 @@ if __name__ == "__main__":
             print("len=%-3d pos=%-3d period=%-3dx%d key=%r" % (
                 length, pos, per, times, key))
             start += 1
+
+            # Get excerpt
+            if per > 100:
+                continue
+            text = encrypted[pos:pos+per]
+            print(text)
+            f = freqs(text)
+            f = map(lambda (a,b): (b,a), f.items())
+            f = sorted(f, reverse=True)
+            #print(f)
+            table = {}
+            # most frequent letter in english decreasingo rder
+            dec = letters()
+            for no, (count, char) in enumerate(f):
+                if no >= len(dec):
+                    break
+                table[char] = dec[no]
+                #print("Guess %s is %s" % (char, dec[no]))
+            # decrypt
+            for ciph, plain in table.items():
+                text = text.replace(ciph, plain)
+            print("Decrypted: %s" % text)
+            if "the" in text:
+                good.append(text)
+    print("Candidates:")
+    for t in good:
+        print(t)
