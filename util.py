@@ -21,6 +21,18 @@ def normalize(s):
             out += ch
     return out.upper()
 
+def revsort(items):
+    return list(sorted(items, reverse=True))
+
+def revitems(items):
+    return list(reverse_pairs(items))
+
+def first(item):
+    return item[0]
+
+def second(item):
+    return item[1]
+
 def read_wordlist(filename="words.txt.gz"):
     """Reads a (optionally gzipped) wordlist, one word per line.
 
@@ -39,9 +51,10 @@ def reverse_pairs(pairs):
     for a, b in pairs:
         yield (b, a)
 
-def subst(text, table, default=""):
-    """Translates each character according to table."""
-    return "".join(table[c] for c in text)
+def transpose(text, table, default="."):
+    """Transposes (translates) characters in a string based on table, using
+    default if not found."""
+    return "".join(table.get(char, default) for char in text)
 
 def readfile(filename):
     """Returns normalized text in file."""

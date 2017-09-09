@@ -39,6 +39,10 @@ en_letters = {
     "z": 0.07,
 }
 
+# Normalize en_letters
+en_letters = dict((k, v/sum(en_letters.values())) for (k,v) in
+        en_letters.items())
+
 # Cornell: Common English double letters
 en_doubles = ["s", "l", "o", "e", "n", "p"]
 
