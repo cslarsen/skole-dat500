@@ -3,6 +3,14 @@ Implements Simplified DES (SDES), as descibed in the paper:
 http://mercury.webster.edu/aleshunas/COSC%205130/G-SDES.pdf
 
 Written by Christian Stigen
+
+The SDES paper counts bit from the MSB, which is unusual. I.e., what would
+normally be called bit 10 (i.e. 0x200) is in the paper denoted bit 1.
+
+For the permutation functions, we could easily write a loop, but I would guess
+that if the number of permutation function is finite, they'd be implemented
+with raw values, in C, because of speed (pipelining, cascading, branch
+prediction, memory locality, etc.).
 """
 
 def test():
@@ -11,39 +19,23 @@ def test():
     assert(encrypt(key=0b1110001110, plaintext=0b01010101) == 0b01110000)
     assert(encrypt(key=0b1111111111, plaintext=0b10101010) == 0b00000100)
 
-def main():
-    return x
+def assert_10bit(n):
+    if n > 0b1111111111:
+        raise ValueError("Value is larger than 10 bits")
 
-def rev_ip(x):
-    return x
-
-def f(key, x):
-    return x
-
-def sw(x):
-    return x
-
-def ip(x):
-    return x
+def assert_8bit(n):
+    if n > 0b11111111:
+        raise ValueError("Value is larger than 8 bits")
 
 def encrypt(key, plaintext):
-    return rev_ip(f(k2, sw(f(k1, ip(plaintext)))))
+    return revip(f(k2, sw(f(k1, ip(plaintext)))))
 
 def decrypt(key, ciphertext):
-    return rev_ip(f(k1, sw(f(k2, ip(ciphertext)))))
+    return revip(f(k1, sw(f(k2, ip(ciphertext)))))
 
 def p10(key):
-    """Performs the P10 permutation.
-
-    The SDES paper counts bit from the MSB, which is unusual. I.e., what would
-    normally be called bit 10 (i.e. 0x200) is in the paper denoted bit 1.
-
-    We could easily create a loop out of this function, and if we wanted to
-    implement true DES, we probably would. But to keep it simple, I'm not going
-    to do it for this one. Besides, this function as it is (if written in C, or
-    JIT-compiled with PyPy, possibly) is very fast without any loops or
-    lookups. It has very good pipelining and cascading characteristics, too.
-    """
+    """P10 permutation."""
+    assert_10bit(key)
     out = 0
     out |= (key & 0b0010000000) << 2 # bit 3
     out |= (key & 0b0000100000) << 3 # bit 5
@@ -74,6 +66,7 @@ def p8(key):
     return out
 
 def ip(key):
+    assert_8bit(key)
     out = 0
     out |= (key & 0b01000000) << 1 # bit 2
     out |= (key & 0b00000100) << 4 # bit 6
@@ -87,6 +80,7 @@ def ip(key):
 
 def revip(key):
     """The reverse of IP."""
+    assert_8bit(key)
     out = 0
     out |= (key & 0b00010000) << 3 # bit 4
     out |= (key & 0b10000000) >> 1 # bit 1
@@ -98,9 +92,10 @@ def revip(key):
     out |= (key & 0b00000100) >> 2 # bit 6
     return out
 
-
 def shiftl5(n):
     """Rotate the MSB and LSB 5 bits individually one position to the left."""
+    assert_10bit(n)
+
     # Mask
     msb5 = (n & 0b1111100000) >> 5
     lsb5 = (n & 0b0000011111)
@@ -119,13 +114,18 @@ def create_subkeys(key):
 
     See figure G.2 in the paper.
     """
-    if not (key <= 0b1111111111):
-        raise ValueError("Key must be 10 bits")
+    assert_10bit(key)
 
     k2 = shiftl5(p10(key))
     k1 = p8(k2)
     k2 = p8(shiftl5(shiftl5(k2)))
     return k1, k2
+
+def f(k,x):
+    return x
+
+def sw(x):
+    return x
 
 if __name__ == "__main__":
     key = 0b1010000010
