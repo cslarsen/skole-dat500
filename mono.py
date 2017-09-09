@@ -157,7 +157,8 @@ def analyse(text):
             table = {}
             for (ours, theirs) in tgrams:
                 for l, r in zip(ours[0], theirs[0]):
-                    if l in table:
+                    #if l in table:
+                    if l in dtable.keys() or r in dtable.values():
                         # Actually, we should jump right to the next tgram here
                         continue
                     table[l] = r
@@ -166,6 +167,35 @@ def analyse(text):
             corr = is_english(plain)
             if corr > 0.1:
                 print("%.4f %s" % (corr, plain))
+
+    if False:
+        dd = ngrams(text, 2, 3, relative="both")
+        #dd = dd[:5]
+        table = {}
+        bestcorr = 0
+        skip = False
+        for dgrams in map_ngrams(dd):
+            dtable = dict(table) # keep original table
+            try:
+                for (ours, theirs) in dgrams:
+                    for l, r in zip(ours[0], theirs[0]):
+                        if l in dtable.keys() or r in dtable.values():
+                            # Actually, we should jump right to the next tgram here
+                            raise IndexError()
+                            continue
+                        dtable[l] = r
+            except IndexError:
+                continue
+
+            # Try to decrypt with the table
+            plain = decr(text, dtable)
+            corr = is_english(plain)
+            if corr > bestcorr:
+                bestcorr = corr
+                #print("       %s" % text)
+                print("%6.4f %s" % (corr, plain))
+            #for monogram in ngrams(text, 1, 8, relative="both"):
+            #pass
 
     dd = ngrams(text, 2, 3, relative="both")
     #dd = dd[:5]
@@ -182,18 +212,39 @@ def analyse(text):
                         raise IndexError()
                         continue
                     dtable[l] = r
+
+            # Try to decrypt with the table
+            plain = decr(text, dtable)
+            corr = is_english(plain)
+            if corr > bestcorr:
+                bestcorr = corr
+                #print("       %s" % text)
+                print("%6.4f %s" % (corr, plain))
+
+            for mgrams in map_ngrams(ngrams(text, 1, 8, relative="both")):
+                mtable = dict(dtable) # keep original table
+                try:
+                    for (ours, theirs) in mgrams:
+                        if l in mtable:
+                            raise IndexError()
+                        mtable[l] = r
+                except IndexError:
+                    continue
+
+                # Try to decrypt with the table
+                plain = decr(text, mtable)
+                corr = is_english(plain)
+                if corr > bestcorr:
+                    bestcorr = corr
+                    #print("       %s" % text)
+                    print("%6.4f %s" % (corr, plain))
+
         except IndexError:
             continue
 
-        # Try to decrypt with the table
-        plain = decr(text, dtable)
-        corr = is_english(plain)
-        if corr > bestcorr:
-            bestcorr = corr
-            #print("       %s" % text)
-            print("%6.4f %s" % (corr, plain))
         #for monogram in ngrams(text, 1, 8, relative="both"):
         #pass
+
 
 
 
