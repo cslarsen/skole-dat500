@@ -1,3 +1,10 @@
+"""
+Implements Simplified DES (SDES), as descibed in the paper:
+http://mercury.webster.edu/aleshunas/COSC%205130/G-SDES.pdf
+
+Written by Christian Stigen
+"""
+
 def test():
     assert(encrypt(key=0b0000000000, plaintext=0b10101010) == 0b00010001)
     assert(encrypt(key=0b1110001110, plaintext=0b10101010) == 0b11001010)
@@ -82,15 +89,16 @@ def shiftl5(n):
     return (msb5 << 5) | lsb5
 
 def create_subkeys(key):
-    assert(key <= 0b1111111111) # require 10-bit key only
+    """Key generation for Simplified DES.
+
+    See figure G.2 in the paper.
+    """
+    if not (key <= 0b1111111111):
+        raise ValueError("Key must be 10 bits")
 
     k2 = shiftl5(p10(key))
     k1 = p8(k2)
-    print("k1 = %s" % bin(k1))
     k2 = p8(shiftl5(shiftl5(k2)))
-    print("k2 = %s" % bin(k2))
-
-    assert(k1 == 0b10100100)
     return k1, k2
 
 if __name__ == "__main__":
