@@ -73,6 +73,32 @@ def p8(key):
     out |= (key & 0b0000000010) >> 1 # bit 9
     return out
 
+def ip(key):
+    out = 0
+    out |= (key & 0b01000000) << 1 # bit 2
+    out |= (key & 0b00000100) << 4 # bit 6
+    out |= (key & 0b00100000)      # bit 3
+    out |= (key & 0b10000000) >> 3 # bit 1
+    out |= (key & 0b00010000) >> 1 # bit 4
+    out |= (key & 0b00000001) << 2 # bit 8
+    out |= (key & 0b00001000) >> 2 # bit 5
+    out |= (key & 0b00000010) >> 1 # bit 7
+    return out
+
+def revip(key):
+    """The reverse of IP."""
+    out = 0
+    out |= (key & 0b00010000) << 3 # bit 4
+    out |= (key & 0b10000000) >> 1 # bit 1
+    out |= (key & 0b00100000)      # bit 3
+    out |= (key & 0b00001000) << 1 # bit 5
+    out |= (key & 0b00000010) << 2 # bit 7
+    out |= (key & 0b01000000) >> 4 # bit 2
+    out |= (key & 0b00000001) << 1 # bit 8
+    out |= (key & 0b00000100) >> 2 # bit 6
+    return out
+
+
 def shiftl5(n):
     """Rotate the MSB and LSB 5 bits individually one position to the left."""
     # Mask
