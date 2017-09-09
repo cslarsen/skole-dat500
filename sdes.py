@@ -1,6 +1,3 @@
-def encrypt(key, plaintext):
-    pass
-
 def test():
     assert(encrypt(key=0b0000000000, plaintext=0b10101010) == 0b00010001)
     assert(encrypt(key=0b1110001110, plaintext=0b10101010) == 0b11001010)
@@ -22,9 +19,17 @@ def sw(x):
 def ip(x):
     return x
 
+def encrypt(key, plaintext):
+    return rev_ip(f(k2, sw(f(k1, ip(plaintext)))))
+
+def decrypt(key, ciphertext):
+    return rev_ip(f(k1, sw(f(k2, ip(ciphertext)))))
+
 if __name__ == "__main__":
     key = 0
+    k1 = 0
+    k2 = 0
     plaintext = 0b10101010
-    ciphertext = rev_ip(f(k2, (sw(f(k2(ip(plaintext)))))))
+    ciphertext = encrypt(key, plaintext)
     print("key=%s plaintext=%s ciphertext=%s" % (bin(key), bin(plaintext),
         bin(ciphertext)))
