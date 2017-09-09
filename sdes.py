@@ -66,7 +66,7 @@ def p8(key):
     out |= (key & 0b0000000010) >> 1 # bit 9
     return out
 
-def shiftl(n):
+def shiftl5(n):
     """Rotate the MSB and LSB 5 bits individually one position to the left."""
     # Mask
     msb5 = (n & 0b1111100000) >> 5
@@ -82,20 +82,17 @@ def shiftl(n):
     return (msb5 << 5) | lsb5
 
 def create_subkeys(key):
+    assert(key <= 0b1111111111) # require 10-bit key only
+
+    k1 = p8(shiftl5(p10(key)))
+    print("k1 = %s" % bin(k1))
+
     return 0, 0
 
 if __name__ == "__main__":
-    key = 0
+    key = 0b1010000010
     k1, k2 = create_subkeys(key)
     plaintext = 0b10101010
     ciphertext = encrypt(key, plaintext)
     print("key=%s plaintext=%s ciphertext=%s" % (bin(key), bin(plaintext),
         bin(ciphertext)))
-
-    k = 0b1010000010
-    o = p10(k)
-    print("p10(%s) => %s" % (bin(k), bin(o)))
-    k = shiftl(o)
-    print("shiftl(%s) => %s" % (bin(o), bin(k)))
-    o = p8(k)
-    print("p8(%s) => %s" % (bin(k), bin(o)))
