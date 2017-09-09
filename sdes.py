@@ -19,13 +19,18 @@ def test():
     assert(encrypt(key=0b1110001110, plaintext=0b01010101) == 0b01110000)
     assert(encrypt(key=0b1111111111, plaintext=0b10101010) == 0b00000100)
 
+def assert_nbit(n, bits):
+    if n > ((1 << bits) - 1):
+        raise ValueError("Value is larger than %d bits: %x" % (bits, n))
+
 def assert_10bit(n):
-    if n > 0b1111111111:
-        raise ValueError("Value is larger than 10 bits")
+    assert_nbit(n, 10)
 
 def assert_8bit(n):
-    if n > 0b11111111:
-        raise ValueError("Value is larger than 8 bits")
+    assert_nbit(n, 8)
+
+def assert_4bit(n):
+    assert_nbit(n, 4)
 
 def encrypt(key, plaintext):
     return revip(f(k2, sw(f(k1, ip(plaintext)))))
@@ -121,11 +126,46 @@ def create_subkeys(key):
     k2 = p8(shiftl5(shiftl5(k2)))
     return k1, k2
 
-def f(k,x):
-    return x
-
 def sw(x):
     return x
+
+def p4(n):
+    assert_4bit(n)
+    return ((n & 0b0100) << 1  # bit 2
+          | (n & 0b0001) << 2  # bit 4
+          | (n & 0b0010)       # bit 3
+          | (n & 0b1000) >> 3) # bit 1
+
+def ep(n):
+    """Expansion/Permutation operation (E/P).
+
+    Takes 4-bit input, returns 8-bit output.
+    """
+    assert_4bit(n)
+    out = 0
+    out |= (n & 0b00000001) << 7 # bit 4
+    out |= (n & 0b00001000) << 3 # bit 1
+    out |= (n & 0b00000100) << 3 # bit 2
+    out |= (n & 0b00000010) << 3 # bit 3
+    out |= (n & 0b00000100) << 1 # bit 2
+    out |= (n & 0b00000010) << 1 # bit 3
+    out |= (n & 0b00000001) << 1 # bit 4
+    out |= (n & 0b00001000) >> 3 # bit 1
+    return out
+
+def Fmap(n, subkey):
+    """4-bit mapping function."""
+    assert_4bit(n)
+    return n
+
+def f(k, n):
+    assert_8bit(n)
+
+    l = (n & 0b11110000) >> 4
+    r = (n & 0b00001111)
+
+    sk = 123
+    return (l ^ Fmap(r, sk)) << 4 | r
 
 if __name__ == "__main__":
     key = 0b1010000010
