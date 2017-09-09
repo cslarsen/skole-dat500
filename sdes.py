@@ -8,7 +8,23 @@ def test():
     assert(encrypt(key=0b1111111111, plaintext=0b10101010) == 0b00000100)
 
 def main():
-    pass
+    return x
+
+def rev_ip(x):
+    return x
+
+def f(key, x):
+    return x
+
+def sw(x):
+    return x
+
+def ip(x):
+    return x
 
 if __name__ == "__main__":
-    pass
+    key = 0
+    plaintext = 0b10101010
+    ciphertext = rev_ip(f(k2, (sw(f(k2(ip(plaintext)))))))
+    print("key=%s plaintext=%s ciphertext=%s" % (bin(key), bin(plaintext),
+        bin(ciphertext)))
