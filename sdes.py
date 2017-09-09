@@ -84,10 +84,14 @@ def shiftl5(n):
 def create_subkeys(key):
     assert(key <= 0b1111111111) # require 10-bit key only
 
-    k1 = p8(shiftl5(p10(key)))
+    k2 = shiftl5(p10(key))
+    k1 = p8(k2)
     print("k1 = %s" % bin(k1))
+    k2 = p8(shiftl5(shiftl5(k2)))
+    print("k2 = %s" % bin(k2))
 
-    return 0, 0
+    assert(k1 == 0b10100100)
+    return k1, k2
 
 if __name__ == "__main__":
     key = 0b1010000010
