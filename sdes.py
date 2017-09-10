@@ -238,6 +238,7 @@ def test(func, arg, expected):
     label = func.__name__
     actual = func(arg)
     ok = actual == expected
+
     print("%s(%s) => %s (%d) %s expected %s (%d) " % (
         label, bin(arg), bin(actual), actual, "OK" if ok else "FAIL",
         bin(expected), expected))
@@ -251,7 +252,7 @@ def testall():
     def subkey1(n):
         return create_subkeys(n)[0]
     def subkey2(n):
-        return create_subkeys(n)[0]
+        return create_subkeys(n)[1]
     test(subkey1, k, 0b10100100)
     test(subkey2, k, 0b01000011)
 
