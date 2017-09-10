@@ -247,6 +247,14 @@ def testall():
     test(p10, k, 0b1000001100)
     test(shiftl5, p10(k), 0b0000111000)
     test(p8, shiftl5(p10(k)), 0b10100100)
+
+    def subkey1(n):
+        return create_subkeys(n)[0]
+    def subkey2(n):
+        return create_subkeys(n)[0]
+    test(subkey1, k, 0b10100100)
+    test(subkey2, k, 0b01000011)
+
     print("")
     testenc(0b0000000000, 0b10101010, 0b00010001)
     testenc(0b1110001110, 0b10101010, 0b11001010)
