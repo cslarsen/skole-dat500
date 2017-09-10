@@ -15,12 +15,6 @@ prediction, memory locality, etc.).
 
 import sys
 
-def test():
-    assert(encrypt(key=0b0000000000, plaintext=0b10101010) == 0b00010001)
-    assert(encrypt(key=0b1110001110, plaintext=0b10101010) == 0b11001010)
-    assert(encrypt(key=0b1110001110, plaintext=0b01010101) == 0b01110000)
-    assert(encrypt(key=0b1111111111, plaintext=0b10101010) == 0b00000100)
-
 def assert_nbit(n, bits):
     if n > ((1 << bits) - 1):
         raise ValueError("Value is larger than %d bits: %x" % (bits, n))
@@ -218,13 +212,12 @@ def Fmap(n, subkey):
 
     return p4(a << 2 | b)
 
-def f(k, n):
+def f(sk, n):
     assert_8bit(n)
 
     l = (n & 0b11110000) >> 4
     r = (n & 0b00001111)
 
-    sk = 123
     return (l ^ Fmap(r, sk)) << 4 | r
 
 def test(key, plaintext, expected):
@@ -239,8 +232,11 @@ def test(key, plaintext, expected):
         sys.stdout.write("  FAIL, expected %10s\n" % bin(expected))
         return False
 
-if __name__ == "__main__":
+def testall():
     test(0b0000000000, 0b10101010, 0b00010001)
     test(0b1110001110, 0b10101010, 0b11001010)
     test(0b1110001110, 0b01010101, 0b01110000)
     test(0b1111111111, 0b10101010, 0b00000100)
+
+if __name__ == "__main__":
+    testall()
