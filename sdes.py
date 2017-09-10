@@ -126,8 +126,10 @@ def create_subkeys(key):
     k2 = p8(shiftl5(shiftl5(k2)))
     return k1, k2
 
-def sw(x):
-    return x
+def sw(n):
+    """Interchanges the upper and lower 4 bits."""
+    assert_8bit(n)
+    return ((n & 0b11110000) >> 4) | ((n & 0b1111) << 4)
 
 def p4(n):
     assert_4bit(n)
