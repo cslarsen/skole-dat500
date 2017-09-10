@@ -315,3 +315,11 @@ if __name__ == "__main__":
 
     print("Task 2")
     triplesdes_test(k1=0b1000101110, k2=0b0110101110, p=0b11010111)
+    triplesdes_test(k1=0b1000101110, k2=0b0110101110, p=0b10101010)
+    triplesdes_test(k1=0b1111111111, k2=0b1111111111, p=0b00000000)
+    triplesdes_test(k1=0, k2=0, p=0b01010010)
+
+    triplesdes_test(k1=0b1000101110, k2=0b0110101110, c=0b11100110)
+    triplesdes_test(k1=0b1011101111, k2=0b0110101110, c=0b01010000)
+    triplesdes_test(k1=0b1111111111, k2=0b1111111111, c=0b00000100)
+    triplesdes_test(k1=0, k2=0, c=0b11110000)
