@@ -239,8 +239,9 @@ def test(func, arg, expected):
     actual = func(arg)
     ok = actual == expected
 
-    print("%s(%s) => %s (%d) %s expected %s (%d) " % (
-        label, bin(arg), bin(actual), actual, "OK" if ok else "FAIL",
+    print("%s %s(%s) => %s (%d) s expected %s (%d) " % (
+        "OK  " if ok else "FAIL",
+        label, bin(arg), bin(actual), actual,
         bin(expected), expected))
 
 def testall():
