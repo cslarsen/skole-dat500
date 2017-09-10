@@ -262,6 +262,7 @@ def testall():
         return create_subkeys(n)[1]
     test(subkey1, k, 0b10100100)
     test(subkey2, k, 0b01000011)
+    test(ep, 0b1011, 0b11010111)
 
     print("")
     testenc(0b0000000000, 0b10101010, 0b00010001)
