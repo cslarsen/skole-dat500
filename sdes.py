@@ -281,6 +281,19 @@ def backtrip(key, cipher):
     print("key=%12s plain=%12s cipher=%12s %s" % (
         bin(key), bin(plain), bin(cipher), "OK" if ok else "FAIL"))
 
+def triplesdes_encrypt(k1, k2, p):
+    return encrypt(k1, decrypt(k2, encrypt(k1, p)))
+
+def triplesdes_decrypt(k1, k2, c):
+    return decrypt(k1, encrypt(k2, decrypt(k1, c)))
+
+def triplesdes_test(k1, k2, p=None, c=None):
+    if c is None:
+        c = triplesdes_encrypt(k1, k2, p)
+    if p is None:
+        p = triplesdes_decrypt(k1, k2, c)
+    print("k1=%s k2=%s p=%s c=%s" % (bin(k1), bin(k2), bin(p), bin(c)))
+
 if __name__ == "__main__":
     testall()
     print("")
@@ -300,3 +313,5 @@ if __name__ == "__main__":
     backtrip(0b1000101110, 0b00011100)
     backtrip(0b1000101110, 0b11000010)
 
+    print("Task 2")
+    triplesdes_test(k1=0b1000101110, k2=0b0110101110, p=0b11010111)
