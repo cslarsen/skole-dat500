@@ -138,6 +138,26 @@ def p4(n):
           | (n & 0b0010)       # bit 3
           | (n & 0b1000) >> 3) # bit 1
 
+def S0(a,b):
+    """S-box S0."""
+    box = (
+        (1, 0, 3, 2),
+        (3, 2, 1, 0),
+        (0, 2, 1, 3),
+        (3, 1, 3, 2),
+    )
+    return box[a][b]
+
+def S1(a,b):
+    """S-box S1."""
+    box = (
+        (0, 1, 2, 3),
+        (2, 0, 1, 3),
+        (3, 0, 1, 0),
+        (2, 1, 0, 3),
+    )
+    return box[a][b]
+
 def ep(n):
     """Expansion/Permutation operation (E/P).
 
