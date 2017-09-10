@@ -273,6 +273,14 @@ def roundtrip(key, plain):
     print("key=%12s plain=%12s cipher=%12s plain again=%12s %s" % (
         bin(key), bin(plain), bin(cipher), bin(decryp), "OK" if ok else "FAIL"))
 
+def backtrip(key, cipher):
+    plain = decrypt(key, cipher)
+    reenc = encrypt(key, plain)
+    ok = cipher == reenc
+
+    print("key=%12s plain=%12s cipher=%12s %s" % (
+        bin(key), bin(plain), bin(cipher), "OK" if ok else "FAIL"))
+
 if __name__ == "__main__":
     testall()
     print("")
@@ -280,7 +288,15 @@ if __name__ == "__main__":
     # Task 1: We don't have to reverse the operation (we *could)
     # algorithmically to retrieve the plaintexts. Instead, we can brute-force,
     # since the plaintext is only 8 bits
+    print("Task 1")
     roundtrip(0, 0)
     roundtrip(0b0000011111, 0b11111111)
     roundtrip(0b0010011111, 0b11111100)
     roundtrip(0b0010011111, 0b10100101)
+
+    # For next, we just descrypt
+    backtrip(0b1111111111, 0b00001111)
+    backtrip(0b0000011111, 0b01000011)
+    backtrip(0b1000101110, 0b00011100)
+    backtrip(0b1000101110, 0b11000010)
+
