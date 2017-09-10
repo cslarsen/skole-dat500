@@ -12,15 +12,51 @@
 My abstract, to be written at the end.
 \end{abstract}
 
-\section{Part I}
+\section{Part I. Poly-alphabetic Ciphers}
 
-\section{Part II}
+\begin{itemize}
+  \item The plaintext message you managed to decipher
+  \item Describe the stragey you employed, show the details for each of the
+    steps of that strategy, describe any programs you wrote show sample output
+    of these programs, and show how you transformed that output into your
+    solution.
+\end{itemize}
+
+\section{Part II. Simplified DES}
 
 \subsection{Task 1: Test cases}
+
+\begin{table}[H]
+  \centering
+  \begin{tabular}{ccc}
+    \hline \textbf{Raw key} &
+           \textbf{Plaintext} &
+           \textbf{Ciphertext} \\
+    \hline
+    0000000000 & 00000000 & ? \\
+    0000011111 & 11111111 & ? \\
+    0010011111 & 11111100 & ? \\
+    0010011111 & 10100101 & ? \\
+    1111111111 & ? & 00001111 \\
+    0000011111 & ? & 01000011 \\
+    1000101110 & ? & 00011100 \\
+    1000101110 & ? & 11000010 \\
+    \hline
+  \end{tabular}
+  \label{table:task1}
+\end{table}
+
 \subsection{Task 2: Test cases}
 \subsection{Task 3: SDES and TripleDES keys}
+The bits making up the keys of the SDES and TripleDES in task3
+
+Describe the filtering strategy you used to know that the keys are correct.
 
 \section{Conclusion}
+
+A short paragraph that restates the objective from your introduction and
+relates it to your results and discussion describes any future improvements on
+your techniques that you would recommend.
 
 \bibliography{references}
 \bibliographystyle{ieeetr}
