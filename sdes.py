@@ -239,7 +239,7 @@ def test(func, arg, expected):
     actual = func(arg)
     ok = actual == expected
 
-    print("%s %s(%s) => %s (%d) s expected %s (%d) " % (
+    print("%s %s(%s) => %s (%d) expected %s (%d) " % (
         "OK  " if ok else "FAIL",
         label, bin(arg), bin(actual), actual,
         bin(expected), expected))
@@ -253,8 +253,8 @@ def testall():
     def ip_revip(k):
         return revip(ip(k))
 
-    test(ip_revip, 0xf3, 0x0f3)
-    test(ip_revip, 0x07, 0x0f7)
+    test(ip_revip, 0xf3, 0xf3)
+    test(ip_revip, 0x07, 0x07)
 
     def subkey1(n):
         return create_subkeys(n)[0]
