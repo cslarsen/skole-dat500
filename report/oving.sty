@@ -1,0 +1,95 @@
+% oving.sty -- en enkel LaTeX pakke for øvinger
+%
+% Versjon: 2011-01-17
+%
+% Av Christian Stigen Larsen.
+% Publisert som allemannseie, altså public domain.
+%
+% For beskrivelse og eksempel, se
+% http://github.com/cslarsen/oving.sty
+
+\ProvidesPackage{oving}
+\usepackage{graphicx}
+
+% Heretter kommenterer jeg bruken av stilarket i engelsk.
+
+% Paragraph style:
+%   - Do not indent
+%   - Separate with two lines
+%
+\setlength{\parindent}{0pt} 
+\setlength{\parskip}{2ex}
+
+% Renew \figurename to use Norwegian "Figur"
+% as caption prefix
+%
+%\renewcommand{\figurename}{Figur}
+
+% Define \oppgave to be a \section without numbering.
+% Set prefix with \oppgavename
+%
+\def \oppgavename {Oppgave}
+\newcommand{\oppgave}[1]{
+  \section*{\normalsize{\oppgavename\ {}#1}}
+  \label{sec:#1}}
+
+\def \problemname {Problem}
+\newcommand{\problem}[1]{
+  \section*{\normalsize{\problemname\ {}#1}}
+  \label{problem.#1}}
+
+% Define \deloppgave to be a "(number)" paragraph
+\newcommand{\deloppgave}[1]{
+  \paragraph{(#1)}}
+
+% Define \subtitle{...}, used in title
+\def \@subtitle {}
+\newcommand{\subtitle}[1]{
+  \renewcommand{\@subtitle}{#1}}
+
+% Define \textbook{...}, used in title
+\def \textbookname {Lærebok:}
+\def \@textbook {}
+\newcommand{\textbook}[1]{
+  \renewcommand{\@textbook}{\textbookname#1}}
+
+% Define \figur taking three parameters:
+%
+%   - graphics file to display
+%   - label   (TODO: make optional)
+%   - caption (TODO: make optional)
+%
+%\newcommand{\figur}[4][!ht]{
+  %\begin{figure}[#1]
+    %\includegraphics[width=\columnwidth]{#2}
+    %\caption{#4}
+    %\label{#3}
+  %\end{figure}}
+
+\newenvironment{formel}[1]
+  {\begin{equation}
+     \label{#1}}
+  {\end{equation}}
+
+% Double lines for answer
+\newcommand{\svar}[1]
+  {{\underline{\underline{#1}}}}
+
+% Renew \maketitle to use a new style which
+% requires setting:
+%
+%   - \title    (feks "BIE220 Navn på fag")
+%   - \subtitle (feks "Øving 1")
+%   - \author
+%   - \date
+%   - \textbook (feks "\textit{Boknavn}, 3. utgave")
+%
+\renewcommand{\maketitle}{
+  \flushleft{\Large{\@title}}
+
+  \flushleft{\normalsize{\@subtitle\\
+    \ {}\\
+    \@author\\
+    \@date\\
+    \ {}\\
+    \@textbook}}}

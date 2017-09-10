@@ -1,4 +1,4 @@
-Coursework for DAT-500
+Coursework for DAT-510
 ======================
 
 Private repository for Christian Stigen Larsen.
