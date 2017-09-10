@@ -179,7 +179,40 @@ def Fmap(n, subkey):
     """4-bit mapping function."""
     assert_4bit(n)
     assert_8bit(subkey)
-    return n
+
+    n = ep(n)
+
+    n4 = (n & 0b10000000) >> 7
+    n1 = (n & 0b01000000) >> 6
+    n2 = (n & 0b00100000) >> 5
+    n3 = (n & 0b00010000) >> 4
+
+    k11 = (subkey & 0b10000000) >> 7
+    k12 = (subkey & 0b01000000) >> 6
+    k13 = (subkey & 0b00100000) >> 5
+    k14 = (subkey & 0b00010000) >> 4
+    k15 = (subkey & 0b00001000) >> 3
+    k16 = (subkey & 0b00000100) >> 2
+    k17 = (subkey & 0b00000010) >> 1
+    k18 = (subkey & 0b00000001)
+
+    p00 = n4 ^ k11
+    p01 = n1 ^ k12
+    p02 = n2 ^ k13
+    p03 = n3 ^ k14
+
+    p10 = n2 ^ k15
+    p11 = n3 ^ k16
+    p12 = n4 ^ k17
+    p13 = n1 ^ k18
+
+    row1 = (p00 << 3) | (p01 << 2) | (p02 << 1) | p03
+    row2 = (p10 << 3) | (p11 << 2) | (p12 << 1) | p13
+
+    a = S0((row1 & 0b1100) >> 2, (row1 & 0b11))
+    b = S1((row2 & 0b1100) >> 2, (row2 & 0b11))
+
+    return p4(a << 2 | b)
 
 def f(k, n):
     assert_8bit(n)
