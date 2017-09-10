@@ -158,6 +158,7 @@ def ep(n):
 def Fmap(n, subkey):
     """4-bit mapping function."""
     assert_4bit(n)
+    assert_8bit(subkey)
     return n
 
 def f(k, n):
