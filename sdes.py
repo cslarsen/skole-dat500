@@ -265,5 +265,22 @@ def testall():
     testenc(0b1110001110, 0b01010101, 0b01110000)
     testenc(0b1111111111, 0b10101010, 0b00000100)
 
+def roundtrip(key, plain):
+    cipher = encrypt(key, plain)
+    decryp = decrypt(key, cipher)
+    ok = plain == decryp
+
+    print("key=%12s plain=%12s cipher=%12s plain again=%12s %s" % (
+        bin(key), bin(plain), bin(cipher), bin(decryp), "OK" if ok else "FAIL"))
+
 if __name__ == "__main__":
     testall()
+    print("")
+
+    # Task 1: We don't have to reverse the operation (we *could)
+    # algorithmically to retrieve the plaintexts. Instead, we can brute-force,
+    # since the plaintext is only 8 bits
+    roundtrip(0, 0)
+    roundtrip(0b0000011111, 0b11111111)
+    roundtrip(0b0010011111, 0b11111100)
+    roundtrip(0b0010011111, 0b10100101)
