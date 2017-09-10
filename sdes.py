@@ -156,11 +156,6 @@ def S1(row, column):
     )
     return box[row][column]
 
-def sbox_arg(n):
-    row = (n & 0b1000) >> 3 | (n & 0b0001)
-    col = (n & 0b0110) >> 1
-    return row, col
-
 def ep(n):
     """Expansion/Permutation operation (E/P).
 
@@ -212,8 +207,8 @@ def Fmap(n, subkey):
     row1 = (p00 << 3) | (p01 << 2) | (p02 << 1) | p03
     row2 = (p10 << 3) | (p11 << 2) | (p12 << 1) | p13
 
-    a = S0(*sbox_arg(row1))
-    b = S1(*sbox_arg(row2))
+    a = S0(p00 << 1 | p03, p01 << 1 | p02)
+    b = S1(p10 << 1 | p13, p11 << 1 | p12)
 
     return p4(a << 2 | b)
 
