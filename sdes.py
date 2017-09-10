@@ -229,15 +229,18 @@ def f(k, n):
 
 def test(key, plaintext, expected):
     ciphertext = encrypt(key, plaintext)
-    sys.stdout.write("key %s  plain %s  cipher %s" % (bin(key), bin(plaintext),
+    sys.stdout.write("key %12s  plain %10s  cipher %10s" % (bin(key), bin(plaintext),
         bin(ciphertext)))
 
     if ciphertext == expected:
         sys.stdout.write("  OK\n")
         return True
     else:
-        sys.stdout.write("  FAIL, expected %s\n" % expected)
+        sys.stdout.write("  FAIL, expected %10s\n" % bin(expected))
         return False
 
 if __name__ == "__main__":
     test(0b0000000000, 0b10101010, 0b00010001)
+    test(0b1110001110, 0b10101010, 0b11001010)
+    test(0b1110001110, 0b01010101, 0b01110000)
+    test(0b1111111111, 0b10101010, 0b00000100)
