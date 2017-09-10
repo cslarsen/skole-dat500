@@ -3,6 +3,23 @@ Coursework for DAT-500
 
 Private repository for Christian Stigen Larsen.
 
+Tasks 1 and 2
+------------
+
+    $ python sdes.py
+
+
+Task 3
+------
+
+The last message should be run with pypy, otherwise it will be too slow. I
+could make a version in C just to show, *or* go deep into the SDES algorithm to
+try to break it in a smarter way to save time, but the input text and keyspace
+is so low that the most practically effective way is to just brute-force it.
+
+    $ python dec.py # message 1
+    $ pypy dec2.py # message 2
+
 Requirements
 ============
 
