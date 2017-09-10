@@ -222,15 +222,12 @@ def f(sk, n):
 
 def testenc(key, plaintext, expected):
     ciphertext = encrypt(key, plaintext)
-    sys.stdout.write("key %12s  plain %10s  cipher %10s" % (bin(key), bin(plaintext),
-        bin(ciphertext)))
+    ok = ciphertext == expected
 
-    if ciphertext == expected:
-        sys.stdout.write("  OK\n")
-        return True
-    else:
-        sys.stdout.write("  FAIL, expected %10s\n" % bin(expected))
-        return False
+    print("%s key %12s  plain %10s  cipher %10s" % (
+        "OK  " if ok else "FAIL",
+        bin(key), bin(plaintext),
+        bin(ciphertext)))
 
 def test(func, arg, expected):
     label = func.__name__
