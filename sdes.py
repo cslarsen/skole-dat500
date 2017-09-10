@@ -249,6 +249,12 @@ def testall():
     test(shiftl5, p10(k), 0b0000111000)
     test(p8, shiftl5(p10(k)), 0b10100100)
 
+    def ip_revip(k):
+        return revip(ip(k))
+
+    test(ip_revip, 0xf3, 0x0f3)
+    test(ip_revip, 0x07, 0x0f7)
+
     def subkey1(n):
         return create_subkeys(n)[0]
     def subkey2(n):
