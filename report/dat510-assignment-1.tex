@@ -107,10 +107,25 @@ Implemented TripleSDES code and completed the following table.
   \label{table:task2}
 \end{table}
 
-\subsection{Task 3: SDES and TripleDES keys}
-The bits making up the keys of the SDES and TripleDES in task3
+\subsection{Task 3: Cracking SDES and TripleDES}
 
-Describe the filtering strategy you used to know that the keys are correct.
+\paragraph{SDES encrypted file} named \texttt{cxt1.txt} was decrypted with the
+following result:
+
+\paragraph{Key} \texttt{1111101010} or \texttt{0x3ea}
+
+\paragraph{Plaintext}
+\texttt{simplifieddesisnotsecureenoughtoprovideyousufficientsecurity}
+
+\paragraph{Plaintext with manually inserted spaces}
+\texttt{simplified des is not secure enough to provide you sufficient security}
+
+Since the key is only 10 bits, I brute-forced it. I started with a set of all
+the possible 1023 keys, then for each byte, I tried to decrypt with each key.
+Assuming that the output text would be ASCII, I checked if the output byte was
+within the printable ASCII range of 32--126. If it wasn't, the key was
+immediately removed from the set. When the set contained a single key, I
+stopped and printed the output.
 
 \section{Conclusion}
 
