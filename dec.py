@@ -1,3 +1,7 @@
+"""
+Part II task 3, first message
+"""
+
 from util import *
 from sdes import *
 
