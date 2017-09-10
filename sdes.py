@@ -209,6 +209,8 @@ def Fmap(n, subkey):
 
     a = S0((row1 & 0b1100) >> 2, (row1 & 0b11))
     b = S1((row2 & 0b1100) >> 2, (row2 & 0b11))
+    #a = S0((row1 & 0b11), (row1 & 0b1100) >> 2)
+    #b = S1((row2 & 0b11), (row2 & 0b1100) >> 2)
 
     return p4(a << 2 | b)
 
@@ -220,7 +222,7 @@ def f(sk, n):
 
     return (l ^ Fmap(r, sk)) << 4 | r
 
-def test(key, plaintext, expected):
+def testenc(key, plaintext, expected):
     ciphertext = encrypt(key, plaintext)
     sys.stdout.write("key %12s  plain %10s  cipher %10s" % (bin(key), bin(plaintext),
         bin(ciphertext)))
@@ -232,11 +234,24 @@ def test(key, plaintext, expected):
         sys.stdout.write("  FAIL, expected %10s\n" % bin(expected))
         return False
 
+def test(func, arg, expected):
+    label = func.__name__
+    actual = func(arg)
+    ok = actual == expected
+    print("%s(%s) => %s (%d) %s expected %s (%d) " % (
+        label, bin(arg), bin(actual), actual, "OK" if ok else "FAIL",
+        bin(expected), expected))
+
 def testall():
-    test(0b0000000000, 0b10101010, 0b00010001)
-    test(0b1110001110, 0b10101010, 0b11001010)
-    test(0b1110001110, 0b01010101, 0b01110000)
-    test(0b1111111111, 0b10101010, 0b00000100)
+    k = 0b1010000010
+    test(p10, k, 0b1000001100)
+    test(shiftl5, p10(k), 0b0000111000)
+    test(p8, shiftl5(p10(k)), 0b10100100)
+    print("")
+    testenc(0b0000000000, 0b10101010, 0b00010001)
+    testenc(0b1110001110, 0b10101010, 0b11001010)
+    testenc(0b1110001110, 0b01010101, 0b01110000)
+    testenc(0b1111111111, 0b10101010, 0b00000100)
 
 if __name__ == "__main__":
     testall()
