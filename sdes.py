@@ -13,6 +13,8 @@ with raw values, in C, because of speed (pipelining, cascading, branch
 prediction, memory locality, etc.).
 """
 
+import sys
+
 def test():
     assert(encrypt(key=0b0000000000, plaintext=0b10101010) == 0b00010001)
     assert(encrypt(key=0b1110001110, plaintext=0b10101010) == 0b11001010)
@@ -33,9 +35,11 @@ def assert_4bit(n):
     assert_nbit(n, 4)
 
 def encrypt(key, plaintext):
+    k1, k2 = create_subkeys(key)
     return revip(f(k2, sw(f(k1, ip(plaintext)))))
 
 def decrypt(key, ciphertext):
+    k1, k2 = create_subkeys(key)
     return revip(f(k1, sw(f(k2, ip(ciphertext)))))
 
 def p10(key):
@@ -223,10 +227,17 @@ def f(k, n):
     sk = 123
     return (l ^ Fmap(r, sk)) << 4 | r
 
-if __name__ == "__main__":
-    key = 0b1010000010
-    k1, k2 = create_subkeys(key)
-    plaintext = 0b10101010
+def test(key, plaintext, expected):
     ciphertext = encrypt(key, plaintext)
-    print("key=%s plaintext=%s ciphertext=%s" % (bin(key), bin(plaintext),
+    sys.stdout.write("key %s  plain %s  cipher %s" % (bin(key), bin(plaintext),
         bin(ciphertext)))
+
+    if ciphertext == expected:
+        sys.stdout.write("  OK\n")
+        return True
+    else:
+        sys.stdout.write("  FAIL, expected %s\n" % expected)
+        return False
+
+if __name__ == "__main__":
+    test(0b0000000000, 0b10101010, 0b00010001)
