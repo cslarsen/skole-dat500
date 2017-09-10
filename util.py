@@ -64,7 +64,7 @@ def readfile(filename):
 def split_string(string, length, start=0, tail=True):
     while start + length < len(string):
         yield string[start:start+length]
-        start += length + 1
+        start += length
 
     if tail:
         yield string[start:]
