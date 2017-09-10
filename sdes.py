@@ -136,7 +136,7 @@ def p4(n):
           | (n & 0b0010)       # bit 3
           | (n & 0b1000) >> 3) # bit 1
 
-def S0(a,b):
+def S0(row, column):
     """S-box S0."""
     box = (
         (1, 0, 3, 2),
@@ -144,9 +144,9 @@ def S0(a,b):
         (0, 2, 1, 3),
         (3, 1, 3, 2),
     )
-    return box[a][b]
+    return box[row][column]
 
-def S1(a,b):
+def S1(row, column):
     """S-box S1."""
     box = (
         (0, 1, 2, 3),
@@ -154,7 +154,12 @@ def S1(a,b):
         (3, 0, 1, 0),
         (2, 1, 0, 3),
     )
-    return box[a][b]
+    return box[row][column]
+
+def sbox_arg(n):
+    row = (n & 0b1000) >> 3 | (n & 0b0001)
+    col = (n & 0b0110) >> 1
+    return row, col
 
 def ep(n):
     """Expansion/Permutation operation (E/P).
@@ -207,11 +212,8 @@ def Fmap(n, subkey):
     row1 = (p00 << 3) | (p01 << 2) | (p02 << 1) | p03
     row2 = (p10 << 3) | (p11 << 2) | (p12 << 1) | p13
 
-    a = S0((row1 & 0b1000) >> 3 | (row1 & 0b0001),
-           (row1 & 0b0110) >> 2)
-
-    b = S1((row2 & 0b1000) >> 3 | (row2 & 0b0001),
-           (row2 & 0b0110) >> 2)
+    a = S0(*sbox_arg(row1))
+    b = S1(*sbox_arg(row2))
 
     return p4(a << 2 | b)
 
