@@ -127,6 +127,34 @@ within the printable ASCII range of 32--126. If it wasn't, the key was
 immediately removed from the set. When the set contained a single key, I
 stopped and printed the output.
 
+\paragraph{TripleSDES encrypted file} named \texttt{cxt2.txt}
+
+\paragraph{Key 1} 1002 / 0x3ea / 0b1111101010 (same as the above key)
+\paragraph{Key 2} 351 / 0x15f / 0b1111101010
+\paragraph{Plaintext}
+\texttt{simplifieddesisnotsecureenoughtoprovideyousufficientsecurity} (same as
+above)
+
+This time, there are two 10-bit keys, giving the 20-bit space of possible keys.
+I used the exact same strategy as above, but used a JIT-compiler to make it
+break the ciphertext in around 2.5 seconds (using pypy).
+
+The filtering mechanism was exactly the same: Remove keys that do not provide
+output in the possible output space.
+
+The running time was slower, but since it still ran in reasonable time and gave
+the correct result, I didn't employ any smarter way to break it. A possible way
+to do that would be to split up the three-part decryption into distinct parts.
+At least the last step, decrypting the final part, I could have filtered that
+alone on all possible input bytes. However, that would mean I would have to
+traverse all 10-bit keys on all 8-bit inputs, so it would do it in $2^{18}$.
+
+An alternative route would be to use a language like C to break it, which would
+not be smarter in any way, just purely faster.
+
+Had the task been to search a larger space, I would surely have figured out a
+smarter way to break it.
+
 \section{Conclusion}
 
 A short paragraph that restates the objective from your introduction and
