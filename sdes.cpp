@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
+#include <set>
+#include <bitset>
 
 // CHECKED
 static uint16_t p10(const uint16_t& n)
@@ -203,12 +205,28 @@ static uint8_t decrypt(const uint32_t& key, const uint8_t& ciphertext)
   return revip(f(k1, sw(f(k2, ip(ciphertext)))));
 }
 
+static uint8_t triplesdes_encrypt(
+    const uint16_t& k1,
+    const uint16_t& k2,
+    const uint8_t& p)
+{
+  return encrypt(k1, decrypt(k2, encrypt(k1, p)));
+}
+
+static uint8_t triplesdes_decrypt(
+    const uint16_t& k1,
+    const uint16_t& k2,
+    const uint8_t& c)
+{
+  return decrypt(k1, encrypt(k2, decrypt(k1, c)));
+}
+
 int main(int, char**)
 {
   encrypt(0,0); // silence compiler warning
 
   // Read binary file
-  FILE *fp = fopen("ctx1.bin", "rb");
+  FILE *fp = fopen("ctx2.bin", "rb");
   if (fp == NULL) {
     perror("ctx1.bin");
     return 1;
@@ -224,6 +242,19 @@ int main(int, char**)
   }
   printf("\n");
 
+  // Brute force.
+  //std::bitset<1024> keys;
+  //keys.flip();
+  //for (uint32_t k = 0; k < 1024; ++k ) {
+    //for ( size_t n = 0; n < 60; ++n ) {
+      //const uint8_t out = decrypt(k, buffer[n]);
+      //if ( out < 32 || out > 126 ) {
+        //keys[k] = 0;
+        //break;
+      //}
+    //}
+  //}
+
   // Decode with known key
   const uint16_t k1 = 0x15f;
   const uint16_t k2 = 0x3ea;
@@ -231,7 +262,7 @@ int main(int, char**)
 
   printf("\nPlaintext:\n");
   for ( int n=0; n<60; ++n ) {
-    const unsigned char plain = decrypt(key, buffer[n]);
+    const unsigned char plain = triplesdes_decrypt(k1, k2, buffer[n]);
     printf("%c", plain);
   }
   printf("\n");
