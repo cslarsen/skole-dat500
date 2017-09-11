@@ -203,7 +203,7 @@ static uint8_t decrypt(const uint32_t& key, const uint8_t& ciphertext)
   return revip(f(k1, sw(f(k2, ip(ciphertext)))));
 }
 
-int main(int argc, char** argv)
+int main(int, char**)
 {
   // Read binary file
   FILE *fp = fopen("ctx1.bin", "rb");
@@ -223,8 +223,8 @@ int main(int argc, char** argv)
   printf("\n");
 
   // Decode with known key
-  const uint16_t k1 = 0x3ea;
-  const uint16_t k2 = 0x15f;
+  const uint16_t k1 = 0x15f;
+  const uint16_t k2 = 0x3ea;
   const uint32_t key = (k1 << 10) | k2; // 0xfa95f
 
   printf("\nPlaintext:\n");
