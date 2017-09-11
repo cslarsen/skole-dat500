@@ -1,6 +1,9 @@
+*.dSYM
+*.dylib
 *.o
 *.pyc
 *.pyo
+*.so
 GPATH
 GRTAGS
 GTAGS

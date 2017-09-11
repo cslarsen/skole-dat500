@@ -1,10 +1,13 @@
+// Written by Christian Stigen
+
 #include <stdio.h>
 #include <stdint.h>
 #include <set>
 #include <bitset>
 
 // CHECKED
-static uint16_t p10(const uint16_t& n)
+extern "C"
+uint16_t p10(const uint16_t n)
 {
   return (n &  0x80) << 2  // bit  3
        | (n & 0x020) << 3  // bit  5
@@ -19,7 +22,8 @@ static uint16_t p10(const uint16_t& n)
 }
 
 // CHECKED
-static uint8_t p8(const uint16_t& n)
+extern "C"
+uint8_t p8(const uint16_t n)
 {
     return (n & 0x10) << 3  // bit  6
          | (n & 0x80) >> 1  // bit  3
@@ -32,7 +36,8 @@ static uint8_t p8(const uint16_t& n)
 }
 
 // CHECKED
-static uint8_t p4(const uint8_t& n)
+extern "C"
+uint8_t p4(const uint8_t n)
 {
     return (n & 0x4) << 1  // bit 2
          | (n & 0x1) << 2  // bit 4
@@ -41,7 +46,8 @@ static uint8_t p4(const uint8_t& n)
 }
 
 // CHECKED
-static uint8_t ip(const uint8_t& n)
+extern "C"
+uint8_t ip(const uint8_t n)
 {
     return (n & 0x40) << 1  // bit 2
          | (n &  0x4) << 4  // bit 6
@@ -54,7 +60,8 @@ static uint8_t ip(const uint8_t& n)
 }
 
 // CHECKED
-static uint8_t revip(const uint8_t& n)
+extern "C"
+uint8_t revip(const uint8_t n)
 {
   return (n & 0x10) >> 3  // bit 4
        | (n & 0x80) >> 1  // bit 1
@@ -67,7 +74,8 @@ static uint8_t revip(const uint8_t& n)
 }
 
 // CHECKED
-static uint8_t ep(const uint8_t& n)
+extern "C"
+uint8_t ep(const uint8_t n)
 {
   return (n & 0x1) << 7  // bit 4
        | (n & 0x8) << 3  // bit 1
@@ -81,14 +89,16 @@ static uint8_t ep(const uint8_t& n)
 
 // CHECKED
 // Interchanges the upper and lower 4 bits (nibbles).
-static uint8_t sw(const uint8_t& n)
+extern "C"
+uint8_t sw(const uint8_t n)
 {
   return ((n & 0xf) << 4) | ((n & 0xf0) >> 4);
 }
 
 // CHECKED VIA shiftl4
 // Rotate/roll left 5 LSBs
-static uint8_t rol5(uint8_t n)
+extern "C"
+uint8_t rol5(uint8_t n)
 {
   return ((n & 0x0f) << 1)  // shift 4 LSBs left
        | ((n & 0x10) >> 4); // and carry into LSB
@@ -96,14 +106,16 @@ static uint8_t rol5(uint8_t n)
 
 // CHECKED
 // Rotates upper and lower 5 bits separately
-static uint16_t shiftl5(const uint16_t& n)
+extern "C"
+uint16_t shiftl5(const uint16_t n)
 {
   return rol5((n & 0x3e0) >> 5) << 5 // upper five
        | rol5(n & 0x1f); // lower five
 }
 
 // CHECKED
-static uint8_t S0(const uint8_t& row, const uint8_t& col)
+extern "C"
+uint8_t S0(const uint8_t row, const uint8_t col)
 {
   static uint8_t box[4][4] = {
     {1, 0, 3, 2},
@@ -116,7 +128,8 @@ static uint8_t S0(const uint8_t& row, const uint8_t& col)
 }
 
 // CHECKED
-static uint8_t S1(const uint8_t& row, const uint8_t& col)
+extern "C"
+uint8_t S1(const uint8_t row, const uint8_t col)
 {
   static uint8_t box[4][4] = {
     {0, 1, 2, 3},
@@ -130,7 +143,8 @@ static uint8_t S1(const uint8_t& row, const uint8_t& col)
 
 // CHECKED
 // Generate two 10-bit keys (figure G.2 in paper)
-static uint32_t create_subkeys(const uint32_t& key)
+extern "C"
+uint32_t create_subkeys(const uint32_t key)
 {
   uint16_t k2 = shiftl5(p10(key));
   const uint16_t k1 = p8(k2);
@@ -139,7 +153,8 @@ static uint32_t create_subkeys(const uint32_t& key)
 }
 
 
-static uint8_t Fmap(uint8_t n, const uint8_t& sk)
+extern "C"
+uint8_t Fmap(uint8_t n, const uint16_t sk)
 {
   n = ep(n);
 
@@ -182,14 +197,16 @@ static uint8_t Fmap(uint8_t n, const uint8_t& sk)
 }
 
 // CHECKED
-static uint8_t f(const uint16_t& sk, const uint8_t& n)
+extern "C"
+uint8_t f(const uint16_t sk, const uint8_t n)
 {
   const uint8_t l = (n & 0xf0) >> 4;
   const uint8_t r = (n & 0x0f);
   return ((l ^ Fmap(r, sk)) << 4) | r;
 }
 
-static uint8_t encrypt(const uint32_t& key, const uint8_t& plaintext)
+extern "C"
+uint8_t encrypt(const uint32_t key, const uint8_t plaintext)
 {
   const uint32_t sks = create_subkeys(key);
   const uint16_t k1 = (sks & 0xffc00) >> 10;
@@ -197,7 +214,8 @@ static uint8_t encrypt(const uint32_t& key, const uint8_t& plaintext)
   return revip(f(k2, sw(f(k1, ip(plaintext)))));
 }
 
-static uint8_t decrypt(const uint32_t& key, const uint8_t& ciphertext)
+extern "C"
+uint8_t decrypt(const uint32_t key, const uint8_t ciphertext)
 {
   const uint32_t sks = create_subkeys(key);
   const uint16_t k1 = (sks & 0xffc00) >> 10;
@@ -205,18 +223,20 @@ static uint8_t decrypt(const uint32_t& key, const uint8_t& ciphertext)
   return revip(f(k1, sw(f(k2, ip(ciphertext)))));
 }
 
-static uint8_t triplesdes_encrypt(
-    const uint16_t& k1,
-    const uint16_t& k2,
-    const uint8_t& p)
+extern "C"
+uint8_t triplesdes_encrypt(
+    const uint16_t k1,
+    const uint16_t k2,
+    const uint8_t p)
 {
   return encrypt(k1, decrypt(k2, encrypt(k1, p)));
 }
 
-static uint8_t triplesdes_decrypt(
-    const uint16_t& k1,
-    const uint16_t& k2,
-    const uint8_t& c)
+extern "C"
+uint8_t triplesdes_decrypt(
+    const uint16_t k1,
+    const uint16_t k2,
+    const uint8_t c)
 {
   return decrypt(k1, encrypt(k2, decrypt(k1, c)));
 }
