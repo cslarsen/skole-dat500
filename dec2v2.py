@@ -40,12 +40,8 @@ badk1s = set()
 badk2s = set()
 removed = set()
 
-# Create a decrypt map
-decrypt_map = collections.defaultdict(list)
-for k in range(2**10):
-    for byte in range(256):
-        decrypt_map[k].append(decrypt(k, byte))
-
+# Create a decrypt map and ALSO:
+#
 # Consider the triplesdes_decrypt function body:
 #
 #     return decrypt(k1, encrypt(k2, decrypt(k1, c)))
@@ -53,17 +49,22 @@ for k in range(2**10):
 # The LAST call is decrypt(k1, byte) here. We are only interested in the input
 # bytes that produce printable ASCII. So let's iterate through all (k1, byte)
 # pairs and keep track of which ones produce ASCII output.
+decrypt_map = [[0]*256]*(2**10)
 dec2ascii = collections.defaultdict(set)
-for k1 in range(2**10):
-    for byte in range(256):
-        if 32 <= decrypt_map[k1][byte] <= 126:
-            dec2ascii[k1].add(byte)
-
-# Create map of middle layer
-encrypt_map = collections.defaultdict(list)
 for k in range(2**10):
     for byte in range(256):
-        encrypt_map[k].append(encrypt(k, byte))
+        out = decrypt(k, byte)
+        decrypt_map[k][byte] = out
+        if 32 <= out <= 126:
+            dec2ascii[k].add(byte)
+
+# Create map of middle layer
+encrypt_map = [[0]*256]*(2**10)
+for k in range(2**10):
+    for byte in range(256):
+        # NOTE: This maps k2 values. Perhaps we can do everything here? Find
+        # (k2, byte) pairs that produce ascii??
+        encrypt_map[k][byte] = encrypt(k, byte)
 
 # Now start with the FIRST TWO calls in the triplesdes_decrypt chaing above:
 # encrypt(k2, decrypt(k1, cipher_byte)). For all unique cipher bytes, this must
@@ -74,24 +75,27 @@ for k in range(2**10):
 # Number of key pairs left to try
 keypairs_left = 2**20
 
-for k1, produces_ascii in dec2ascii.items():
-    # Precalculate FIRST call decrypt(k1, cipher_byte).
-    decrypted_k1_cipherbytes = map(lambda c: decrypt_map[k1][c], unique)
-    for k2 in range(2**10):
-        try:
-            for byte in decrypted_k1_cipherbytes:
-                out = encrypt_map[k2][byte]
-                if out not in produces_ascii:
-                    raise RuntimeError()
-        except RuntimeError:
-            removed.add((k1 << 10) | k2)
-            keypairs_left -= 1
+try:
+    for k1, produces_ascii in dec2ascii.items():
+        # Precalculate FIRST call decrypt(k1, cipher_byte).
+        decrypted_k1_cipherbytes = map(lambda c: decrypt_map[k1][c], unique)
+        for k2 in range(2**10):
+            try:
+                for byte in decrypted_k1_cipherbytes:
+                    out = encrypt_map[k2][byte]
+                    if out not in produces_ascii:
+                        raise RuntimeError()
+            except RuntimeError:
+                removed.add((k1 << 10) | k2)
+                keypairs_left -= 1
 
-            # This breaks early, but has no effect on the keys for this
-            # assignment. It would be slightly faster if key1 was a low number
-            # like 0x60. Leaving it here just to show that this is possible.
-            if keypairs_left <= 1:
-                break
+                # This breaks early, but has no effect on the keys for this
+                # assignment. It would be slightly faster if key1 was a low number
+                # like 0x60. Leaving it here just to show that this is possible.
+                if keypairs_left <= 1:
+                    raise RuntimeError()
+except RuntimeError:
+    pass
 
 print("Removing %d unsuitable 20-bit keys" % len(removed))
 keys -= removed
