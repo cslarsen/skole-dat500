@@ -9,5 +9,8 @@ libsdes.so: sdes.cpp
 run:
 	pypy mono.py cipher-mono.txt
 
+check: libsdes.so
+	python compare.py
+
 clean:
 	rm -f $(TARGETS)
