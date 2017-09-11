@@ -41,7 +41,7 @@ for n in range(2**8):
         raise RuntimeError("revip(0x%x) py=0x%x cpp=0x%x" % (n, py, cpp))
 print("ok revip")
 
-for n in range(2**8):
+for n in range(2**4):
     py = sdes.ep(n)
     cpp = csdes.ep(n)
     if cpp != py:
