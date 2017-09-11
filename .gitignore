@@ -1,4 +1,5 @@
-GTAGS
-GRTAGS
-GPATH
 *.pyc
+*.pyo
+GPATH
+GRTAGS
+GTAGS
