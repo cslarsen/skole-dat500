@@ -60,9 +60,9 @@ Fmap = libsdes.Fmap
 Fmap.argtypes = [ctypes.c_uint8, ctypes.c_uint8]
 Fmap.restype = ctypes.c_uint8
 
-f = libsdes.f
-f.argtypes = [ctypes.c_uint16, ctypes.c_uint8]
-f.restype = ctypes.c_uint8
+fK = libsdes.fK
+fK.argtypes = [ctypes.c_uint16, ctypes.c_uint8]
+fK.restype = ctypes.c_uint8
 
 encrypt = libsdes.encrypt
 encrypt.argtypes = [ctypes.c_uint32, ctypes.c_uint8]

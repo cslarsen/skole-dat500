@@ -10,7 +10,7 @@ run:
 	pypy mono.py cipher-mono.txt
 
 check: libsdes.so
-	python compare.py
+	pypy compare.py
 
 clean:
 	rm -f $(TARGETS)

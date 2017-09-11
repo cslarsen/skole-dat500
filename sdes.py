@@ -215,10 +215,10 @@ def Fmap(n, subkey):
 def f(sk, n):
     assert_8bit(n)
 
-    l = (n & 0b11110000) >> 4
-    r = (n & 0b00001111)
+    l = (n & 0b11110000) >> 4 # 4-bit
+    r = (n & 0b00001111)      # 4-bit
 
-    return (l ^ Fmap(r, sk)) << 4 | r
+    return (l ^ Fmap(r, sk & 0xff)) << 4 | r
 
 def testenc(key, plaintext, expected):
     ciphertext = encrypt(key, plaintext)

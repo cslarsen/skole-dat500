@@ -5,86 +5,102 @@
 #include <set>
 #include <bitset>
 
+// Create a few typedefs to make it clear what bit width we are operating with.
+typedef uint8_t uint2_t;
+typedef uint8_t uint4_t;
+
 // CHECKED
 extern "C"
 uint16_t p10(const uint16_t n)
 {
-  return (n &  0x80) << 2  // bit  3
-       | (n & 0x020) << 3  // bit  5
-       | (n & 0x100) >> 1  // bit  2
-       | (n &   0x8) << 3  // bit  7
-       | (n &  0x40) >> 1  // bit  4
-       | (n &   0x1) << 4  // bit 10
-       | (n & 0x200) >> 6  // bit  1
-       | (n &   0x2) << 1  // bit  9
-       | (n &   0x4) >> 1  // bit  8
-       | (n &  0x10) >> 4; // bit  6
+  return uint16_t(
+      (n &  0x80) << 2  // bit  3
+    | (n & 0x020) << 3  // bit  5
+    | (n & 0x100) >> 1  // bit  2
+    | (n &   0x8) << 3  // bit  7
+    | (n &  0x40) >> 1  // bit  4
+    | (n &   0x1) << 4  // bit 10
+    | (n & 0x200) >> 6  // bit  1
+    | (n &   0x2) << 1  // bit  9
+    | (n &   0x4) >> 1  // bit  8
+    | (n &  0x10) >> 4  // bit  6
+  );
 }
 
 // CHECKED
 extern "C"
 uint8_t p8(const uint16_t n)
 {
-    return (n & 0x10) << 3  // bit  6
-         | (n & 0x80) >> 1  // bit  3
-         | (n &  0x8) << 2  // bit  7
-         | (n & 0x40) >> 2  // bit  4
-         | (n &  0x4) << 1  // bit  8
-         | (n & 0x20) >> 3  // bit  5
-         | (n &  0x1) << 1  // bit 10
-         | (n &  0x2) >> 1; // bit  9
+  return uint8_t(
+      (n & 0x10) << 3  // bit  6
+    | (n & 0x80) >> 1  // bit  3
+    | (n &  0x8) << 2  // bit  7
+    | (n & 0x40) >> 2  // bit  4
+    | (n &  0x4) << 1  // bit  8
+    | (n & 0x20) >> 3  // bit  5
+    | (n &  0x1) << 1  // bit 10
+    | (n &  0x2) >> 1  // bit  9
+  );
 }
 
 // CHECKED
 extern "C"
-uint8_t p4(const uint8_t n)
+uint8_t p4(const uint4_t n)
 {
-    return (n & 0x4) << 1  // bit 2
-         | (n & 0x1) << 2  // bit 4
-         | (n & 0x2)       // bit 3
-         | (n & 0x8) >> 3; // bit 1
+  return uint8_t(
+      (n & 0x4) << 1  // bit 2
+    | (n & 0x1) << 2  // bit 4
+    | (n & 0x2)       // bit 3
+    | (n & 0x8) >> 3  // bit 1
+  );
 }
 
 // CHECKED
 extern "C"
 uint8_t ip(const uint8_t n)
 {
-    return (n & 0x40) << 1  // bit 2
-         | (n &  0x4) << 4  // bit 6
-         | (n & 0x20)       // bit 3
-         | (n & 0x80) >> 3  // bit 1
-         | (n & 0x10) >> 1  // bit 4
-         | (n &  0x1) << 2  // bit 8
-         | (n &  0x8) >> 2  // bit 5
-         | (n &  0x2) >> 1; // bit 7
+  return uint8_t(
+      (n & 0x40) << 1  // bit 2
+    | (n &  0x4) << 4  // bit 6
+    | (n & 0x20)       // bit 3
+    | (n & 0x80) >> 3  // bit 1
+    | (n & 0x10) >> 1  // bit 4
+    | (n &  0x1) << 2  // bit 8
+    | (n &  0x8) >> 2  // bit 5
+    | (n &  0x2) >> 1  // bit 7
+  );
 }
 
 // CHECKED
 extern "C"
 uint8_t revip(const uint8_t n)
 {
-  return (n & 0x10) << 3  // bit 4
-       | (n & 0x80) >> 1  // bit 1
-       | (n & 0x20)       // bit 3
-       | (n &  0x8) << 1  // bit 5
-       | (n &  0x2) << 2  // bit 7
-       | (n & 0x40) >> 4  // bit 2
-       | (n &  0x1) << 1  // bit 8
-       | (n &  0x4) >> 2; // bit 6
+  return uint8_t(
+      (n & 0x10) << 3  // bit 4
+    | (n & 0x80) >> 1  // bit 1
+    | (n & 0x20)       // bit 3
+    | (n &  0x8) << 1  // bit 5
+    | (n &  0x2) << 2  // bit 7
+    | (n & 0x40) >> 4  // bit 2
+    | (n &  0x1) << 1  // bit 8
+    | (n &  0x4) >> 2  // bit 6
+  );
 }
 
 // CHECKED
 extern "C"
-uint8_t ep(const uint8_t n)
+uint8_t ep(const uint4_t n)
 {
-  return (n & 0x1) << 7  // bit 4
-       | (n & 0x8) << 3  // bit 1
-       | (n & 0x4) << 3  // bit 2
-       | (n & 0x2) << 3  // bit 3
-       | (n & 0x4) << 1  // bit 2
-       | (n & 0x2) << 1  // bit 3
-       | (n & 0x1) << 1  // bit 4
-       | (n & 0x8) >> 3; // bit 1
+  return uint8_t(
+      (n & 0x1) << 7  // bit 4
+    | (n & 0x8) << 3  // bit 1
+    | (n & 0x4) << 3  // bit 2
+    | (n & 0x2) << 3  // bit 3
+    | (n & 0x4) << 1  // bit 2
+    | (n & 0x2) << 1  // bit 3
+    | (n & 0x1) << 1  // bit 4
+    | (n & 0x8) >> 3  // bit 1
+  );
 }
 
 // CHECKED
@@ -92,7 +108,8 @@ uint8_t ep(const uint8_t n)
 extern "C"
 uint8_t sw(const uint8_t n)
 {
-  return ((n & 0xf) << 4) | ((n & 0xf0) >> 4);
+  return uint8_t((n & 0x0f) << 4)
+              | ((n & 0xf0) >> 4);
 }
 
 // CHECKED VIA shiftl4
@@ -100,8 +117,8 @@ uint8_t sw(const uint8_t n)
 extern "C"
 uint8_t rol5(uint8_t n)
 {
-  return ((n & 0x0f) << 1)  // shift 4 LSBs left
-       | ((n & 0x10) >> 4); // and carry into LSB
+  return uint8_t(((n & 0x0f) << 1)   // shift 4 LSBs left
+               | ((n & 0x10) >> 4)); // and carry into LSB
 }
 
 // CHECKED
@@ -109,13 +126,14 @@ uint8_t rol5(uint8_t n)
 extern "C"
 uint16_t shiftl5(const uint16_t n)
 {
-  return rol5((n & 0x3e0) >> 5) << 5 // upper five
-       | rol5(n & 0x1f); // lower five
+  return uint16_t(
+      rol5((n & 0x3e0) >> 5) << 5 // upper five
+    | rol5(n & 0x1f));            // lower five
 }
 
 // CHECKED
 extern "C"
-uint8_t S0(const uint8_t row, const uint8_t col)
+uint2_t S0(const uint2_t row, const uint2_t col)
 {
   static uint8_t box[4][4] = {
     {1, 0, 3, 2},
@@ -129,7 +147,7 @@ uint8_t S0(const uint8_t row, const uint8_t col)
 
 // CHECKED
 extern "C"
-uint8_t S1(const uint8_t row, const uint8_t col)
+uint2_t S1(const uint2_t row, const uint2_t col)
 {
   static uint8_t box[4][4] = {
     {0, 1, 2, 3},
@@ -144,17 +162,16 @@ uint8_t S1(const uint8_t row, const uint8_t col)
 // CHECKED
 // Generate two 10-bit keys (figure G.2 in paper)
 extern "C"
-uint32_t create_subkeys(const uint32_t key)
+uint32_t create_subkeys(const uint16_t key)
 {
   uint16_t k2 = shiftl5(p10(key));
   const uint16_t k1 = p8(k2);
   k2 = p8(shiftl5(shiftl5(k2)));
-  return (k1 << 10) | k2;
+  return (uint32_t(k1) << 10) | k2;
 }
 
-
 extern "C"
-uint8_t Fmap(uint8_t n, const uint16_t sk)
+uint8_t Fmap(uint4_t n, const uint8_t sk)
 {
   n = ep(n);
 
@@ -170,7 +187,6 @@ uint8_t Fmap(uint8_t n, const uint16_t sk)
   const uint8_t n2 = (n & 0x20) >> 5;
   const uint8_t n3 = (n & 0x10) >> 4;
 
-  // bits
   const uint8_t k11 = (sk & 0x80) >> 7;
   const uint8_t k12 = (sk & 0x40) >> 6;
   const uint8_t k13 = (sk & 0x20) >> 5;
@@ -190,37 +206,40 @@ uint8_t Fmap(uint8_t n, const uint16_t sk)
   const uint8_t p12 = n4 ^ k17;
   const uint8_t p13 = n1 ^ k18;
 
-  const uint8_t row1 = S0(p00 << 1 | p03, p01 << 1 | p02);
-  const uint8_t row2 = S1(p10 << 1 | p13, p11 << 1 | p12);
+  const uint2_t row1 = S0(uint8_t(p00 << 1 | p03),
+                          uint8_t(p01 << 1 | p02));
 
-  return p4(row1 << 2 | row2);
+  const uint2_t row2 = S1(uint8_t(p10 << 1 | p13),
+                          uint8_t(p11 << 1 | p12));
+
+  return p4(uint4_t(row1 << 2) | uint4_t(row2));
 }
 
 // CHECKED
 extern "C"
-uint8_t f(const uint16_t sk, const uint8_t n)
+uint8_t fK(const uint8_t sk, const uint8_t n)
 {
-  const uint8_t l = (n & 0xf0) >> 4;
-  const uint8_t r = (n & 0x0f);
-  return ((l ^ Fmap(r, sk)) << 4) | r;
+  const uint4_t l = (n & 0xf0) >> 4;
+  const uint4_t r = (n & 0x0f);
+  return uint8_t(r | (l ^ Fmap(r, sk)) << 4);
 }
 
 extern "C"
-uint8_t encrypt(const uint32_t key, const uint8_t plaintext)
+uint8_t encrypt(const uint16_t key, const uint8_t plaintext)
 {
   const uint32_t sks = create_subkeys(key);
   const uint16_t k1 = (sks & 0xffc00) >> 10;
   const uint16_t k2 = (sks & 0x3ff);
-  return revip(f(k2, sw(f(k1, ip(plaintext)))));
+  return revip(fK(k2 & 0xff, sw(fK(k1 & 0xff, ip(plaintext)))));
 }
 
 extern "C"
-uint8_t decrypt(const uint32_t key, const uint8_t ciphertext)
+uint8_t decrypt(const uint16_t key, const uint8_t ciphertext)
 {
   const uint32_t sks = create_subkeys(key);
   const uint16_t k1 = (sks & 0xffc00) >> 10;
   const uint16_t k2 = (sks & 0x3ff);
-  return revip(f(k1, sw(f(k2, ip(ciphertext)))));
+  return revip(fK(k1 & 0xff, sw(fK(k2 & 0xff, ip(ciphertext)))));
 }
 
 extern "C"
@@ -257,7 +276,7 @@ int main(int, char**)
   fclose(fp);
 
   printf("Ciphertext:\n");
-  for ( int n=0; n < sizeof(buffer)/sizeof(unsigned char); ++n ) {
+  for ( size_t n=0; n < sizeof(buffer)/sizeof(unsigned char); ++n ) {
     printf("%2.2x ", buffer[n]);
   }
   printf("\n");
@@ -272,7 +291,7 @@ int main(int, char**)
       for ( size_t n = 0; n < sizeof(buffer) / sizeof(char); ++n ) {
         const uint8_t out = triplesdes_decrypt(k1, k2, buffer[n]);
         if ( out < 32 || out > 126 ) {
-          const uint32_t key = k1 << 10 | k2;
+          const uint32_t key = uint32_t(k1) << 10 | k2;
           keyspace[key] = 0; // key is not viable, remove it
           left -= 1;
           goto NEXT_K2;
@@ -306,7 +325,7 @@ DONE:
   printf("k2: 0x%x\n", k2);
 
   printf("\nPlaintext:\n");
-  for ( int n=0; n < sizeof(buffer)/sizeof(unsigned char); ++n ) {
+  for ( size_t n=0; n < sizeof(buffer)/sizeof(unsigned char); ++n ) {
     const unsigned char plain = triplesdes_decrypt(k1, k2, buffer[n]);
     printf("%c", plain);
   }

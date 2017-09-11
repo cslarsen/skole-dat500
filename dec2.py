@@ -22,7 +22,7 @@ def is_printable(char):
 def split_key(key):
     return (key & 0xffc00) >> 10, key & 0x3ff
 
-print("Brute-forcing 10-bit key")
+print("Brute-forcing 20-bit key")
 for char in split_string(cipher_raw, 8):
     byte = int(char, 2)
     removed = set()
