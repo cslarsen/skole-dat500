@@ -4,10 +4,10 @@ Part II task 3, second message
 Optimized version of dec2.py. This runs in 0.7 secs in pypy and 10 secs in
 ordinary python 2.7
 
-The original version ran on 2.5 seconds on pypy and 1.5 minutes on python.
-I was first able to optimize that down to 1.6s pypy and 30s python. This
-version takes 0.56s pypy and ~10s python. I believe it is possible to optimize
-it further.
+The original version ran on 2.5 seconds on pypy and 1.5 minutes on python.  I
+was first able to optimize that down to 1.6s pypy and 30s python. This version
+takes 0.56s pypy and ~10s python (~8 secs without asserts. I believe it is
+possible to optimize it further.
 """
 
 from util import *

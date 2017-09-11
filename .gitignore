@@ -1,5 +1,7 @@
+*.o
 *.pyc
 *.pyo
 GPATH
 GRTAGS
 GTAGS
+sdes
