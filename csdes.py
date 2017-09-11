@@ -1,12 +1,19 @@
 """
-Implements Simplified DES through a C++ shared library.
+Python interface for the C++ Simplified DES (SDES) symmetric cipher.
+
+This module wraps the shared library libsdes.so, which must reside in a library
+path or in the current directory. If the module reports errors loading
+libsdes.so, you can specify an environment variable LIBSDES_PATH to the
+directory containing it.
 
 Written by Christian Stigen
 """
 
 import ctypes
+import os
 
-libsdes = ctypes.CDLL("libsdes.so")
+LIBSDES_PATH = os.getenv("LIBSDES_PATH", os.getcwd())
+libsdes = ctypes.CDLL(os.path.join(LIBSDES_PATH, "libsdes.so"))
 
 p10 = libsdes.p10
 p10.argtypes = [ctypes.c_uint16]

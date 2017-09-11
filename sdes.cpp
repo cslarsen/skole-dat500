@@ -1,13 +1,20 @@
 // Written by Christian Stigen
 
-#include <stdio.h>
-#include <stdint.h>
-#include <set>
 #include <bitset>
+#include <set>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 // Create a few typedefs to make it clear what bit width we are operating with.
 typedef uint8_t uint2_t;
 typedef uint8_t uint4_t;
+
+// Define a struct for use with bruteforcing.
+struct bruteforce_result {
+  size_t count;
+  uint32_t key;
+};
 
 // CHECKED
 extern "C"
@@ -260,27 +267,11 @@ uint8_t triplesdes_decrypt(
   return decrypt(k1, encrypt(k2, decrypt(k1, c)));
 }
 
-int main(int, char**)
+extern "C"
+struct bruteforce_result bruteforce_3sdes_key(
+    const unsigned char* ciphertext,
+    const size_t length)
 {
-  triplesdes_encrypt(0,0,0); // silence compiler warning
-
-  // Read binary file
-  FILE *fp = fopen("ctx2.bin", "rb");
-  if (fp == NULL) {
-    perror("ctx1.bin");
-    return 1;
-  }
-  unsigned char buffer[60];
-  fread(buffer, sizeof(unsigned char), sizeof(buffer)/sizeof(unsigned char),
-      fp);
-  fclose(fp);
-
-  printf("Ciphertext:\n");
-  for ( size_t n=0; n < sizeof(buffer)/sizeof(unsigned char); ++n ) {
-    printf("%2.2x ", buffer[n]);
-  }
-  printf("\n");
-
   // Find 20-bit key by brute force.
   int left = (1<<20) - 1; // this is faster than doing a popcount
   std::bitset< ((1<<20) - 1)> keyspace; // takes ~127kb of memory
@@ -291,16 +282,27 @@ int main(int, char**)
   size_t unique_len = 0;
   {
     std::set<unsigned char> unique_bytes;
-    for ( size_t n = 0; n < sizeof(buffer) / sizeof(char); ++n )
-      unique_bytes.insert(buffer[n]);
+    for ( size_t n = 0; n < length;  ++n )
+      unique_bytes.insert(ciphertext[n]);
     for ( auto chr : unique_bytes )
       unique[unique_len++] = chr;
   }
 
+  unsigned char decrypted[60];
+  //return decrypt(k1, encrypt(k2, decrypt(k1, c)));
+
   for ( uint16_t k1 = 0; k1 < 1024; ++k1 ) {
+
+    // Precalculate decrypt(k1, unique[n])
+    for ( size_t n = 0; n < unique_len; ++n )
+      decrypted[n] = decrypt(k1, unique[n]);
+
     for ( uint16_t k2 = 0; k2 < 1024; ++k2 ) {
       for ( size_t n = 0; n < unique_len; ++n ) {
-        const uint8_t out = triplesdes_decrypt(k1, k2, unique[n]);
+        // Originally we did triplesdes_decrypt here, but now we've split it up
+        // into parts to make it faster.
+        // const uint8_t out = triplesdes_decrypt(k1, k2, unique[n]);
+        const uint8_t out = decrypt(k1, encrypt(k2, decrypted[n]));
         if ( out < 32 || out > 126 ) {
           const uint32_t key = uint32_t(k1) << 10 | k2;
           keyspace[key] = 0; // key is not viable, remove it
@@ -314,33 +316,84 @@ NEXT_K2:
       continue;
     }
   }
+
 DONE:
-  // Print found key (we could list all candidates here as well, but that
-  // usually means we've not really found the right one.)
-  uint32_t found_key = 0;
+  bruteforce_result result;
+  result.count = keyspace.count();
+  result.key = 0;
+
   for ( uint32_t k=0; k < (1<<20)-1; ++k ) {
     if ( keyspace[k] == 1 ) {
-      found_key = k;
-      if ( left > 1 )
-        printf("brute-forced key candidate: 0x%x", k);
-      else
-        break;
+      result.key = k;
+      break;
     }
   }
 
-  const uint16_t k1 = (found_key & 0xffc00) >> 10;
-  const uint16_t k2 = (found_key & 0x003ff);
+  return result;
+}
 
-  printf("\nusing candidate 20-bit key: 0x%x\n", found_key);
-  printf("  k1: 0x%x\n", k1);
-  printf("  k2: 0x%x\n", k2);
+size_t readfile(const char* filename, unsigned char* buffer, const size_t length)
+{
+  FILE *fp = fopen(filename, "rb");
 
-  printf("\nPlaintext:\n'");
-  for ( size_t n=0; n < sizeof(buffer)/sizeof(unsigned char); ++n ) {
-    const unsigned char plain = triplesdes_decrypt(k1, k2, buffer[n]);
-    printf("%c", plain);
+  if ( fp == NULL ) {
+    perror(filename);
+    exit(1);
   }
-  printf("'\n");
+
+  size_t result = fread(buffer, sizeof(unsigned char), length, fp);
+  fclose(fp);
+
+  if ( result != length ) {
+    perror(filename);
+    return 0;
+  }
+
+  return result;
+}
+
+int main(int, char**)
+{
+  const size_t length = 60;
+  unsigned char ciphertext[length];
+  readfile("ctx2.bin", ciphertext, length);
+
+  printf("Ciphertext:\n  ");
+  for ( size_t n = 0; n < length; ++n )
+    printf("%2.2x%s", ciphertext[n], !((n+1) % 16) ? "\n  " : " ");
+  printf("\n\n");
+
+  printf("Brute-forcing 20-bit key ... ");
+  fflush(stdout);
+
+  const auto bf = bruteforce_3sdes_key(ciphertext, length);
+
+  printf("found %zu keys\n", bf.count);
+  fflush(stdout);
+
+  const uint16_t k1 = (bf.key & 0xffc00) >> 10;
+  const uint16_t k2 = (bf.key & 0x003ff);
+
+  printf("  20-bit key: 0x%5.5x\n", bf.key);
+  printf("  10-bit k1:    0x%3.3x\n", k1);
+  printf("  10-bit k2:    0x%3.3x\n", k2);
+  printf("\n");
+
+  printf("Plaintext:\n");
+
+  printf("  ");
+  for ( size_t n = 0; n < length; ++n ) {
+    const auto plaintext = triplesdes_decrypt(k1, k2, ciphertext[n]);
+    printf("%2.2x%s", plaintext, !((n+1) % 16) ? "\n  " : " ");
+  }
+  printf("\n\n");
+
+  printf("ASCII:\n  '");
+  for ( size_t n = 0; n < length; ++n ) {
+    const auto plaintext = triplesdes_decrypt(k1, k2, ciphertext[n]);
+    printf("%c", plaintext);
+  }
+  printf("'\n\n");
 
   return 0;
 }
