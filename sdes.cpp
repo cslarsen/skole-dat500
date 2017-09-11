@@ -223,7 +223,7 @@ static uint8_t triplesdes_decrypt(
 
 int main(int, char**)
 {
-  encrypt(0,0); // silence compiler warning
+  triplesdes_encrypt(0,0,0); // silence compiler warning
 
   // Read binary file
   FILE *fp = fopen("ctx2.bin", "rb");
@@ -256,9 +256,9 @@ int main(int, char**)
   //}
 
   // Decode with known key
-  const uint16_t k1 = 0x15f;
-  const uint16_t k2 = 0x3ea;
-  const uint32_t key = (k1 << 10) | k2; // 0xfa95f
+  const uint16_t k1 = 0x3ea;
+  const uint16_t k2 = 0x15f;
+  //const uint32_t key = (k1 << 10) | k2; // 0xfa95f
 
   printf("\nPlaintext:\n");
   for ( int n=0; n<60; ++n ) {
