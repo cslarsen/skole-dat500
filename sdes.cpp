@@ -59,6 +59,7 @@ static uint8_t revip(const uint8_t& n)
        | (n &  0x4) >> 2; // bit 6
 }
 
+// CHECKED
 static uint8_t ep(const uint8_t& n)
 {
   return (n & 0x1) << 7  // bit 4
@@ -72,12 +73,14 @@ static uint8_t ep(const uint8_t& n)
 }
 
 // Interchanges the upper and lower 4 bits (nibbles).
+// CHECKED
 static uint8_t sw(const uint8_t& n)
 {
   return ((n & 0xf) << 4) | ((n & 0xf0) >> 4);
 }
 
 // Rotate/roll left 5 LSBs
+// CHECKED VIA shiftl4
 static uint8_t rol5(uint8_t n)
 {
   return ((n & 0x0f) << 1)  // shift 4 LSBs left
@@ -85,6 +88,7 @@ static uint8_t rol5(uint8_t n)
 }
 
 // Rotates upper and lower 5 bits separately
+// CHECKED
 static uint16_t shiftl5(const uint16_t& n)
 {
   return rol5((n & 0x3e0) >> 5) << 5 // upper five
@@ -129,34 +133,38 @@ static uint8_t Fmap(uint8_t n, const uint16_t& sk)
   n = ep(n);
 
   // bits
-  uint8_t n2 = (n & 0x4) >> 2; // bit 2
-  uint8_t n3 = (n & 0x2) >> 1; // bit 3
-  uint8_t n4 = (n & 0x1);      // bit 4
-  uint8_t n1 = (n & 0x8) >> 3; // bit 1
-
+  // The two here should be equal, but they are not
+  //uint8_t n2 = (n & 0x4) >> 2; // bit 2
+  //uint8_t n3 = (n & 0x2) >> 1; // bit 3
+  //uint8_t n4 = (n & 0x1);      // bit 4
+  //uint8_t n1 = (n & 0x8) >> 3; // bit 1
+  const uint8_t n4 = (n & 0x80) >> 7;
+  const uint8_t n1 = (n & 0x40) >> 6;
+  const uint8_t n2 = (n & 0x20) >> 5;
+  const uint8_t n3 = (n & 0x10) >> 4;
 
   // bits
-  uint8_t k11 = (sk & 0x80) >> 7;
-  uint8_t k12 = (sk & 0x40) >> 6;
-  uint8_t k13 = (sk & 0x20) >> 5;
-  uint8_t k14 = (sk & 0x10) >> 4;
-  uint8_t k15 = (sk & 0x08) >> 3;
-  uint8_t k16 = (sk & 0x04) >> 2;
-  uint8_t k17 = (sk & 0x02) >> 1;
-  uint8_t k18 = (sk & 0x01);
+  const uint8_t k11 = (sk & 0x80) >> 7;
+  const uint8_t k12 = (sk & 0x40) >> 6;
+  const uint8_t k13 = (sk & 0x20) >> 5;
+  const uint8_t k14 = (sk & 0x10) >> 4;
+  const uint8_t k15 = (sk & 0x08) >> 3;
+  const uint8_t k16 = (sk & 0x04) >> 2;
+  const uint8_t k17 = (sk & 0x02) >> 1;
+  const uint8_t k18 = (sk & 0x01);
 
-  uint8_t p00 = n4 ^ k11;
-  uint8_t p01 = n1 ^ k12;
-  uint8_t p02 = n2 ^ k13;
-  uint8_t p03 = n3 ^ k14;
+  const uint8_t p00 = n4 ^ k11;
+  const uint8_t p01 = n1 ^ k12;
+  const uint8_t p02 = n2 ^ k13;
+  const uint8_t p03 = n3 ^ k14;
 
-  uint8_t p10 = n2 ^ k15;
-  uint8_t p11 = n3 ^ k16;
-  uint8_t p12 = n4 ^ k17;
-  uint8_t p13 = n1 ^ k18;
+  const uint8_t p10 = n2 ^ k15;
+  const uint8_t p11 = n3 ^ k16;
+  const uint8_t p12 = n4 ^ k17;
+  const uint8_t p13 = n1 ^ k18;
 
-  uint16_t row1 = S0(p00 << 1 | p03, p01 << 1 | p02);
-  uint16_t row2 = S1(p10 << 1 | p13, p11 << 1 | p12);
+  const uint8_t row1 = S0(p00 << 1 | p03, p01 << 1 | p02);
+  const uint8_t row2 = S1(p10 << 1 | p13, p11 << 1 | p12);
 
   return p4(row1 << 2 | row2);
 }
