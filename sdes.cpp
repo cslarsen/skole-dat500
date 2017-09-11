@@ -270,7 +270,7 @@ int main(int, char**)
     perror("ctx1.bin");
     return 1;
   }
-  unsigned char buffer[60] = {0};
+  unsigned char buffer[60];
   fread(buffer, sizeof(unsigned char), sizeof(buffer)/sizeof(unsigned char),
       fp);
   fclose(fp);
@@ -286,10 +286,21 @@ int main(int, char**)
   std::bitset< ((1<<20) - 1)> keyspace; // takes ~127kb of memory
   keyspace.flip(); // put all keys into the keyspace
 
+  // Find unique ciphertext bytes, to reduce the innerloop
+  unsigned char unique[60];
+  size_t unique_len = 0;
+  {
+    std::set<unsigned char> unique_bytes;
+    for ( size_t n = 0; n < sizeof(buffer) / sizeof(char); ++n )
+      unique_bytes.insert(buffer[n]);
+    for ( auto chr : unique_bytes )
+      unique[unique_len++] = chr;
+  }
+
   for ( uint16_t k1 = 0; k1 < 1024; ++k1 ) {
     for ( uint16_t k2 = 0; k2 < 1024; ++k2 ) {
-      for ( size_t n = 0; n < sizeof(buffer) / sizeof(char); ++n ) {
-        const uint8_t out = triplesdes_decrypt(k1, k2, buffer[n]);
+      for ( size_t n = 0; n < unique_len; ++n ) {
+        const uint8_t out = triplesdes_decrypt(k1, k2, unique[n]);
         if ( out < 32 || out > 126 ) {
           const uint32_t key = uint32_t(k1) << 10 | k2;
           keyspace[key] = 0; // key is not viable, remove it
@@ -306,30 +317,30 @@ NEXT_K2:
 DONE:
   // Print found key (we could list all candidates here as well, but that
   // usually means we've not really found the right one.)
-  uint32_t key = 0;
+  uint32_t found_key = 0;
   for ( uint32_t k=0; k < (1<<20)-1; ++k ) {
     if ( keyspace[k] == 1 ) {
-      key = k;
-      //printf("brute-forced key candidate: 0x%x", k);
-      break;
+      found_key = k;
+      if ( left > 1 )
+        printf("brute-forced key candidate: 0x%x", k);
+      else
+        break;
     }
   }
 
-  // Decode with found key
-  const uint16_t k1 = (key & 0xffc00) >> 10; //0x3ea;
-  const uint16_t k2 = key & 0x3ff; //0x15f;
-  //const uint32_t key = (k1 << 10) | k2; // 0xfa95f
+  const uint16_t k1 = (found_key & 0xffc00) >> 10;
+  const uint16_t k2 = (found_key & 0x003ff);
 
-  printf("\nbrute-forced key candidate: 0x%x\n", key);
-  printf("k1: 0x%x\n", k1);
-  printf("k2: 0x%x\n", k2);
+  printf("\nusing candidate 20-bit key: 0x%x\n", found_key);
+  printf("  k1: 0x%x\n", k1);
+  printf("  k2: 0x%x\n", k2);
 
-  printf("\nPlaintext:\n");
+  printf("\nPlaintext:\n'");
   for ( size_t n=0; n < sizeof(buffer)/sizeof(unsigned char); ++n ) {
     const unsigned char plain = triplesdes_decrypt(k1, k2, buffer[n]);
     printf("%c", plain);
   }
-  printf("\n");
+  printf("'\n");
 
   return 0;
 }
