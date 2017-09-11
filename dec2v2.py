@@ -1,5 +1,13 @@
 """
 Part II task 3, second message
+
+Optimized version of dec2.py. This runs in 0.7 secs in pypy and 10 secs in
+ordinary python 2.7
+
+The original version ran on 2.5 seconds on pypy and 1.5 minutes on python.
+I was first able to optimize that down to 1.6s pypy and 30s python. This
+version takes 0.56s pypy and ~10s python. I believe it is possible to optimize
+it further.
 """
 
 from util import *
@@ -32,6 +40,12 @@ badk1s = set()
 badk2s = set()
 removed = set()
 
+# Create a decrypt map
+decrypt_map = collections.defaultdict(list)
+for k in range(2**10):
+    for byte in range(256):
+        decrypt_map[k].append(decrypt(k, byte))
+
 # Consider the triplesdes_decrypt function body:
 #
 #     return decrypt(k1, encrypt(k2, decrypt(k1, c)))
@@ -42,37 +56,47 @@ removed = set()
 dec2ascii = collections.defaultdict(set)
 for k1 in range(2**10):
     for byte in range(256):
-        if 32 <= decrypt(k1, byte) <= 126:
+        if 32 <= decrypt_map[k1][byte] <= 126:
             dec2ascii[k1].add(byte)
+
+# Create map of middle layer
+encrypt_map = collections.defaultdict(list)
+for k in range(2**10):
+    for byte in range(256):
+        encrypt_map[k].append(encrypt(k, byte))
 
 # Now start with the FIRST TWO calls in the triplesdes_decrypt chaing above:
 # encrypt(k2, decrypt(k1, cipher_byte)). For all unique cipher bytes, this must
 # produce a (k1, decrypted_byte) that is in dec2ascii, or else it won't produce
 # an ASCII output. Consequently, those (k1, k2) pairs that don't produce ASCII
 # for all cipher bytes can be thrown away.
-for k1, good in dec2ascii.items():
+
+# Number of key pairs left to try
+keypairs_left = 2**20
+
+for k1, produces_ascii in dec2ascii.items():
     # Precalculate FIRST call decrypt(k1, cipher_byte).
-    decr = map(lambda c: decrypt(k1, c), unique)
+    decrypted_k1_cipherbytes = map(lambda c: decrypt_map[k1][c], unique)
     for k2 in range(2**10):
         try:
-            for byte in decr:
-                out = encrypt(k2, byte)
-                if out not in good:
+            for byte in decrypted_k1_cipherbytes:
+                out = encrypt_map[k2][byte]
+                if out not in produces_ascii:
                     raise RuntimeError()
         except RuntimeError:
             removed.add((k1 << 10) | k2)
-            continue
-#for key in keys:
-    #k1, k2 = split_key(key)
-    #for byte in unique:
-        #out = decrypt(k1, encrypt(k2, decrypt(k1, byte)))
-        #if not (32 <= out <= 126):
-            #removed.add(key)
-            #break
-print("Removing %d keys" % len(removed))
+            keypairs_left -= 1
+
+            # This breaks early, but has no effect on the keys for this
+            # assignment. It would be slightly faster if key1 was a low number
+            # like 0x60. Leaving it here just to show that this is possible.
+            if keypairs_left <= 1:
+                break
+
+print("Removing %d unsuitable 20-bit keys" % len(removed))
 keys -= removed
 
-print("Possible keys: %d" % len(keys))
+print("Number of possible 20-bit keys: %d" % len(keys))
 
 if len(keys) == 1:
     key = list(keys)[0]
