@@ -205,6 +205,8 @@ static uint8_t decrypt(const uint32_t& key, const uint8_t& ciphertext)
 
 int main(int, char**)
 {
+  encrypt(0,0); // silence compiler warning
+
   // Read binary file
   FILE *fp = fopen("ctx1.bin", "rb");
   if (fp == NULL) {
