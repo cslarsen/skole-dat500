@@ -273,7 +273,7 @@ struct bruteforce_result bruteforce_3sdes_key(
     const size_t length)
 {
   // Find 20-bit key by brute force.
-  int left = (1<<20) - 1; // this is faster than doing a popcount
+  int keysleft = (1<<20) - 1; // this is faster than doing a popcount
   std::bitset< ((1<<20) - 1)> keyspace; // takes ~127kb of memory
   keyspace.flip(); // put all keys into the keyspace
 
@@ -288,30 +288,41 @@ struct bruteforce_result bruteforce_3sdes_key(
       unique[unique_len++] = chr;
   }
 
-  unsigned char decrypted[60];
+  // Lookup tables
+  unsigned char decrypted[256];
+
   //return decrypt(k1, encrypt(k2, decrypt(k1, c)));
 
   for ( uint16_t k1 = 0; k1 < 1024; ++k1 ) {
-
-    // Precalculate decrypt(k1, unique[n])
-    for ( size_t n = 0; n < unique_len; ++n )
-      decrypted[n] = decrypt(k1, unique[n]);
+    // Populate lookup table
+    for ( unsigned n = 0; n < 256; ++n )
+      decrypted[n] = decrypt(k1, uint8_t(n));
 
     for ( uint16_t k2 = 0; k2 < 1024; ++k2 ) {
       for ( size_t n = 0; n < unique_len; ++n ) {
         // Originally we did triplesdes_decrypt here, but now we've split it up
         // into parts to make it faster.
         // const uint8_t out = triplesdes_decrypt(k1, k2, unique[n]);
-        const uint8_t out = decrypt(k1, encrypt(k2, decrypted[n]));
-        if ( out < 32 || out > 126 ) {
+
+        // Perform triplesdes_decrypt in steps:
+        auto byte = unique[n]; // a unique ciphertext byte
+        byte = decrypted[byte]; // decrypt(k1, byte)
+        byte = encrypt(k2, byte);
+        byte = decrypted[byte]; // decrypt(k1, byte)
+
+        // Does this decrypt to a printable ASCII character? We ignore control
+        // characters. This range could be even tighter, but since we bail out
+        // the entire key on the first bad output byte, we should be a bit
+        // generous.
+        if ( byte < 32 || byte > 126 ) {
           const uint32_t key = uint32_t(k1) << 10 | k2;
           keyspace[key] = 0; // key is not viable, remove it
-          left -= 1;
+          keysleft -= 1;
           goto NEXT_K2;
         }
       }
 NEXT_K2:
-      if ( left <= 1 )
+      if ( keysleft <= 1 )
         goto DONE;
       continue;
     }
