@@ -242,28 +242,28 @@ int main(int, char**)
   }
   printf("\n");
 
-  // Brute force.
+  //Brute force.
   //std::bitset<1024*1024> kset;
-  std::set<uint32_t> kset;
+  //std::set<uint32_t> kset;
   //kset.flip();
-  printf("** start\n");
-  for ( uint16_t k1 = 0; k1 < 1024; ++k1 ) {
-    for ( uint16_t k2 = 0; k2 < 1024; ++k2 ) {
-      for ( size_t n = 0; n < 60; ++n ) {
-        const uint8_t out = triplesdes_decrypt(k1, k2, buffer[n]);
-        if ( out < 32 || out > 126 ) {
-          const uint32_t key = k1 << 10 | k2;
+  //printf("** start\n");
+  //for ( uint16_t k1 = 0; k1 < 1024; ++k1 ) {
+    //for ( uint16_t k2 = 0; k2 < 1024; ++k2 ) {
+      //for ( size_t n = 0; n < 60; ++n ) {
+        //const uint8_t out = triplesdes_decrypt(k1, k2, buffer[n]);
+        //if ( out < 32 || out > 126 ) {
+          //const uint32_t key = k1 << 10 | k2;
           //kset[key] = 0;
-          kset.erase(key);
-          goto NEXT_K2;
-        }
-      }
-NEXT_K2:
-      continue;
-    }
-  }
+          //kset.erase(key);
+          //goto NEXT_K2;
+        //}
+      //}
+//NEXT_K2:
+      //continue;
+    //}
+  //}
   //printf("** set %zu\n", kset.count());
-  printf("** set %zu\n", kset.size());
+  //printf("** set %zu\n", kset.size());
 
   // Decode with known key
   const uint16_t k1 = 0x3ea;
