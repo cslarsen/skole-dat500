@@ -28,10 +28,26 @@ seconds with pypy. For a larger keyspace (52 bit for example), it would still
 be viable, but may need to move to C, and for larger keys, need a smarter
 approach.
 
+For fun, I optimized this in several steps. The original run took 1.5 minutes
+with stock Python 2.7, and 2.6s JIT-compiled through pypy. I was able to make
+the brute-forcing algorithm smarter by reducing the time complexity from
+something like O(n^2) to something more like O(n), where n is the number of
+bits in the key (20).
+
+After that, the runtime dropped first to 30s for Python 2.7 and 1.6s for pypy,
+then some more optimizations got it down to 10-11s for Python, 0.8s for pypy.
+To push the envelope, I implemented SDES in C++. With the unoptimized
+brute-force algorithm, it finds the key in less than 0.3s. I can probably get
+it below a hundred milliseconds, but at the cost of memory usage. I don't think
+it's worth it to spend more time on this, but it may be good later on.
+
 Requirements
 ============
 
 Python 2.7 or 3.3+ with standard libraries such as zlib.
+
+The C++ implementation of SDES requires a C++ compiler such as clang++ or g++
+(LLVM and GCC, respectively).
 
 References
 ----------

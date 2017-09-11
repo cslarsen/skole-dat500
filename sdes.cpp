@@ -257,41 +257,56 @@ int main(int, char**)
   fclose(fp);
 
   printf("Ciphertext:\n");
-  for ( int n=0; n<60; ++n ) {
+  for ( int n=0; n < sizeof(buffer)/sizeof(unsigned char); ++n ) {
     printf("%2.2x ", buffer[n]);
   }
   printf("\n");
 
-  //Brute force.
-  //std::bitset<1024*1024> kset;
-  //std::set<uint32_t> kset;
-  //kset.flip();
-  //printf("** start\n");
-  //for ( uint16_t k1 = 0; k1 < 1024; ++k1 ) {
-    //for ( uint16_t k2 = 0; k2 < 1024; ++k2 ) {
-      //for ( size_t n = 0; n < 60; ++n ) {
-        //const uint8_t out = triplesdes_decrypt(k1, k2, buffer[n]);
-        //if ( out < 32 || out > 126 ) {
-          //const uint32_t key = k1 << 10 | k2;
-          //kset[key] = 0;
-          //kset.erase(key);
-          //goto NEXT_K2;
-        //}
-      //}
-//NEXT_K2:
-      //continue;
-    //}
-  //}
-  //printf("** set %zu\n", kset.count());
-  //printf("** set %zu\n", kset.size());
+  // Find 20-bit key by brute force.
+  int left = (1<<20) - 1; // this is faster than doing a popcount
+  std::bitset< ((1<<20) - 1)> keyspace; // takes ~127kb of memory
+  keyspace.flip(); // put all keys into the keyspace
 
-  // Decode with known key
-  const uint16_t k1 = 0x3ea;
-  const uint16_t k2 = 0x15f;
+  for ( uint16_t k1 = 0; k1 < 1024; ++k1 ) {
+    for ( uint16_t k2 = 0; k2 < 1024; ++k2 ) {
+      for ( size_t n = 0; n < sizeof(buffer) / sizeof(char); ++n ) {
+        const uint8_t out = triplesdes_decrypt(k1, k2, buffer[n]);
+        if ( out < 32 || out > 126 ) {
+          const uint32_t key = k1 << 10 | k2;
+          keyspace[key] = 0; // key is not viable, remove it
+          left -= 1;
+          goto NEXT_K2;
+        }
+      }
+NEXT_K2:
+      if ( left <= 1 )
+        goto DONE;
+      continue;
+    }
+  }
+DONE:
+  // Print found key (we could list all candidates here as well, but that
+  // usually means we've not really found the right one.)
+  uint32_t key = 0;
+  for ( uint32_t k=0; k < (1<<20)-1; ++k ) {
+    if ( keyspace[k] == 1 ) {
+      key = k;
+      //printf("brute-forced key candidate: 0x%x", k);
+      break;
+    }
+  }
+
+  // Decode with found key
+  const uint16_t k1 = (key & 0xffc00) >> 10; //0x3ea;
+  const uint16_t k2 = key & 0x3ff; //0x15f;
   //const uint32_t key = (k1 << 10) | k2; // 0xfa95f
 
+  printf("\nbrute-forced key candidate: 0x%x\n", key);
+  printf("k1: 0x%x\n", k1);
+  printf("k2: 0x%x\n", k2);
+
   printf("\nPlaintext:\n");
-  for ( int n=0; n<60; ++n ) {
+  for ( int n=0; n < sizeof(buffer)/sizeof(unsigned char); ++n ) {
     const unsigned char plain = triplesdes_decrypt(k1, k2, buffer[n]);
     printf("%c", plain);
   }
