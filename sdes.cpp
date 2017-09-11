@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
 
+// CHECKED
 static uint16_t p10(const uint16_t& n)
 {
   return (n &  0x80) << 2  // bit  3
@@ -15,6 +16,7 @@ static uint16_t p10(const uint16_t& n)
        | (n &  0x10) >> 4; // bit  6
 }
 
+// CHECKED
 static uint8_t p8(const uint16_t& n)
 {
     return (n & 0x10) << 3  // bit  6
@@ -27,6 +29,7 @@ static uint8_t p8(const uint16_t& n)
          | (n &  0x2) >> 1; // bit  9
 }
 
+// CHECKED
 static uint8_t p4(const uint8_t& n)
 {
     return (n & 0x4) << 1  // bit 2
@@ -35,6 +38,7 @@ static uint8_t p4(const uint8_t& n)
          | (n & 0x8) >> 3; // bit 1
 }
 
+// CHECKED
 static uint8_t ip(const uint8_t& n)
 {
     return (n & 0x40) << 1  // bit 2
@@ -47,6 +51,7 @@ static uint8_t ip(const uint8_t& n)
          | (n &  0x2) >> 1; // bit 7
 }
 
+// CHECKED
 static uint8_t revip(const uint8_t& n)
 {
   return (n & 0x10) >> 3  // bit 4
@@ -72,29 +77,30 @@ static uint8_t ep(const uint8_t& n)
        | (n & 0x8) >> 3; // bit 1
 }
 
-// Interchanges the upper and lower 4 bits (nibbles).
 // CHECKED
+// Interchanges the upper and lower 4 bits (nibbles).
 static uint8_t sw(const uint8_t& n)
 {
   return ((n & 0xf) << 4) | ((n & 0xf0) >> 4);
 }
 
-// Rotate/roll left 5 LSBs
 // CHECKED VIA shiftl4
+// Rotate/roll left 5 LSBs
 static uint8_t rol5(uint8_t n)
 {
   return ((n & 0x0f) << 1)  // shift 4 LSBs left
        | ((n & 0x10) >> 4); // and carry into LSB
 }
 
-// Rotates upper and lower 5 bits separately
 // CHECKED
+// Rotates upper and lower 5 bits separately
 static uint16_t shiftl5(const uint16_t& n)
 {
   return rol5((n & 0x3e0) >> 5) << 5 // upper five
        | rol5(n & 0x1f); // lower five
 }
 
+// CHECKED
 static uint8_t S0(const uint8_t& row, const uint8_t& col)
 {
   static uint8_t box[4][4] = {
@@ -107,6 +113,7 @@ static uint8_t S0(const uint8_t& row, const uint8_t& col)
   return box[row][col];
 }
 
+// CHECKED
 static uint8_t S1(const uint8_t& row, const uint8_t& col)
 {
   static uint8_t box[4][4] = {
@@ -119,16 +126,18 @@ static uint8_t S1(const uint8_t& row, const uint8_t& col)
   return box[row][col];
 }
 
+// CHECKED
 // Generate two 10-bit keys (figure G.2 in paper)
 static uint32_t create_subkeys(const uint32_t& key)
 {
-  uint8_t k2 = shiftl5(p10(key));
-  const uint8_t k1 = p8(k2);
+  uint16_t k2 = shiftl5(p10(key));
+  const uint16_t k1 = p8(k2);
   k2 = p8(shiftl5(shiftl5(k2)));
   return (k1 << 10) | k2;
 }
 
-static uint8_t Fmap(uint8_t n, const uint16_t& sk)
+
+static uint8_t Fmap(uint8_t n, const uint8_t& sk)
 {
   n = ep(n);
 
@@ -138,6 +147,7 @@ static uint8_t Fmap(uint8_t n, const uint16_t& sk)
   //uint8_t n3 = (n & 0x2) >> 1; // bit 3
   //uint8_t n4 = (n & 0x1);      // bit 4
   //uint8_t n1 = (n & 0x8) >> 3; // bit 1
+
   const uint8_t n4 = (n & 0x80) >> 7;
   const uint8_t n1 = (n & 0x40) >> 6;
   const uint8_t n2 = (n & 0x20) >> 5;
@@ -169,6 +179,7 @@ static uint8_t Fmap(uint8_t n, const uint16_t& sk)
   return p4(row1 << 2 | row2);
 }
 
+// CHECKED
 static uint8_t f(const uint16_t& sk, const uint8_t& n)
 {
   const uint8_t l = (n & 0xf0) >> 4;
@@ -195,15 +206,15 @@ static uint8_t decrypt(const uint32_t& key, const uint8_t& ciphertext)
 int main(int argc, char** argv)
 {
   // Read binary file
-  FILE *f = fopen("ctx1.bin", "rb");
-  if (f == NULL) {
+  FILE *fp = fopen("ctx1.bin", "rb");
+  if (fp == NULL) {
     perror("ctx1.bin");
     return 1;
   }
   unsigned char buffer[60] = {0};
   fread(buffer, sizeof(unsigned char), sizeof(buffer)/sizeof(unsigned char),
-      f);
-  fclose(f);
+      fp);
+  fclose(fp);
 
   printf("Ciphertext:\n");
   for ( int n=0; n<60; ++n ) {
@@ -212,9 +223,9 @@ int main(int argc, char** argv)
   printf("\n");
 
   // Decode with known key
-  const uint8_t k1 = 0x3ea;
-  const uint8_t k2 = 0x15f;
-  const uint16_t key = (k1 << 10) | k2; // 0xfa95f
+  const uint16_t k1 = 0x3ea;
+  const uint16_t k2 = 0x15f;
+  const uint32_t key = (k1 << 10) | k2; // 0xfa95f
 
   printf("\nPlaintext:\n");
   for ( int n=0; n<60; ++n ) {
