@@ -63,7 +63,7 @@ uint8_t ip(const uint8_t n)
 extern "C"
 uint8_t revip(const uint8_t n)
 {
-  return (n & 0x10) >> 3  // bit 4
+  return (n & 0x10) << 3  // bit 4
        | (n & 0x80) >> 1  // bit 1
        | (n & 0x20)       // bit 3
        | (n &  0x8) << 1  // bit 5

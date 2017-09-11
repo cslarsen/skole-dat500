@@ -34,6 +34,20 @@ for n in range(2**8):
         raise RuntimeError("ip(0x%x) py=0x%x cpp=0x%x" % (n, py, cpp))
 print("ok ip")
 
+for n in range(2**8):
+    py = sdes.revip(n)
+    cpp = csdes.revip(n)
+    if cpp != py:
+        raise RuntimeError("revip(0x%x) py=0x%x cpp=0x%x" % (n, py, cpp))
+print("ok revip")
+
+for n in range(2**8):
+    py = sdes.ep(n)
+    cpp = csdes.ep(n)
+    if cpp != py:
+        raise RuntimeError("ep(0x%x) py=0x%x cpp=0x%x" % (n, py, cpp))
+print("ok ep")
+
 # Check by converting C++ to tuple
 for key in range(2**10):
     py = sdes.create_subkeys(key)
