@@ -1,3 +1,15 @@
+// Simplified DES (SDES) primitive library with a fast key recovery capability.
+//
+// This source is written in pure C++11 source, and can be compiled both as a
+// program and a shared library. There is a ctypes-based Python library to
+// drive it, if needed.
+//
+// On an old 2010 Core i7 machine, it finds a 20-bit TripleSDES key and
+// retrieves the plaintext in 60 milliseconds.
+//
+// This program is part of the coursework for DAT-510 at University of
+// Stavanger autumn 2017.
+//
 // Written by Christian Stigen
 
 #include <bitset>
@@ -6,17 +18,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// Create a few typedefs to make it clear what bit width we are operating with.
+// Create a few typedefs to make it clear which bit widths the various
+// functions operate with.
+
 typedef uint8_t uint2_t;
 typedef uint8_t uint4_t;
 
-// Define a struct for use with bruteforcing.
+// Define a struct to hold results for brute-forcing.
+
 struct bruteforce_result {
   size_t count;
   uint32_t key;
 };
 
-// CHECKED
 extern "C"
 uint16_t p10(const uint16_t n)
 {
@@ -34,7 +48,6 @@ uint16_t p10(const uint16_t n)
   );
 }
 
-// CHECKED
 extern "C"
 uint8_t p8(const uint16_t n)
 {
@@ -50,7 +63,6 @@ uint8_t p8(const uint16_t n)
   );
 }
 
-// CHECKED
 extern "C"
 uint8_t p4(const uint4_t n)
 {
@@ -62,7 +74,6 @@ uint8_t p4(const uint4_t n)
   );
 }
 
-// CHECKED
 extern "C"
 uint8_t ip(const uint8_t n)
 {
@@ -78,7 +89,6 @@ uint8_t ip(const uint8_t n)
   );
 }
 
-// CHECKED
 extern "C"
 uint8_t revip(const uint8_t n)
 {
@@ -94,7 +104,6 @@ uint8_t revip(const uint8_t n)
   );
 }
 
-// CHECKED
 extern "C"
 uint8_t ep(const uint4_t n)
 {
@@ -110,7 +119,6 @@ uint8_t ep(const uint4_t n)
   );
 }
 
-// CHECKED
 // Interchanges the upper and lower 4 bits (nibbles).
 extern "C"
 uint8_t sw(const uint8_t n)
@@ -119,7 +127,6 @@ uint8_t sw(const uint8_t n)
               | ((n & 0xf0) >> 4);
 }
 
-// CHECKED VIA shiftl4
 // Rotate/roll left 5 LSBs
 extern "C"
 uint8_t rol5(uint8_t n)
@@ -128,7 +135,6 @@ uint8_t rol5(uint8_t n)
                | ((n & 0x10) >> 4)); // and carry into LSB
 }
 
-// CHECKED
 // Rotates upper and lower 5 bits separately
 extern "C"
 uint16_t shiftl5(const uint16_t n)
@@ -138,7 +144,7 @@ uint16_t shiftl5(const uint16_t n)
     | rol5(n & 0x1f));            // lower five
 }
 
-// CHECKED
+// The S0 s-box
 extern "C"
 uint2_t S0(const uint2_t row, const uint2_t col)
 {
@@ -152,7 +158,7 @@ uint2_t S0(const uint2_t row, const uint2_t col)
   return box[row][col];
 }
 
-// CHECKED
+// The S1 s-box
 extern "C"
 uint2_t S1(const uint2_t row, const uint2_t col)
 {
@@ -166,8 +172,7 @@ uint2_t S1(const uint2_t row, const uint2_t col)
   return box[row][col];
 }
 
-// CHECKED
-// Generate two 10-bit keys (figure G.2 in paper)
+// Generates two 10-bit keys (figure G.2 in SDES paper).
 extern "C"
 uint32_t create_subkeys(const uint16_t key)
 {
@@ -182,12 +187,7 @@ uint8_t Fmap(uint4_t n, const uint8_t sk)
 {
   n = ep(n);
 
-  // bits
-  // The two here should be equal, but they are not
-  //uint8_t n2 = (n & 0x4) >> 2; // bit 2
-  //uint8_t n3 = (n & 0x2) >> 1; // bit 3
-  //uint8_t n4 = (n & 0x1);      // bit 4
-  //uint8_t n1 = (n & 0x8) >> 3; // bit 1
+  // All of the following variables hold single bits.
 
   const uint8_t n4 = (n & 0x80) >> 7;
   const uint8_t n1 = (n & 0x40) >> 6;
@@ -222,7 +222,6 @@ uint8_t Fmap(uint4_t n, const uint8_t sk)
   return p4(uint4_t(row1 << 2) | uint4_t(row2));
 }
 
-// CHECKED
 extern "C"
 uint8_t fK(const uint8_t sk, const uint8_t n)
 {
@@ -290,8 +289,13 @@ struct bruteforce_result bruteforce_3sdes_key(
 
   // Lookup tables
   unsigned char decrypted[256];
+  uint8_t encrypted[1024][256];
 
-  //return decrypt(k1, encrypt(k2, decrypt(k1, c)));
+  // Create encrypt(key, byte) lookup table. It's only 256 kb, and memory is so
+  // cheap these days it can be wasted.
+  for ( uint16_t key = 0; key < 1024; ++key )
+    for ( uint16_t b = 0; b < 256; ++b )
+      encrypted[key][b] = encrypt(key, uint8_t(b));
 
   for ( uint16_t k1 = 0; k1 < 1024; ++k1 ) {
     // Populate lookup table
@@ -300,23 +304,17 @@ struct bruteforce_result bruteforce_3sdes_key(
 
     for ( uint16_t k2 = 0; k2 < 1024; ++k2 ) {
       for ( size_t n = 0; n < unique_len; ++n ) {
-        // Originally we did triplesdes_decrypt here, but now we've split it up
-        // into parts to make it faster.
-        // const uint8_t out = triplesdes_decrypt(k1, k2, unique[n]);
-
-        // Perform triplesdes_decrypt in steps:
-        auto byte = unique[n]; // a unique ciphertext byte
+        // Perform triplesdes_decrypt in steps. This is faster than doing:
+        //     auto byte = triplesdes_decrypt(k1, k2, unique[n])
+        uint8_t byte = unique[n];
         byte = decrypted[byte]; // decrypt(k1, byte)
-        byte = encrypt(k2, byte);
+        byte = encrypted[k2][byte]; // encrypt(k2, byte);
         byte = decrypted[byte]; // decrypt(k1, byte)
 
-        // Does this decrypt to a printable ASCII character? We ignore control
-        // characters. This range could be even tighter, but since we bail out
-        // the entire key on the first bad output byte, we should be a bit
-        // generous.
+        // Does this decrypt to a *visible* 7-bit ASCII character?
         if ( byte < 32 || byte > 126 ) {
           const uint32_t key = uint32_t(k1) << 10 | k2;
-          keyspace[key] = 0; // key is not viable, remove it
+          keyspace[key] = 0; // remove key from candidate set
           keysleft -= 1;
           goto NEXT_K2;
         }
