@@ -15,15 +15,38 @@ import os
 LIBSDES_PATH = os.getenv("LIBSDES_PATH", os.getcwd())
 libsdes = ctypes.CDLL(os.path.join(LIBSDES_PATH, "libsdes.so"))
 
+uint8ptr = ctypes.POINTER(ctypes.c_uint8)
+
 # The bruteforce_result struct
 class BruteforceResult(ctypes.Structure):
     _fields_ = [("count", ctypes.c_uint32),
                 ("key", ctypes.c_uint32)]
 
-bruteforce_3sdes_key = libsdes.bruteforce_3sdes_key
-bruteforce_3sdes_key.argtypes = [ctypes.c_char_p, ctypes.c_uint32,
-        ctypes.c_uint8, ctypes.c_uint8]
-bruteforce_3sdes_key.restype = BruteforceResult
+class Buffer(ctypes.Structure):
+    _fields_ = [("length", ctypes.c_uint32),
+                ("data", ctypes.POINTER(ctypes.c_uint8))]
+
+_bruteforce_3sdes_key = libsdes.bruteforce_3sdes_key
+_bruteforce_3sdes_key.argtypes = [ctypes.POINTER(ctypes.c_uint8),
+        ctypes.c_uint32, ctypes.c_uint8, ctypes.c_uint8]
+_bruteforce_3sdes_key.restype = BruteforceResult
+
+def bruteforce_3sdes_key(ciphertext, start, stop):
+    raw = (ctypes.c_uint8*len(ciphertext)).from_buffer_copy(ciphertext)
+    bf = _bruteforce_3sdes_key(raw, len(raw), start, stop)
+    return bf
+
+_triplesdes_decrypt_buffer = libsdes.triplesdes_decrypt_buffer
+_triplesdes_decrypt_buffer.argtypes = [ctypes.c_uint16, ctypes.c_uint16,
+        ctypes.c_uint32, ctypes.POINTER(ctypes.c_uint8)]
+_triplesdes_decrypt_buffer.restype = ctypes.POINTER(Buffer)
+
+def triplesdes_decrypt_buffer(k1, k2, ciphertext):
+    raw = (ctypes.c_uint8*len(ciphertext)).from_buffer_copy(ciphertext)
+    result = _triplesdes_decrypt_buffer(k1, k2, len(raw), raw)
+    length = result.contents.length
+    plaintext = "".join(chr(c) for c in result.contents.data[:length])
+    return plaintext
 
 p10 = libsdes.p10
 p10.argtypes = [ctypes.c_uint16]

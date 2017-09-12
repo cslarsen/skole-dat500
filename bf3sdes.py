@@ -23,7 +23,8 @@ def read_ciphertext(filename):
     """Converts text file consisting of zeroes and ones in ASCII to binary
     string."""
     ciphertext = readfile(filename)
-    return bytes(int(c, 2) for c in split_string(ciphertext, 8))
+    ciphertext = [int(c, 2) for c in split_string(ciphertext, 8)]
+    return bytearray(ciphertext)
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
@@ -35,7 +36,7 @@ Discard keys that decrypt to bytes outside of the --start and --end range. A
 good starting point is to require that all decrypted bytes fall within the
 visible ASCII range of 32 to 126.""".lstrip())
 
-    p.add_argument("--end", type=int, default=126,
+    p.add_argument("--stop", type=int, default=126,
             help="""End of range; see --start""")
 
     opts = p.parse_args()
@@ -44,14 +45,15 @@ visible ASCII range of 32 to 126.""".lstrip())
 
     # Bruteforce it
     start = mark_time()
-    bf = csdes.bruteforce_3sdes_key(ciphertext, len(ciphertext), opts.start,
-            opts.end)
+    bf = csdes.bruteforce_3sdes_key(ciphertext, opts.start, opts.stop)
     stop = mark_time()
+
     print("Found %d keys in %.1f ms CPU time" % (bf.count, 1000.0*(stop - start)))
 
     k1 = (bf.key & 0xffc00) >> 10;
     k2 = (bf.key & 0x003ff);
 
+    print("First found key:")
     print("  20-bit key: 0x%5.5x" % bf.key);
     print("  10-bit k1:    0x%3.3x" % k1);
     print("  10-bit k2:    0x%3.3x" % k2);
@@ -60,4 +62,9 @@ visible ASCII range of 32 to 126.""".lstrip())
     print("  k1 binary:  %10s.........." % bin(k1))
     print("  k2 binary:  ..........%12s" % bin(k2))
 
-    # TODO: Print plaintext
+    if bf.count == 1:
+        plaintext = csdes.triplesdes_decrypt_buffer(k1, k2, ciphertext)
+        print("Plaintext (%d bytes):" % len(plaintext))
+        print("%r" % plaintext)
+    else:
+        print("None or several keys were found; not decrypting")

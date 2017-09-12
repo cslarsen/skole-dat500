@@ -15,6 +15,8 @@
 //
 // Written by Christian Stigen
 
+// TODO: Use uint8_t instead of unsigned char, everywhere
+
 #include <bitset>
 #include <set>
 #include <stdint.h>
@@ -27,11 +29,16 @@
 typedef uint8_t uint2_t;
 typedef uint8_t uint4_t;
 
-// Define a struct to hold results for brute-forcing.
+// Define a few structs for returning results
 
 struct bruteforce_result {
   uint32_t count;
   uint32_t key;
+};
+
+struct buffer {
+  uint32_t length;
+  uint8_t* data;
 };
 
 extern "C"
@@ -269,6 +276,41 @@ uint8_t triplesdes_decrypt(
   return decrypt(k1, encrypt(k2, decrypt(k1, c)));
 }
 
+extern "C"
+struct buffer* malloc_buffer(const uint32_t size)
+{
+  struct buffer* p = static_cast<struct buffer*>(malloc(sizeof(struct buffer)));
+  p->length = 0;
+  p->data = static_cast<uint8_t*>(malloc(sizeof(uint8_t)*size));
+  return p;
+}
+
+extern "C"
+void free_buffer(struct buffer* p)
+{
+  if ( p != NULL ) {
+    if ( p->data != NULL )
+      free(p->data);
+    free(p);
+  }
+}
+
+extern "C"
+struct buffer* triplesdes_decrypt_buffer(
+    const uint16_t k1,
+    const uint16_t k2,
+    const uint32_t length,
+    const uint8_t* ciphertext)
+{
+  struct buffer* out = malloc_buffer(length);
+  out->length = length;
+
+  for ( size_t n = 0; n < length; ++n )
+    out->data[n] = triplesdes_decrypt(k1, k2, ciphertext[n]);
+
+  return out;
+}
+
 // Finds a 20-bit TripleSDES key by brute force
 //
 // Args:
@@ -285,7 +327,7 @@ uint8_t triplesdes_decrypt(
 //    that you get one key, then try to decrypt the ciphertext using that key.
 extern "C"
 struct bruteforce_result bruteforce_3sdes_key(
-    const unsigned char* ciphertext,
+    const uint8_t* ciphertext,
     const uint32_t length,
     const uint8_t filter_start,
     const uint8_t filter_end)
