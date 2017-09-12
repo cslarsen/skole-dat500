@@ -266,52 +266,64 @@ uint8_t triplesdes_decrypt(
   return decrypt(k1, encrypt(k2, decrypt(k1, c)));
 }
 
+// Finds a 20-bit TripleSDES key by brute force. In ~60ms.
 extern "C"
 struct bruteforce_result bruteforce_3sdes_key(
     const unsigned char* ciphertext,
     const size_t length)
 {
-  // Find 20-bit key by brute force.
-  int keysleft = (1<<20) - 1; // this is faster than doing a popcount
-  std::bitset< ((1<<20) - 1)> keyspace; // takes ~127kb of memory
-  keyspace.flip(); // put all keys into the keyspace
+  // Number of keys left in candidate set. Using a counter is faster than
+  // continually doing a popcount on the bitset.
+  int keysleft = (1<<20) - 1;
 
-  // Find unique ciphertext bytes, to reduce the innerloop
+  // Use a bitset to contain candidate 20-bit keys (consisting of k1 and k2).
+  // If a bit is set, it is still a candidate. Using a bitset takes only ~128
+  // kb of memory and has constant lookups.
+  std::bitset< ((1<<20) - 1)> keyspace;
+  keyspace.flip(); // All keys are initially candidates
+
+  // Find unique cipher text bytes. This set is usually very small: The 60-byte
+  // ciphertext is now reduced to 18 bytes. TripleSDES also seems to have very
+  // low entropy, since a good symmetric cipher would use the full range of 256
+  // bytes. Of course, it's an educational cipher.
   unsigned char unique[60];
   size_t unique_len = 0;
   {
     std::set<unsigned char> unique_bytes;
+
     for ( size_t n = 0; n < length;  ++n )
       unique_bytes.insert(ciphertext[n]);
+
     for ( auto chr : unique_bytes )
       unique[unique_len++] = chr;
   }
 
-  // Lookup tables
-  unsigned char decrypted[256];
-  uint8_t encrypted[1024][256];
-
-  // Create encrypt(key, byte) lookup table. It's only 256 kb, and memory is so
-  // cheap these days it can be wasted.
+  // Make encryption lookup table. It only takes 256 kb, and memory is cheap.
+  uint8_t encrypted[1024][256]; // (key, byte)
   for ( uint16_t key = 0; key < 1024; ++key )
     for ( uint16_t b = 0; b < 256; ++b )
       encrypted[key][b] = encrypt(key, uint8_t(b));
 
+  // Try all k1 keys
   for ( uint16_t k1 = 0; k1 < 1024; ++k1 ) {
-    // Populate lookup table
+    // Populate lookup table for use in innerloops. Since we only scan k1 once,
+    // we don't win anything by calculating this before this loop.
+    unsigned char decrypted[256]; // (k1, byte)
     for ( unsigned n = 0; n < 256; ++n )
       decrypted[n] = decrypt(k1, uint8_t(n));
 
+    // Try all k2 keys
     for ( uint16_t k2 = 0; k2 < 1024; ++k2 ) {
       for ( size_t n = 0; n < unique_len; ++n ) {
         // Perform triplesdes_decrypt in steps. This is faster than doing:
         //     auto byte = triplesdes_decrypt(k1, k2, unique[n])
         uint8_t byte = unique[n];
-        byte = decrypted[byte]; // decrypt(k1, byte)
+        byte = decrypted[byte];     // decrypt(k1, byte)
         byte = encrypted[k2][byte]; // encrypt(k2, byte);
-        byte = decrypted[byte]; // decrypt(k1, byte)
+        byte = decrypted[byte];     // decrypt(k1, byte)
 
-        // Does this decrypt to a *visible* 7-bit ASCII character?
+        // Does the keys k1 and k2 decrypt this ciphertext byte a *visible*
+        // 7-bit ASCII character?
         if ( byte < 32 || byte > 126 ) {
           const uint32_t key = uint32_t(k1) << 10 | k2;
           keyspace[key] = 0; // remove key from candidate set
@@ -320,9 +332,10 @@ struct bruteforce_result bruteforce_3sdes_key(
         }
       }
 NEXT_K2:
+      // This exactly when GOTO is considered beneficial. When we've found a
+      // single key-pair that seem to work, we bail out.
       if ( keysleft <= 1 )
         goto DONE;
-      continue;
     }
   }
 
@@ -331,6 +344,8 @@ DONE:
   result.count = keyspace.count();
   result.key = 0;
 
+  // Unfortunately, std::bitset doesn't have any nice way of finding the MSB,
+  // so we'll just iterate.
   for ( uint32_t k=0; k < (1<<20)-1; ++k ) {
     if ( keyspace[k] == 1 ) {
       result.key = k;
