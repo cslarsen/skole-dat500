@@ -1,4 +1,4 @@
-CXXFLAGS := -W -Wall -Wextra -Wconversion -march=native -O3 --std=c++11
+CXXFLAGS := -W -Wall -Wextra -march=native -O3 --std=c++11
 TARGETS := sdes libsdes.so
 
 all: $(TARGETS)
