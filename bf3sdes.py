@@ -36,7 +36,8 @@ if __name__ == "__main__":
     print("  10-bit k1:    0x%3.3x" % k1);
     print("  10-bit k2:    0x%3.3x" % k2);
 
-    print("  k1 binary: %s" % bin(k1))
-    print("  k2 binary: %s" % bin(k2))
+    print("  key binary: %20s" % bin(bf.key))
+    print("  k1 binary:  %10s.........." % bin(k1))
+    print("  k2 binary:  ..........%12s" % bin(k2))
 
     # TODO: Print plaintext
