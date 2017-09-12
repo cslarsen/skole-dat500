@@ -10,6 +10,13 @@ Written by Christian Stigen
 from util import *
 import argparse
 import csdes
+import time
+import sys
+
+if sys.version_info.major < 3:
+    timer = time.clock
+else:
+    timer = time.cputime
 
 def read_ciphertext(filename):
     """Converts text file consisting of zeroes and ones in ASCII to binary
@@ -26,8 +33,10 @@ if __name__ == "__main__":
     ciphertext = read_ciphertext(opts.FILE)
 
     # Bruteforce it
+    start = timer()
     bf = csdes.bruteforce_3sdes_key(ciphertext, len(ciphertext))
-    print("Found %d keys" % bf.count)
+    stop = timer()
+    print("Found %d keys in %.1f ms CPU time" % (bf.count, 1000.0*(stop - start)))
 
     k1 = (bf.key & 0xffc00) >> 10;
     k2 = (bf.key & 0x003ff);
