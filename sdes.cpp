@@ -311,6 +311,56 @@ struct buffer* triplesdes_decrypt_buffer(
   return out;
 }
 
+extern "C"
+struct bruteforce_result bruteforce_sdes_key(
+    const uint8_t* ciphertext,
+    const uint32_t length,
+    const uint8_t filter_start,
+    const uint8_t filter_end)
+{
+  std::bitset<1024> keyspace;
+  keyspace.flip(); // All keys are initially candidates
+
+  // Find unique cipher text bytes. This set is usually very small: The 60-byte
+  // ciphertext is now reduced to 18 bytes. TripleSDES also seems to have very
+  // low entropy, since a good symmetric cipher would use the full range of 256
+  // bytes. Of course, it's an educational cipher.
+  unsigned char unique[length];
+  size_t unique_len = 0;
+  {
+    std::set<unsigned char> unique_bytes;
+
+    for ( size_t n = 0; n < length;  ++n )
+      unique_bytes.insert(ciphertext[n]);
+
+    for ( auto chr : unique_bytes )
+      unique[unique_len++] = chr;
+  }
+
+  for ( size_t key = 0; key < 1024; ++key ) {
+    for ( size_t n = 0; n < unique_len; ++n) {
+      const auto byte = decrypt(key, unique[n]);
+      if ( byte < filter_start || byte > filter_end )
+        keyspace[key] = 0;
+    }
+    if ( keyspace.count() <= 1 )
+      break;
+  }
+
+  bruteforce_result r;
+  r.count = uint32_t(keyspace.count());
+  r.key = 0;
+
+  for ( size_t n = 0; n < 1024; ++n ) {
+    if ( keyspace[n] == 1 ) {
+      r.key = n;
+      break;
+    }
+  }
+
+  return r;
+}
+
 // Finds a 20-bit TripleSDES key by brute force
 //
 // Args:
