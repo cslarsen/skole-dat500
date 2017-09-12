@@ -16,13 +16,13 @@ import sys
 if sys.version_info.major < 3:
     timer = time.clock
 else:
-    timer = time.cputime
+    timer = time.perf_counter
 
 def read_ciphertext(filename):
     """Converts text file consisting of zeroes and ones in ASCII to binary
     string."""
     ciphertext = readfile(filename)
-    return "".join(chr(int(c, 2)) for c in split_string(ciphertext, 8))
+    return bytes(int(c, 2) for c in split_string(ciphertext, 8))
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
