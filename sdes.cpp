@@ -4,6 +4,9 @@
 // program and a shared library. There is a ctypes-based Python library to
 // drive it, if needed.
 //
+// NOTE: This program expects to read the file in *binary* format. But you can
+// use a Python driver program to do that.
+//
 // On an old 2010 Core i7 machine, it finds a 20-bit TripleSDES key and
 // retrieves the plaintext in 60 milliseconds.
 //
@@ -27,7 +30,7 @@ typedef uint8_t uint4_t;
 // Define a struct to hold results for brute-forcing.
 
 struct bruteforce_result {
-  size_t count;
+  uint32_t count;
   uint32_t key;
 };
 
@@ -270,7 +273,7 @@ uint8_t triplesdes_decrypt(
 extern "C"
 struct bruteforce_result bruteforce_3sdes_key(
     const unsigned char* ciphertext,
-    const size_t length)
+    const uint32_t length)
 {
   // Number of keys left in candidate set. Using a counter is faster than
   // continually doing a popcount on the bitset.

@@ -15,6 +15,15 @@ import os
 LIBSDES_PATH = os.getenv("LIBSDES_PATH", os.getcwd())
 libsdes = ctypes.CDLL(os.path.join(LIBSDES_PATH, "libsdes.so"))
 
+# The bruteforce_result struct
+class BruteforceResult(ctypes.Structure):
+    _fields_ = [("count", ctypes.c_uint32),
+                ("key", ctypes.c_uint32)]
+
+bruteforce_3sdes_key = libsdes.bruteforce_3sdes_key
+bruteforce_3sdes_key.argtypes = [ctypes.c_char_p, ctypes.c_uint32]
+bruteforce_3sdes_key.restype = BruteforceResult
+
 p10 = libsdes.p10
 p10.argtypes = [ctypes.c_uint16]
 p10.restype = ctypes.c_uint16
