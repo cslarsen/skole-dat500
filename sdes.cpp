@@ -269,11 +269,26 @@ uint8_t triplesdes_decrypt(
   return decrypt(k1, encrypt(k2, decrypt(k1, c)));
 }
 
-// Finds a 20-bit TripleSDES key by brute force. In ~60ms.
+// Finds a 20-bit TripleSDES key by brute force
+//
+// Args:
+//   - ciphertext: Raw binary ciphertext to break
+//   - length: Number of bytes in ciphertext
+//   - filter_start, filter_end: Discard decrypted bytes that fall outside of
+//       this range. A good defaul is to use 32 and 126, i.e. discard any keys
+//       that do not produce decrypted bytes that fall within the visible ASCII
+//       range.
+//
+//  Returns:
+//    A struct containing number of 20-keys found to produce decrypted bytes in
+//    the given range, and the first of those keys. Tweak the filter range so
+//    that you get one key, then try to decrypt the ciphertext using that key.
 extern "C"
 struct bruteforce_result bruteforce_3sdes_key(
     const unsigned char* ciphertext,
-    const uint32_t length)
+    const uint32_t length,
+    const uint8_t filter_start,
+    const uint8_t filter_end)
 {
   // Number of keys left in candidate set. Using a counter is faster than
   // continually doing a popcount on the bitset.
@@ -327,7 +342,7 @@ struct bruteforce_result bruteforce_3sdes_key(
 
         // Does the keys k1 and k2 decrypt this ciphertext byte a *visible*
         // 7-bit ASCII character?
-        if ( byte < 32 || byte > 126 ) {
+        if ( byte < filter_start || byte > filter_end ) {
           const uint32_t key = uint32_t(k1) << 10 | k2;
           keyspace[key] = 0; // remove key from candidate set
           keysleft -= 1;
@@ -393,7 +408,7 @@ int main(int, char**)
   printf("Brute-forcing 20-bit key ... ");
   fflush(stdout);
 
-  const auto bf = bruteforce_3sdes_key(ciphertext, length);
+  const auto bf = bruteforce_3sdes_key(ciphertext, length, 32, 126);
 
   printf("found %u keys\n", bf.count);
   fflush(stdout);

@@ -21,7 +21,8 @@ class BruteforceResult(ctypes.Structure):
                 ("key", ctypes.c_uint32)]
 
 bruteforce_3sdes_key = libsdes.bruteforce_3sdes_key
-bruteforce_3sdes_key.argtypes = [ctypes.c_char_p, ctypes.c_uint32]
+bruteforce_3sdes_key.argtypes = [ctypes.c_char_p, ctypes.c_uint32,
+        ctypes.c_uint8, ctypes.c_uint8]
 bruteforce_3sdes_key.restype = BruteforceResult
 
 p10 = libsdes.p10

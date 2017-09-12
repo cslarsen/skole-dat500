@@ -13,10 +13,11 @@ import csdes
 import time
 import sys
 
+# Which function to use to measure time spent brute-forcing
 if sys.version_info.major < 3:
-    timer = time.clock
+    mark_time = time.clock
 else:
-    timer = time.perf_counter
+    mark_time = time.perf_counter
 
 def read_ciphertext(filename):
     """Converts text file consisting of zeroes and ones in ASCII to binary
@@ -28,14 +29,24 @@ if __name__ == "__main__":
     p = argparse.ArgumentParser()
     p.add_argument("FILE", type=str, nargs="?", default="ctx2.txt",
             help="""Ciphertext file to break, consiting of 0 and 1 in ASCII.""")
+    p.add_argument("--start", type=int, default=32,
+            help="""
+Discard keys that decrypt to bytes outside of the --start and --end range. A
+good starting point is to require that all decrypted bytes fall within the
+visible ASCII range of 32 to 126.""".lstrip())
+
+    p.add_argument("--end", type=int, default=126,
+            help="""End of range; see --start""")
+
     opts = p.parse_args()
 
     ciphertext = read_ciphertext(opts.FILE)
 
     # Bruteforce it
-    start = timer()
-    bf = csdes.bruteforce_3sdes_key(ciphertext, len(ciphertext))
-    stop = timer()
+    start = mark_time()
+    bf = csdes.bruteforce_3sdes_key(ciphertext, len(ciphertext), opts.start,
+            opts.end)
+    stop = mark_time()
     print("Found %d keys in %.1f ms CPU time" % (bf.count, 1000.0*(stop - start)))
 
     k1 = (bf.key & 0xffc00) >> 10;
