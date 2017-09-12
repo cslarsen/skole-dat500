@@ -344,7 +344,7 @@ NEXT_K2:
 
 DONE:
   bruteforce_result result;
-  result.count = keyspace.count();
+  result.count = uint32_t(keyspace.count());
   result.key = 0;
 
   // Unfortunately, std::bitset doesn't have any nice way of finding the MSB,
@@ -395,7 +395,7 @@ int main(int, char**)
 
   const auto bf = bruteforce_3sdes_key(ciphertext, length);
 
-  printf("found %zu keys\n", bf.count);
+  printf("found %u keys\n", bf.count);
   fflush(stdout);
 
   const uint16_t k1 = (bf.key & 0xffc00) >> 10;
