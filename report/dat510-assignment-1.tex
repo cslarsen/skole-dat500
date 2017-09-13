@@ -12,7 +12,105 @@
 My abstract, to be written at the end.
 \end{abstract}
 
-\section{Part I. Poly-alphabetic Ciphers}
+\section{Part I}
+
+Below is the plaintext message with spaces added to make each block coincide
+with the length of the key \texttt{TSHTAD}. I have also added a readable
+version.
+
+\begin{verbatim}
+CRYPTO GRAPHY CANBES TRONGO RWEAKC RYPTOG RAPHIC STRENG
+THISME ASURED INTHET IMEAND RESOUR CESITW OULDRE QUIRET
+ORECOV ERTHEP LAINTE XTTHER ESULTO FSTRON GCRYPT OGRAPH
+YISCIP HERTEX TTHATI SVERYD IFFICU LTTODE CIPHER WITHOU
+TPOSSE SSIONO FTHEAP PROPRI ATEDEC ODINGT OOLHOW DIFFIC
+ULTGIV ENALLO FTODAY SCOMPU TINGPO WERAND AVAILA BLETIM
+EEVENA BILLIO NCOMPU TERSDO INGABI LLIONC HECKSA SECOND
+ITISNO TPOSSI BLETOD ECIPHE RTHERE SULTOF STRONG CRYPTO
+GRAPHY BEFORE THEEND OFTHEU NIVERS E
+\end{verbatim}
+
+\textit{Cryptography can be strong or weak. Cryptographic strength is measured
+in the time and resources it would require to recover the plaintext.  The
+result of strong cryptography is ciphertext that is very difficult to decipher
+without possession of the appropriate decoding tool. How difficult given all of
+today's computer power and available time, even a billion computers doing a
+billion checks a second, it is not possible to decipher the result of strong
+cryptography before the end of the universe.}
+
+\subsection{Strategy}
+
+I based my approach on the Kasinski method with \textit{coincidence counting}\todo{add
+references}. Briefly,
+
+\begin{itemize}
+  \item Find repeating words and the distances between them
+  \item Find common factors between all the distances; their product may be the
+    key length
+  \item Use frequency analysis with coincidence counting to recover the
+    plaintext message
+  \item Decrypt Use frequency analysis to decipher the message
+\end{itemize}
+
+\paragraph{Finding repeated words}
+
+This was fairly simple: The assignment stated that the key length was less than
+ten, so I chopped the text up into $n$ pieces from $3\dots10$ and simply
+searched for multiple occurrences. In pseudo-code:
+
+\verbatim{
+  for keylength in range(3, 10):
+     for start in range(length(ciphertext)):
+        key = ciphertext[start:start+length]
+        positions = ciphertext.findall(key)
+}
+
+I found the following repeats:
+
+\verbatim{
+pos=  0       'VJFITRZJHIHB' pos=378       'VJFITRZJHIHB' dist=378
+pos=  0        'VJFITRZJHIH' pos=378        'VJFITRZJHIH' dist=378
+pos=  0         'VJFITRZJHI' pos=378         'VJFITRZJHI' dist=378
+pos=  2         'FITRZJHIHB' pos=380         'FITRZJHIHB' dist=378
+pos=  0          'VJFITRZJH' pos=378          'VJFITRZJH' dist=378
+pos=  0          'VJFITRZJH' pos=378          'VJFITRZJH' dist=378
+pos=  0           'VJFITRZJ' pos=378           'VJFITRZJ' dist=378
+pos=  0            'VJFITRZ' pos=378            'VJFITRZ' dist=378
+pos=  0            'VJFITRZ' pos=378            'VJFITRZ' dist=378
+pos=  0             'VJFITR' pos=378             'VJFITR' dist=378
+pos=  6             'ZJHIHB' pos=384             'ZJHIHB' dist=378
+pos=  0             'VJFITR' pos=378             'VJFITR' dist=378
+pos=  6             'ZJHIHB' pos=384             'ZJHIHB' dist=378
+pos=  0              'VJFIT' pos=378              'VJFIT' dist=378
+pos=  5              'RZJHI' pos=383              'RZJHI' dist=378
+pos=260              'VFPXM' pos=302              'VFPXM' dist=42
+pos=  2              'FITRZ' pos=380              'FITRZ' dist=378
+pos=  7              'JHIHB' pos=385              'JHIHB' dist=378
+pos=  0               'VJFI' pos=378               'VJFI' dist=378
+pos=  4               'TRZJ' pos=382               'TRZJ' dist=378
+pos=  8               'HIHB' pos=386               'HIHB' dist=378
+pos=192               'MHVL' pos=342               'MHVL' dist=150
+pos=260               'VFPX' pos=302               'VFPX' dist=42
+pos=282               'UDLM' pos=348               'UDLM' dist=66
+pos=  2               'FITR' pos=380               'FITR' dist=378
+pos=  6               'ZJHI' pos=384               'ZJHI' dist=378
+Distances: 378 66 42 150
+Common factors: 2 3
+Perhaps the keylength is 6
+Ciphertext in 6 columns
+VJFITR
+ZJHIHB
+VSUUEV
+MJVGGR
+KOLTKF
+KQWMOJ
+KSWAIF
+... 64 more
+}
+
+TODO: Describe strategy you employed. SHow the details for each of the steps of
+the strategy. Describe any programs you wrote. Show sample output of these
+programs. Show how you transformed that output into your solution.
 
 \begin{itemize}
   \item The plaintext message you managed to decipher
