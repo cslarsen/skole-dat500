@@ -82,6 +82,34 @@ def make_vigenere_table():
             tbl[Y][X] = char
     return tbl
 
+def vigenere_encrypt(plaintext, key):
+    ciphertext = ""
+    table = make_vigenere_table()
+    plaintext = plaintext.replace(" ", "").upper()
+    key = key.upper()
+    for n in range(len(plaintext)):
+        x = key[n % len(key)]
+        y = plaintext[n]
+        if y != " ":
+            ciphertext += table[x][y]
+    return ciphertext
+
+def vigenere_decrypt(ciphertext, key):
+    table = make_vigenere_table()
+    plaintext = ""
+    alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    ciphertext = ciphertext.replace(" ", "").upper()
+    key = key.upper()
+    for n in range(len(ciphertext)):
+        x = key[n % len(key)]
+        byte = ciphertext[n]
+
+        line = "".join(table[x][c] for c in alpha)
+        # find byte in line
+        idx = line.find(byte)
+        plaintext += alpha[idx]
+    return plaintext
+
 if __name__ == "__main__":
     ciphertext = readfile("cipher.txt")
 
@@ -152,4 +180,10 @@ if __name__ == "__main__":
     print("Helpful functions: rf() print relfreqs, tr() transpose")
     print(" digs(n) digrams in text that occur more than n")
     print(" endigs() english digrams")
-    vtable()
+
+    plain = "there is a secret passage behind the picture frame"
+    key = "ihs"
+    c = vigenere_encrypt("there is a secret passage behind the picture frame", key)
+    print(c)
+    p = vigenere_decrypt(c, key)
+    print(p)
