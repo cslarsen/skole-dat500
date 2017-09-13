@@ -167,3 +167,173 @@ B ...    ..
 C ...
 
 Then SHIFT the cipher side until the frequencies line up.
+
+OK, this approach looks interesting. I've made it visual, so it's easy to see
+when the small and large relative frequency values line up. I have a shift()
+function that can shift the alphabet. Since the Vigenere cipher rows/columns
+are in alphabetical order, and shifted by a specific amount, this should make
+it possible to reconstruct the message itself.
+
+>>> sf(0)
+                   Text - English
+      ****  0.0435 A  -  0.0812 A *******
+     *****  0.0580 B  -  0.0149 B *
+    ******  0.0725 C  -  0.0271 C **
+         *  0.0145 D  -  0.0432 D ****
+    ******  0.0725 E  -  0.1202 E **********
+      ****  0.0435 F  -  0.0230 F **
+      ****  0.0435 G  -  0.0203 G **
+       ***  0.0290 H  -  0.0592 H *****
+    ******  0.0725 I  -  0.0731 I ******
+            0.0000 J  -  0.0010 J
+            0.0000 K  -  0.0069 K *
+      ****  0.0435 L  -  0.0398 L ***
+            0.0000 M  -  0.0261 M **
+       ***  0.0290 N  -  0.0695 N ******
+  ********  0.0870 O  -  0.0768 O ******
+         *  0.0145 P  -  0.0182 P **
+         *  0.0145 Q  -  0.0011 Q
+    ******  0.0725 R  -  0.0602 R *****
+ *********  0.1014 S  -  0.0628 S *****
+**********  0.1159 T  -  0.0910 T ********
+         *  0.0145 U  -  0.0288 U **
+            0.0000 V  -  0.0111 V *
+       ***  0.0290 W  -  0.0209 W **
+         *  0.0145 X  -  0.0017 X
+         *  0.0145 Y  -  0.0211 Y **
+>>> recombine(monos)
+'CJFITRGJHIHBCSUUEVTJVGGRROLTKFRQWMOJRSWAIFSLYXNJTZPLMHAKBKEGIFAAEWIELTNGRWZHUU
+CWZBTZOMSWRHQMPKEWOJLVOYEJAAESLSPGTHXLAAEUEKBETRFKAKOQGUYRPWOYYTPKYAZVISHWYMEAT
+LOTTLSNLKYGIXMBCXLLAHDHCAWAEUWAAAOXTHVLSHSKPHNRFLOXASPJVIRLALLWEFOVPGGWOGSAOZDA
+MYIFUDAZIYEFHELRFLVWABSUVFPXTAUZPRWWYTNGANHBLDBDLMIPEWCXNDBASEIRNUVFPXTWYLDRIFN
+TBLLDPHNFHWJDSDSWJHNGILPLNRTHVLSLBDLMOGEUPIHHRLOXRHSMSMOISLYHNJCJFITRGJHIHBBWMH
+RHTZLXNGOXAAEXNACXRV'
+>>>
+
+This is the result of shifting monos by 7 places positive. Have not done the
+other ones yes.
+
+Tried some more, got this:
+
+>>> recombine(monos)
+CCYPTA GCAPHK CLNBEE TCONGA RHEAKO RJPTOS RLPHIO SERENS TSISMQ ADUREP IYTHEF
+IXEANP RPSOUD CPSITI OFLDRQ QFIREF OCECOH ECTHEB LLINTQ XETHED EDULTA FDTROZ
+GNRYPF ORRAPT YTSCIB HPRTEJ TEHATU SGERYP IQFICG LETODQ CTPHED WTTHOG TAOSSQ
+SDIONA FEHEAB PCOPRU AEEDEO OOINGF OZLHOI DTFFIO UWTGIH EYALLA FEODAK SNOMPG
+TTNGPA WPRANP AGAILM BWETIY EPVENM BTLLIA NNOMPG TPRSDA IYGABU LWIONO HPCKSM
+SPCONP IEISNA TAOSSU BWETOP ENIPHQ REHERQ SFLTOR SERONS CCYPTA GCAPHK BPFORQ
+TSEENP OQTHEG NTVERE
+
+This doesn't look like anything to me. Can't see any words that make sense
+here... Although there are indeed some instances of the trigram THE
+
+CCYPTA GCAPHK CLNBEE TCONGA RHEAKO RJPTOS RLPHIO SERENS TSISMQ ADUREP IYTHEF
+                                                                        ^^^
+IXEANP RPSOUD CPSITI OFLDRQ QFIREF OCECOH ECTHEB LLINTQ XETHED EDULTA FDTROZ
+                                            ^^^           ^^^
+GNRYPF ORRAPT YTSCIB HPRTEJ TEHATU SGERYP IQFICG LETODQ CTPHED WTTHOG TAOSSQ
+SDIONA FEHEAB PCOPRU AEEDEO OOINGF OZLHOI DTFFIO UWTGIH EYALLA FEODAK SNOMPG
+TTNGPA WPRANP AGAILM BWETIY EPVENM BTLLIA NNOMPG TPRSDA IYGABU LWIONO HPCKSM
+SPCONP IEISNA TAOSSU BWETOP ENIPHQ REHERQ SFLTOR SERONS CCYPTA GCAPHK BPFORQ
+TSEENP OQTHEG NTVERE
+         ^^^
+
+Perhaps some of them are "THERE", "THEM"? I can try to make the according
+shifts and check the frequency tables.
+
+Take the last one, THEG.. so if we shift from G to R, what happens?
+
+                   Text - English
+       ***  0.0435 A  -  0.0812 A *******
+            0.0000 B  -  0.0149 B *
+     *****  0.0725 C  -  0.0271 C **
+   *******  0.1014 D  -  0.0432 D ****
+  ********  0.1159 E  -  0.1202 E **********
+         *  0.0145 F  -  0.0230 F **
+       ***  0.0435 G  -  0.0203 G **
+         *  0.0145 H  -  0.0592 H *****
+      ****  0.0580 I  -  0.0731 I ******
+            0.0000 J  -  0.0010 J
+            0.0000 K  -  0.0069 K *
+            0.0000 L  -  0.0398 L ***
+         *  0.0145 M  -  0.0261 M **
+         *  0.0145 N  -  0.0695 N ******
+**********  0.1449 O  -  0.0768 O ******
+       ***  0.0435 P  -  0.0182 P **
+            0.0000 Q  -  0.0011 Q
+       ***  0.0435 R  -  0.0602 R *****
+        **  0.0290 S  -  0.0628 S *****
+      ****  0.0580 T  -  0.0910 T ********
+     *****  0.0725 U  -  0.0288 U **
+        **  0.0290 V  -  0.0111 V *
+        **  0.0290 W  -  0.0209 W **
+         *  0.0145 X  -  0.0017 X
+       ***  0.0435 Y  -  0.0211 Y **
+>>> recombine(monos)
+CCYPTOGCAPHYCLNBESTCONGORHEAKCRJPTOGRLPHICSERENGTSISMEADUREDIYTHE
+TIXEANDRPSOURCPSITWOFLDREQFIRETOCECOVECTHEPLLINTEXETHEREDULTOFDTR
+ONGNRYPTORRAPHYTSCIPHPRTEXTEHATISGERYDIQFICULETODECTPHERWTTHOUTAO
+SSESDIONOFEHEAPPCOPRIAEEDECOOINGTOZLHOWDTFFICUWTGIVEYALLOFEODAYSN
+OMPUTTNGPOWPRANDAGAILABWETIMEPVENABTLLIONNOMPUTPRSDOIYGABILWIONCH
+PCKSASPCONDIEISNOTAOSSIBWETODENIPHEREHERESFLTOFSERONGCCYPTOGCAPHY
+BPFORETSEENDOQTHEUNTVERS
+
+"CCYPTO GCAPHY" <- if the second letter had been an R, this would say
+"Cryptography"! Let's try that.
+
+>>> show_freqs(shift(monos[1], ord('R')-ord('G')))
+                   Text - English
+ *********  0.1304 A  -  0.0812 A *******
+        **  0.0290 B  -  0.0149 B *
+         *  0.0145 C  -  0.0271 C **
+        **  0.0290 D  -  0.0432 D ****
+   *******  0.1014 E  -  0.1202 E **********
+            0.0000 F  -  0.0230 F **
+            0.0000 G  -  0.0203 G **
+      ****  0.0580 H  -  0.0592 H *****
+         *  0.0145 I  -  0.0731 I ******
+       ***  0.0435 J  -  0.0010 J
+         *  0.0145 K  -  0.0069 K *
+        **  0.0290 L  -  0.0398 L ***
+            0.0000 M  -  0.0261 M **
+  ********  0.1159 N  -  0.0695 N ******
+      ****  0.0580 O  -  0.0768 O ******
+**********  0.1449 P  -  0.0182 P **
+       ***  0.0435 Q  -  0.0011 Q
+        **  0.0290 R  -  0.0602 R *****
+         *  0.0145 S  -  0.0628 S *****
+            0.0000 T  -  0.0910 T ********
+         *  0.0145 U  -  0.0288 U **
+            0.0000 V  -  0.0111 V *
+       ***  0.0435 W  -  0.0209 W **
+            0.0000 X  -  0.0017 X
+      ****  0.0580 Y  -  0.0211 Y **
+         *  0.0145 Z  -  0.0007 Z
+
+The match isn't too good, but I think it makes sense to not match too much every
+peak, but rather look at the general patterns. Let's try recombining back:
+
+>>> monos[1] = shift(monos[1], 4)
+>>> recombine(monos)
+CRYPTOGRAPHYCANBESTRONGORWEAKCRYPTOGRAPHICSTRENGTHISMEASUREDINTHETIME
+ANDRESOURCESITWOULDREQUIRETORECOVERTHEPLAINTEXTTHERESULTOFSTRONGCRYPT
+OGRAPHYISCIPHERTEXTTHATISVERYDIFFICULTTODECIPHERWITHOUTPOSSESSIONOFTH
+EAPPROPRIATEDECODINGTOOLHOWDIFFICULTGIVENALLOFTODAYSCOMPUTINGPOWERAND
+AVAILABLETIMEEVENABILLIONCOMPUTERSDOINGABILLIONCHECKSASECONDITISNOTPO
+SSIBLETODECIPHERTHERESULTOFSTRONGCRYPTOGRAPHYBEFORETHEENDOFTHEUNIVERS
+
+Woho! So it seems the text is:
+
+CRYPTOGRAPHY CAN BE STRONG OR WEAK CRYPTOGRAPHIC STRENGTH IS MEASURED
+IN THE TIME AND RESOURCES IT WOULD REQUIRE TO RECOVER THE PLAINTEXT
+THE RESULT OF STRONG CRYPTOGRAPHY IS CIPHERTEXT THAT IS VERY DIFFICULT
+TO DECIPHER WITHOUT POSSESSION OF THE APPROPRIATE DECODING TOOL HOW
+DIFFICULT GIVEN ALL OF TODAYS COMPUTING POWER AND AVAILABLE TIME
+EVEN A BILLION COMPUTERS DOING A BILLION CHECKS A SECOND IT IS NOT
+POSSIBLE TO DECIPHER THE RESULT OF STRONG CRYPTOGRAPHY BEFORE THE
+END OF THE UNIVERS
+
+Is there an "E" missing? That's just the recombination code, I believe.
+
+Now that we have the ciphertext, I believe we should be able to recover the key
+as well.
