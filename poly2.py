@@ -178,8 +178,8 @@ def rebuild(parts, tables, show=True):
         after = transpose(part, table)
         decoded.append(after)
         if show:
-            print("** part  %s" % part)
-            print("-- after %s" % after)
+            print("  cipher %s" % part)
+            print("  plain  %s" % after)
     return recombine(decoded)
 
 if __name__ == "__main__":
@@ -227,69 +227,30 @@ if __name__ == "__main__":
     print("Perhaps the keylength is %d" % cfactor)
 
     print("Ciphertext in %d columns" % cfactor)
-    parts = list(split_string(ciphertext, cfactor))
-    for i, part in enumerate(parts):
+    columns = list(split_string(ciphertext, cfactor))
+    for i, part in enumerate(columns):
         print(part)
         if i > 5:
-            print("... %d more" % (len(parts) - i))
+            print("... %d more" % (len(columns) - i))
             break
 
-    print("Take every letter down vertically into %d strings" % cfactor)
-
+    # Take character N from every column
     monos = []
-    if len(parts[-1]) < cfactor:
-        del parts[-1] # delete tail
-    for index in range(cfactor):
-        monos.append("".join(s[index] for s in parts))
-
-    print(monos[0])
-    print("These strings are stored in the variable 'monos'")
-
-    out = []
     tables = []
-    for mono in monos:
-        tbl = {}
-        # NOTE: Probably not a good idea to do this
-        for (char, f), (ef, ec) in zip(freqs(mono), english_freq()):
-            tbl[char] = ec.upper()
-        tables.append(tbl)
-        out.append(transpose(mono, tbl))
+    for i in range(cfactor):
+        tables.append({})
 
-    # convert back
-    plain = recombine(out)
-    print("---")
-    print(plain)
-    print("---")
+    if len(columns[-1]) < cfactor:
+        del columns[-1] # delete tail
+    for index in range(cfactor):
+        monos.append("".join(s[index] for s in columns))
 
-
-    mono = monos[0]
-
-    # Step 2: Look at letter frequencies
-    def rf():
-        """Print relative frequencies"""
-        rf = relfreqs(mono)
-        rfitems = sorted(rf.items(), key=lambda (a,b): (b,a), reverse=True)
-        for (c, f), (ec, ef) in zip(rfitems, english_freq()):
-            print("  %6.5f '%c' vs %6.5f '%c'" % (f, c, ec, ef))
-
-    tbl = {}
-    print(mono)
-    def tr():
-        """Transpose according to table."""
-        print(mono)
-        print(transpose(mono, tbl))
-
-    def digs(n=1):
-        """Show digrams that appear more than n times."""
-        dd = ngrams(mono, 2, n, relative=True)
-        print(dd)
+    def reb():
+        rebuild(monos, tables)
 
     def endigs():
         return sorted(map(lambda (a,b): (b,a), en_digrams.items()), reverse=True)
 
-    print(transpose(mono, tbl))
-    print("Now continue by hand (run w/python -i poly2.py")
-    print("Translation table is in 'tbl', cipher in 'mono'")
-    print("Helpful functions: rf() print relfreqs, tr() transpose")
-    print(" digs(n) digrams in text that occur more than n")
-    print(" endigs() english digrams")
+    print("Functions")
+    print("reb() - decode monos using tables for transposition")
+    print("Variables: ciphertext, monos, tables")

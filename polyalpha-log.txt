@@ -1,0 +1,96 @@
+Found repeated words
+Found their distances
+Found the common factors in the distances: 2 3
+Those numbers multiplited is 6, so suspect keylength is 6 characters.
+
+Output:
+
+pos=  0       'VJFITRZJHIHB' pos=378       'VJFITRZJHIHB' dist=378
+pos=  0        'VJFITRZJHIH' pos=378        'VJFITRZJHIH' dist=378
+pos=  0         'VJFITRZJHI' pos=378         'VJFITRZJHI' dist=378
+pos=  2         'FITRZJHIHB' pos=380         'FITRZJHIHB' dist=378
+pos=  0          'VJFITRZJH' pos=378          'VJFITRZJH' dist=378
+pos=  0          'VJFITRZJH' pos=378          'VJFITRZJH' dist=378
+pos=  0           'VJFITRZJ' pos=378           'VJFITRZJ' dist=378
+pos=  0            'VJFITRZ' pos=378            'VJFITRZ' dist=378
+pos=  0            'VJFITRZ' pos=378            'VJFITRZ' dist=378
+pos=  0             'VJFITR' pos=378             'VJFITR' dist=378
+pos=  6             'ZJHIHB' pos=384             'ZJHIHB' dist=378
+pos=  0             'VJFITR' pos=378             'VJFITR' dist=378
+pos=  6             'ZJHIHB' pos=384             'ZJHIHB' dist=378
+pos=  0              'VJFIT' pos=378              'VJFIT' dist=378
+pos=  5              'RZJHI' pos=383              'RZJHI' dist=378
+pos=260              'VFPXM' pos=302              'VFPXM' dist=42
+pos=  2              'FITRZ' pos=380              'FITRZ' dist=378
+pos=  7              'JHIHB' pos=385              'JHIHB' dist=378
+pos=  0               'VJFI' pos=378               'VJFI' dist=378
+pos=  4               'TRZJ' pos=382               'TRZJ' dist=378
+pos=  8               'HIHB' pos=386               'HIHB' dist=378
+pos=192               'MHVL' pos=342               'MHVL' dist=150
+pos=260               'VFPX' pos=302               'VFPX' dist=42
+pos=282               'UDLM' pos=348               'UDLM' dist=66
+pos=  2               'FITR' pos=380               'FITR' dist=378
+pos=  6               'ZJHI' pos=384               'ZJHI' dist=378
+Distances: 378 66 42 150
+Common factors: 2 3
+Perhaps the keylength is 6
+Ciphertext in 6 columns
+VJFITR
+ZJHIHB
+VSUUEV
+MJVGGR
+KOLTKF
+KQWMOJ
+KSWAIF
+... 64 more
+
+Took every 6 characters from ciphertext, printed above each other.
+Each vertical column should be encoded using same substitution alphabet.
+
+Took frequency counts for each column. Had 6 tables if substitutions. From this
+point on, I just did it by trial and error.
+
+The variable "monos" holds the six monoalphabetic ciphertexts. I started by
+assigning the value "e" for the top letter in each.
+
+>>> show_freqs(monos[0])
+   0.12 M  -  0.12 E
+   0.10 L  -  0.09 T
+   0.09 H  -  0.08 A
+   0.07 X  -  0.08 O
+   0.07 V  -  0.07 I
+   0.07 K  -  0.07 N
+   0.07 B  -  0.06 S
+   0.06 U  -  0.06 R
+   0.04 Z  -  0.06 H
+   0.04 Y  -  0.04 D
+   0.04 T  -  0.04 L
+   0.04 E  -  0.03 U
+   0.03 P  -  0.03 C
+   0.03 G  -  0.03 M
+   0.03 A  -  0.02 F
+   0.01 W  -  0.02 Y
+   0.01 R  -  0.02 W
+   0.01 Q  -  0.02 G
+   0.01 N  -  0.02 P
+   0.01 J  -  0.01 B
+   0.01 I  -  0.01 V
+>>> tables[0]["M"] = "e"
+
+... and so on.
+
+>>> reb()
+  cipher VZVMKKKLMTBBKVHJHXEQXYZHRAMLBEVPMLYITHHWNXYLMPTUXUGMBEALBMUXKLLVZUMHG
+  plain  .............................................................
+  cipher JJSJOQSLZKFEWWMMJJSLKKUYAWLNXLAAHKLJLVGADFLUAWNDWAUWFDWWLHDULMLJJWZXA
+  plain  .......e...........e......e..e....e.e.....e.............e...e.e......
+  cipher FHUVLWWYPBALZZSPLAPABAYYZYOLMAWAVPOVLPSMAHVVUYHLCSVYNPJJPVLPOSYFHMLAC
+  plain  ........e......e..e..............e...e...............e..e..e.........
+  cipher IIUGTMAXLKATHBWKVAGAEKRTVMTKBHAALHXIWGAYZEWFZTBMXEFLTHDHLLMIXMHIIHXAX
+  plain  ......e...e......e.e..........ee......e............................e.
+  cipher THEGKOINMEENUTREOETETOPPIETYCDEOSNAREGOIILAPPNLINIPDBNSNNSOHRONTHRNER
+  plain  .......e...e.....................e...........e..e....e.ee.....e...e..
+  cipher RBVRFJFJHGWGUZHWYSHURQWKSALGXHUXHRSLFWZFYRBXRGDPDRXRLFDGRLGHHIJRBHGXV
+  plain  e..e................e............e.......e..e....e.e....e......e.....
+
+
