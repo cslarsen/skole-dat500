@@ -162,9 +162,42 @@ def freqs(text):
 
     return items
 
+def shift(text, amount):
+    alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    assert(len(alpha) == 26)
+    shifted = ""
+    for n in range(len(alpha)):
+        shifted += alpha[(n + amount) % len(alpha)]
+
+    tbl = dict((a, b) for (a, b) in zip(alpha, shifted))
+    return transpose(text.upper(), tbl)
+
 def show_freqs(text):
-    for (ch1, n1), (ch2, n2) in zip(freqs(text), freqs_en()):
-        print("  %7.4f %c  - %7.4f %c" % (n1, ch1, n2, ch2))
+    txt = freqs(text)
+    eng = freqs_en()
+
+    # Change it up: Show frequencies by alphabetical entries
+    def rev(pairs):
+        out = {}
+        for a in range(ord("A"), ord("Z")):
+            out[chr(a)] = 0
+        for char, count in pairs:
+            out[char] = count
+        return out
+
+    txt = rev(txt)
+    eng = rev(eng)
+
+    txt = sorted(txt.items())
+    eng = sorted(eng.items())
+
+    print("                   Text - English")
+    max1 = max(n for (c,n) in txt)
+    max2 = max(n for (c,n) in eng)
+    for (ch1, n1), (ch2, n2) in zip(txt, eng):
+        bar1 = "*"*int(round(10*n1/max1)) if n1>0 else ""
+        bar2 = "*"*int(round(10*n2/max2)) if n2>0 else ""
+        print("%10s %7.4f %c  - %7.4f %c %-10s" % (bar1, n1, ch1, n2, ch2, bar2))
 
 def recombine(parts):
     plain = ""
@@ -260,6 +293,9 @@ if __name__ == "__main__":
 
     def endigs():
         return sorted(map(lambda (a,b): (b,a), en_digrams.items()), reverse=True)
+
+    def sf(n):
+        show_freqs(monos[n])
 
     print("Functions")
     print("show() - decode monos using tables for transposition")

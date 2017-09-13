@@ -154,3 +154,16 @@ Freqs for table 0:
 
 The three 0.0725 can be used to compose words like "IN" or "ON". Let's insert
 "?" for those to see where they are, then we'll try some things.
+
+For the 10th time, start over again. Will be using the shifting technique
+instead, as described on wikipedia.
+
+Basically, what I've done is sort by decreasing frequency, and then try to
+match up. Another way is to list by alphabetical order..
+
+cipher   english
+A 0.01   A 0.09
+B ...    ..
+C ...
+
+Then SHIFT the cipher side until the frequencies line up.
