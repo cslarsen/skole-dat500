@@ -121,9 +121,9 @@ if __name__ == "__main__":
     print("")
 
     # Step 1: Find repeats, look for the lowest distance between two repeats
-    lowest = 999999
+    lowest = 0
     mono = ""
-    for length in range(10, 3, -1):
+    for length in range(len(ciphertext), 3, -1):
         start = 0
         while start+length < len(ciphertext):
             key = ciphertext[start:start+length]
@@ -133,22 +133,14 @@ if __name__ == "__main__":
                     dist = -1
                     if i > 0:
                         dist = pos - positions[i-1]
-                    write("pos=%3d %11r dist=%d " % (pos,
-                        ciphertext[pos:pos+length], dist))
-                if len(positions) == 2:
-                    dist = positions[1] - positions[0]
-                    if dist < lowest:
-                        lowest = dist
-                        print("** distance %d between two repeats at %d" %
-                                (lowest, positions[0]))
-                        pos = positions[0]
-                        mono = ciphertext[pos:pos+dist]
-                        print("%r" % ciphertext[pos:pos+dist+length])
+                    write("pos=%3d %20r %s" % (pos,
+                        ciphertext[pos:pos+length],
+                            "dist=%d" % dist if dist>0 else ""))
                 write("\n")
             start += length
 
     print("")
-    print("Next step is to decode the shortest string we found:")
+    print("We should now determine the keylength")
     print(repr(mono))
 
     # Step 2: Look at letter frequencies
