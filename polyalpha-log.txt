@@ -120,3 +120,28 @@ Tables at this point:
 [{'H': 'a', 'M': 'e', 'L': 't'}, {'J': 'a', 'L': 'e', 'W': 't'}, {'A': 'a',
 'P': 'e', 'L': 't'}, {'A': 'e', 'H': 't', 'T': 'o', 'X': 'a'}, {'E': 't', 'N':
 'e'}, {'H': 't', 'R': 'e'}]
+
+For the nth time, I started over again. If I have three top letters with the
+same relative frequency, it's best not to assign them, and instead assign those
+that there can be little doubt about, for each of the six tables. That way, I
+can look for very comon words, like "THE". That's what I'm doing now. The
+current situation is:
+
+>>> reb()
+  cipher VZVMKK KLMTBB KVHJHX EQXYZH RAMLBE VPMLYI THHWNX YLMPTU XUGMBE ALBMUX KLLVZU MHG
+  plain  ...e.. .te... ...... ...... ..et.. ..et.. ...... .te... ...e.. .t.e.. .tt... e..
+  cipher JJSJOQ SLZKFE WWMMJJ SLKKUY AWLNXL AAHKLJ LVGADF LUAWND WAUWFD WWLHDU LMLJJW ZXA
+  plain  ...... .e.... tt.... .e.... .te..e ....e. e..... e..t.. t..t.. tte... e.e..t ...
+  cipher FHUVLW WYPBAL ZZSPLA PABAYY ZYOLMA WAVPOV LPSMAH VVUYHL CSVYNP JJPVLP OSYFHM LAC
+  plain  ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...
+  cipher IIUGTM AXLKAT HBWKVA GAEKRT VMTKBH AALHXI WGAYZE WFZTBM XEFLTH DHLLMI XMHIIH XAX
+  plain  ...... e...e. t....e .e.... .....t ee.t.. ..e... ...... .....t .t.... ..t..t .e.
+  cipher THEGKO INMEEN UTREOE TETOPP IETYCD EOSNAR EGOIIL APPNLI NIPDBN SNNSOH RONTHR NER
+  plain  ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...
+  cipher RBVRFJ FJHGWG UZHWYS HURQWK SALGXH UXHRSL FWZFYR BXRGDP DRXRLF DGRLGH HIJRBH GXV
+  plain  e..e.. ..t... ..t... t.e... .....t ..te.. .....e ..e... .e.e.. ..e..t t..e.t ...
+>>> tables
+[{'M': 'e', 'L': 't'}, {'L': 'e', 'W': 't'}, {}, {'A': 'e', 'H': 't'}, {}, {'H': 't', 'R': 'e'}]
+
+At "ALBMUX" there is a possibility that "B" is an "h" in table[2]. This is also
+the case at "HURQWK", but in table[1].

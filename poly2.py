@@ -164,7 +164,7 @@ def freqs(text):
 
 def show_freqs(text):
     for (ch1, n1), (ch2, n2) in zip(freqs(text), freqs_en()):
-        print("  %5.2f %c  - %5.2f %c" % (n1, ch1, n2, ch2))
+        print("  %7.4f %c  - %7.4f %c" % (n1, ch1, n2, ch2))
 
 def recombine(parts):
     plain = ""
@@ -246,7 +246,17 @@ if __name__ == "__main__":
         monos.append("".join(s[index] for s in columns))
 
     def reb():
-        rebuild(monos, tables)
+        p = rebuild(monos, tables, show=False)
+        cols = 12
+        p = list(split_string(p, cfactor*cols))
+        c = list(split_string(ciphertext, cfactor*cols))
+
+        for plain, ciph in zip(p, c):
+            print(" ".join(split_string(ciph, cfactor)))
+            print(" ".join(split_string(plain, cfactor)))
+
+    def reset():
+        tables = [{}, {}, {}, {}, {}, {}]
 
     def endigs():
         return sorted(map(lambda (a,b): (b,a), en_digrams.items()), reverse=True)
