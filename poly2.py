@@ -165,16 +165,35 @@ if __name__ == "__main__":
     print("Take every letter down vertically into %d strings" % cfactor)
 
     monos = []
+    if len(parts[-1]) < cfactor:
+        del parts[-1] # delete tail
     for index in range(cfactor):
-        try:
-            monos.append("".join(s[index] for s in parts))
-        except IndexError:
-            pass
+        monos.append("".join(s[index] for s in parts))
 
     print(monos[0])
     print("These strings are stored in the variable 'monos'")
-    mono = monos[0]
 
+    out = []
+    tables = []
+    for mono in monos:
+        tbl = {}
+        rf = relfreqs(mono)
+        rfitems = sorted(rf.items(), key=lambda (a,b): (b,a), reverse=True)
+        for (c, f), (ef, ec) in zip(rfitems, english_freq()):
+            tbl[c.upper()] = ec.upper()
+        tables.append(tbl)
+        out.append(transpose(mono, tbl))
+
+    # convert back
+    plain = ""
+    for index in range(len(out[0])):
+        plain += "".join(s[index] for s in out)
+    print("---")
+    print(plain)
+    print("---")
+
+
+    mono = monos[0]
 
     # Step 2: Look at letter frequencies
     def rf():
