@@ -69,6 +69,19 @@ def english_freq():
     for letter, count in sorted(en.items(), reverse=True):
         yield letter, count
 
+def make_vigenere_table():
+    """Returns a Vigenere table."""
+    tbl = {}
+    alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    for shift in range(len(alpha)):
+        Y = alpha[shift]
+        tbl[Y] = {}
+        for n in range(len(alpha)):
+            char = alpha[(shift + n) % len(alpha)]
+            X = alpha[n]
+            tbl[Y][X] = char
+    return tbl
+
 if __name__ == "__main__":
     ciphertext = readfile("cipher.txt")
 
@@ -82,14 +95,18 @@ if __name__ == "__main__":
     # Step 1: Find repeats, look for the lowest distance between two repeats
     lowest = 999999
     mono = ""
-    for length in range(3, 11):
+    for length in range(10, 3, -1):
         start = 0
         while start+length < len(ciphertext):
             key = ciphertext[start:start+length]
             positions = list(find_all(ciphertext, key))
             if len(positions) > 1:
-                for pos in positions:
-                    write("pos=%3d %11r  " % (pos, ciphertext[pos:pos+length]))
+                for i, pos in enumerate(positions):
+                    dist = -1
+                    if i > 0:
+                        dist = pos - positions[i-1]
+                    write("pos=%3d %11r dist=%d " % (pos,
+                        ciphertext[pos:pos+length], dist))
                 if len(positions) == 2:
                     dist = positions[1] - positions[0]
                     if dist < lowest:
@@ -135,3 +152,4 @@ if __name__ == "__main__":
     print("Helpful functions: rf() print relfreqs, tr() transpose")
     print(" digs(n) digrams in text that occur more than n")
     print(" endigs() english digrams")
+    vtable()
