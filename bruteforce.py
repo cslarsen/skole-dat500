@@ -45,21 +45,22 @@ visible ASCII range of 32 to 126.""".lstrip())
 
     opts = p.parse_args()
 
+    print("Reading %s" % opts.FILE)
+    ciphertext = read_ciphertext(opts.FILE)
+
     if opts.sdes:
-        print("File is SDES-encrypted")
+        print("Interpreting file as SDES-encrypted")
         bruteforce_key = csdes.bruteforce_sdes_key
     else:
-        print("File is TripleSDES-encrypted")
+        print("Interpreting file as TripleSDES-encrypted")
         bruteforce_key = csdes.bruteforce_3sdes_key
-
-    ciphertext = read_ciphertext(opts.FILE)
 
     # Bruteforce it
     start = mark_time()
     bf = bruteforce_key(ciphertext, opts.start, opts.stop)
     stop = mark_time()
 
-    print("Found %d keys in %.1f ms CPU time" % (bf.count, 1000.0*(stop - start)))
+    print("Found %d keys in %.2f ms CPU time" % (bf.count, 1000.0*(stop - start)))
 
     print("First found key:")
 
