@@ -62,16 +62,19 @@ visible ASCII range of 32 to 126.""".lstrip())
     print("Found %d keys in %.1f ms CPU time" % (bf.count, 1000.0*(stop - start)))
 
     print("First found key:")
-    print("  20-bit key: 0x%5.5x" % bf.key);
-    print("  key binary: %20s" % bin(bf.key))
 
     if not opts.sdes:
+        print("  20-bit key: 0x%5.5x" % bf.key);
+        print("  key binary: %20s" % bin(bf.key)[2:])
         k1 = (bf.key & 0xffc00) >> 10;
         k2 = (bf.key & 0x003ff);
         print("  10-bit k1:    0x%3.3x" % k1);
         print("  10-bit k2:    0x%3.3x" % k2);
-        print("  k1 binary:  %10s.........." % bin(k1))
-        print("  k2 binary:  ..........%12s" % bin(k2))
+        print("  k1 binary:  %10s.........." % bin(k1)[2:])
+        print("  k2 binary:  ..........%10s" % bin(k2)[2:])
+    else:
+        print("  10-bit key: 0x%3.3x" % bf.key);
+        print("  key binary: %10s" % bin(bf.key)[2:])
 
     if bf.count == 1:
         if opts.sdes:
