@@ -312,6 +312,21 @@ struct buffer* triplesdes_decrypt_buffer(
 }
 
 extern "C"
+struct buffer* sdes_decrypt_buffer(
+    const uint16_t key,
+    const uint32_t length,
+    const uint8_t* ciphertext)
+{
+  struct buffer* out = malloc_buffer(length);
+  out->length = length;
+
+  for ( size_t n = 0; n < length; ++n )
+    out->data[n] = decrypt(key, ciphertext[n]);
+
+  return out;
+}
+
+extern "C"
 struct bruteforce_result bruteforce_sdes_key(
     const uint8_t* ciphertext,
     const uint32_t length,

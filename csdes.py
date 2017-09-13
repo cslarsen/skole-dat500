@@ -19,6 +19,11 @@ uint8ptr = ctypes.POINTER(ctypes.c_uint8)
 
 # The bruteforce_result struct
 class BruteforceResult(ctypes.Structure):
+    """Contains the result of brute-forcing a key.
+
+    ``count`` contains the number of candidate keys found, while
+    ``key`` contains the first of those keys.
+    """
     _fields_ = [("count", ctypes.c_uint32),
                 ("key", ctypes.c_uint32)]
 
@@ -31,9 +36,33 @@ _bruteforce_3sdes_key.argtypes = [ctypes.POINTER(ctypes.c_uint8),
         ctypes.c_uint32, ctypes.c_uint8, ctypes.c_uint8]
 _bruteforce_3sdes_key.restype = BruteforceResult
 
-def bruteforce_3sdes_key(ciphertext, start, stop):
+def bruteforce_3sdes_key(ciphertext, start=32, stop=126):
+    """Attempts to brute-force a TripleSDES key from ciphertext.
+
+    It basically tries all keys and discards those that decode to bytes falling
+    outside of the [start, stop] range of bytes. By default, this range has
+    been set to the visible, printable ASCII characters.
+
+    Args:
+        ciphertext: Binary buffer for ciphertext
+        start: Discard keys that decode to bytes below this value
+        stop: Discard keys that decode to bytes above this value
+
+    Returns:
+        A ``BruteForceResult`` object.
+    """
     raw = (ctypes.c_uint8*len(ciphertext)).from_buffer_copy(ciphertext)
     bf = _bruteforce_3sdes_key(raw, len(raw), start, stop)
+    return bf
+
+_bruteforce_sdes_key = libsdes.bruteforce_sdes_key
+_bruteforce_sdes_key.argtypes = [ctypes.POINTER(ctypes.c_uint8),
+        ctypes.c_uint32, ctypes.c_uint8, ctypes.c_uint8]
+_bruteforce_sdes_key.restype = BruteforceResult
+
+def bruteforce_sdes_key(ciphertext, start=32, stop=126):
+    raw = (ctypes.c_uint8*len(ciphertext)).from_buffer_copy(ciphertext)
+    bf = _bruteforce_sdes_key(raw, len(raw), start, stop)
     return bf
 
 _triplesdes_decrypt_buffer = libsdes.triplesdes_decrypt_buffer
@@ -44,6 +73,18 @@ _triplesdes_decrypt_buffer.restype = ctypes.POINTER(Buffer)
 def triplesdes_decrypt_buffer(k1, k2, ciphertext):
     raw = (ctypes.c_uint8*len(ciphertext)).from_buffer_copy(ciphertext)
     result = _triplesdes_decrypt_buffer(k1, k2, len(raw), raw)
+    length = result.contents.length
+    plaintext = "".join(chr(c) for c in result.contents.data[:length])
+    return plaintext
+
+_sdes_decrypt_buffer = libsdes.sdes_decrypt_buffer
+_sdes_decrypt_buffer.argtypes = [ctypes.c_uint16, ctypes.c_uint32,
+        ctypes.POINTER(ctypes.c_uint8)]
+_sdes_decrypt_buffer.restype = ctypes.POINTER(Buffer)
+
+def sdes_decrypt_buffer(key, ciphertext):
+    raw = (ctypes.c_uint8*len(ciphertext)).from_buffer_copy(ciphertext)
+    result = _sdes_decrypt_buffer(key, len(raw), raw)
     length = result.contents.length
     plaintext = "".join(chr(c) for c in result.contents.data[:length])
     return plaintext
