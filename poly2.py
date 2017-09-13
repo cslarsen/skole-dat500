@@ -151,11 +151,30 @@ if __name__ == "__main__":
             if all(not divisible(n, c) for c in common):
                 common.add(n)
     print("Common factors: %s" % " ".join(map(str, common)))
-    print("Perhaps the keylength is %d" % reduce(lambda a,b: a*b, common))
+    cfactor = reduce(lambda a,b: a*b, common)
+    print("Perhaps the keylength is %d" % cfactor)
 
-    print("")
-    print("We should now determine the keylength")
-    print(repr(mono))
+    print("Ciphertext in %d columns" % cfactor)
+    parts = list(split_string(ciphertext, cfactor))
+    for i, part in enumerate(parts):
+        print(part)
+        if i > 5:
+            print("... %d more" % (len(parts) - i))
+            break
+
+    print("Take every letter down vertically into %d strings" % cfactor)
+
+    monos = []
+    for index in range(cfactor):
+        try:
+            monos.append("".join(s[index] for s in parts))
+        except IndexError:
+            pass
+
+    print(monos[0])
+    print("These strings are stored in the variable 'monos'")
+    mono = monos[0]
+
 
     # Step 2: Look at letter frequencies
     def rf():
@@ -186,10 +205,3 @@ if __name__ == "__main__":
     print("Helpful functions: rf() print relfreqs, tr() transpose")
     print(" digs(n) digrams in text that occur more than n")
     print(" endigs() english digrams")
-
-    plain = "there is a secret passage behind the picture frame"
-    key = "ihs"
-    c = vigenere_encrypt("there is a secret passage behind the picture frame", key)
-    print(c)
-    p = vigenere_decrypt(c, key)
-    print(p)
