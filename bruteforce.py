@@ -65,17 +65,14 @@ visible ASCII range of 32 to 126.""".lstrip())
     print("First found key:")
 
     if not opts.sdes:
-        print("  20-bit key: 0x%5.5x" % bf.key);
-        print("  key binary: %20s" % bin(bf.key)[2:])
+        print("  20-bit key: %20s = 0x%5.5x" % (bin(bf.key)[2:], bf.key))
         k1 = (bf.key & 0xffc00) >> 10;
+        print("   10-bit k1: %10.10s.......... = 0x%5.5x" % (bin(bf.key)[2:12], k1))
         k2 = (bf.key & 0x003ff);
-        print("  10-bit k1:    0x%3.3x" % k1);
-        print("  10-bit k2:    0x%3.3x" % k2);
-        print("  k1 binary:  %10s.........." % bin(k1)[2:])
-        print("  k2 binary:  ..........%10s" % bin(k2)[2:])
+        print("   10-bit k2: ..........%10.10s = 0x%5.5x" % (bin(bf.key)[12:], k2))
     else:
-        print("  10-bit key: 0x%3.3x" % bf.key);
-        print("  key binary: %10s" % bin(bf.key)[2:])
+        print("  10-bit key: %10s = 0x%3.3x / %d" % (bin(bf.key)[2:], bf.key,
+            bf.key));
 
     if bf.count == 1:
         if opts.sdes:
