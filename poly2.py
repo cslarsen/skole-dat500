@@ -123,6 +123,7 @@ if __name__ == "__main__":
     # Step 1: Find repeats, look for the lowest distance between two repeats
     lowest = 0
     mono = ""
+    distances = set()
     for length in range(len(ciphertext), 3, -1):
         start = 0
         while start+length < len(ciphertext):
@@ -133,11 +134,24 @@ if __name__ == "__main__":
                     dist = -1
                     if i > 0:
                         dist = pos - positions[i-1]
+                        distances.add(dist)
                     write("pos=%3d %20r %s" % (pos,
                         ciphertext[pos:pos+length],
                             "dist=%d" % dist if dist>0 else ""))
                 write("\n")
             start += length
+
+    print("Distances: %s" % " ".join(map(str, distances)))
+    divisible = lambda a, b: float(a)/b - a//b == 0
+
+    # Find common factors
+    common = set()
+    for n in range(2, max(distances)):
+        if all(divisible(d, n) for d in distances):
+            if all(not divisible(n, c) for c in common):
+                common.add(n)
+    print("Common factors: %s" % " ".join(map(str, common)))
+    print("Perhaps the keylength is %d" % reduce(lambda a,b: a*b, common))
 
     print("")
     print("We should now determine the keylength")
