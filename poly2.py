@@ -15,9 +15,12 @@ abc....x
 and crack that by itself as a monoalphabetic section.
 """
 
-from util import *
+import collections
 import sys
-from poly import find_all, period, relfreqs, english
+
+# local imports
+from poly import find_all, period, english
+from util import readfile, split_string, transpose, normalize
 
 write = sys.stdout.write
 
@@ -110,6 +113,75 @@ def vigenere_decrypt(ciphertext, key):
         plaintext += alpha[idx]
     return plaintext
 
+def freqs_en():
+    counts = [
+        (12.02, "e"),
+        (9.10, "t"),
+        (8.12, "a"),
+        (7.68, "o"),
+        (7.31, "i"),
+        (6.95, "n"),
+        (6.28, "s"),
+        (6.02, "r"),
+        (5.92, "h"),
+        (4.32, "d"),
+        (3.98, "l"),
+        (2.88, "u"),
+        (2.71, "c"),
+        (2.61, "m"),
+        (2.30, "f"),
+        (2.11, "y"),
+        (2.09, "w"),
+        (2.03, "g"),
+        (1.82, "p"),
+        (1.49, "b"),
+        (1.11, "v"),
+        (0.69, "k"),
+        (0.17, "x"),
+        (0.11, "q"),
+        (0.10, "j"),
+        (0.07, "z"),
+    ]
+    total = sum(count for (count, letter) in counts)
+    counts = [(ch.upper(), float(count)/total) for (count, ch) in counts]
+    return sorted(counts, key=lambda (a,b): (b,a), reverse=True)
+
+def freqs(text):
+    # Frequency count letters
+    counts = collections.defaultdict(int)
+    for char in normalize(text):
+        counts[char.upper()] += 1
+
+    # Sort by decreasing count
+    items = counts.items()
+    items = sorted(items, key=lambda (a,b): (b,a), reverse=True)
+
+    # Calculate relative frequency
+    total = sum(count for (char, count) in items)
+    items = [(char, float(count)/total) for (char, count) in items]
+
+    return items
+
+def show_freqs(text):
+    for (ch1, n1), (ch2, n2) in zip(freqs(text), freqs_en()):
+        print("  %5.2f %c  - %5.2f %c" % (n1, ch1, n2, ch2))
+
+def recombine(parts):
+    plain = ""
+    for index in range(len(parts[0])):
+        plain += "".join(s[index] for s in parts)
+    return plain
+
+def rebuild(parts, tables, show=True):
+    decoded = []
+    for part, table in zip(parts, tables):
+        after = transpose(part, table)
+        decoded.append(after)
+        if show:
+            print("** part  %s" % part)
+            print("-- after %s" % after)
+    return recombine(decoded)
+
 if __name__ == "__main__":
     ciphertext = readfile("cipher.txt")
 
@@ -177,17 +249,14 @@ if __name__ == "__main__":
     tables = []
     for mono in monos:
         tbl = {}
-        rf = relfreqs(mono)
-        rfitems = sorted(rf.items(), key=lambda (a,b): (b,a), reverse=True)
-        for (c, f), (ef, ec) in zip(rfitems, english_freq()):
-            tbl[c.upper()] = ec.upper()
+        # NOTE: Probably not a good idea to do this
+        for (char, f), (ef, ec) in zip(freqs(mono), english_freq()):
+            tbl[char] = ec.upper()
         tables.append(tbl)
         out.append(transpose(mono, tbl))
 
     # convert back
-    plain = ""
-    for index in range(len(out[0])):
-        plain += "".join(s[index] for s in out)
+    plain = recombine(out)
     print("---")
     print(plain)
     print("---")
