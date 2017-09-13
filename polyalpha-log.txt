@@ -79,69 +79,78 @@ assigning the value "e" for the top letter in each.
 
 ... and so on.
 
-Here is the table after all the top two letters of every alphabet has been
-assigned the characters "e" and "t":
+Went through all frequency tables, setting "e" and "t" but only for the most
+obvious candidate (i.e., not for those whose two/three most frequent have the
+same relative frequencies).
 
-  cipher VZVMKK KLMTBB KVHJHX EQXYZH RAMLBE VPMLYI THHWNX YLMPTU XUGMBE ALBMUX KLLVZU MHG
-  plain  ...e.. .te... ...... ...... ..et.. ..et.. ...... .te... ...e.. .t.e.. .tt... e..
-  cipher JJSJOQ SLZKFE WWMMJJ SLKKUY AWLNXL AAHKLJ LVGADF LUAWND WAUWFD WWLHDU LMLJJW ZXA
-  plain  ...... .e.... tt.... .e.... .te..e ....e. e..... e..t.. t..t.. tte... e.e..t ...
-  cipher FHUVLW WYPBAL ZZSPLA PABAYY ZYOLMA WAVPOV LPSMAH VVUYHL CSVYNP JJPVLP OSYFHM LAC
-  plain  ....t. ..e..t ...et. e..... ...t.. ...e.. te.... .....t .....e ..e.te ...... t..
-  cipher IIUGTM AXLKAT HBWKVA GAEKRT VMTKBH AALHXI WGAYZE WFZTBM XEFLTH DHLLMI XMHIIH XAX
-  plain  ...... e...e. t....e .e.... .....t ee.t.. ..e... ...... .....t .t.... ..t..t .e.
-  cipher THEGKO INMEEN UTREOE TETOPP IETYCD EOSNAR EGOIIL APPNLI NIPDBN SNNSOH RONTHR NER
-  plain  ..t... .e.tte ...t.t .t.... .t.... t..e.. t..... ...e.. e....e .ee... ..e... et.
-  cipher RBVRFJ FJHGWG UZHWYS HURQWK SALGXH UXHRSL FWZFYR BXRGDP DRXRLF DGRLGH HIJRBH GXV
-  plain  e..e.. ..t... ..t... t.e... .....t ..te.. .....e ..e... .e.e.. ..e..t t..e.t ...
-
-There are no obvious errors so far, so I just continued down the frequency
-list. Errors would be triple Es or Ts, or other invalid sequences.
-
-At this point, I spotted a double "aa", which might be wrong. The problem is
-that the spaces have been removed, so it's very hard to see whether a double a
-is an error or not. I'll leave it so far:
-
-  cipher VZVMKK KLMTBB KVHJHX EQXYZH RAMLBE VPMLYI THHWNX YLMPTU XUGMBE ALBMUX KLLVZU MHG
-  plain  ...e.. .te... ..a.a. .....a ..et.. ..et.. .aa... .te... ...e.. .t.e.. .tt... ea.
-  cipher JJSJOQ SLZKFE WWMMJJ SLKKUY AWLNXL AAHKLJ LVGADF LUAWND WAUWFD WWLHDU LMLJJW ZXA
-  plain  aa.a.. .e.... tt..aa .e.... .te..e ....ea e..... e..t.. t..t.. tte... e.eaat ...
-  cipher FHUVLW WYPBAL ZZSPLA PABAYY ZYOLMA WAVPOV LPSMAH VVUYHL CSVYNP JJPVLP OSYFHM LAC
-  plain  ....t. ..e..t ...et. e..... ...t.. ...e.. te.... .....t .....e ..e.te ...... t..
-  cipher IIUGTM AXLKAT HBWKVA GAEKRT VMTKBH AALHXI WGAYZE WFZTBM XEFLTH DHLLMI XMHIIH XAX
-  plain  ...... e...e. t....e .e.... .....t ee.t.. ..e... ...... .....t .t.... ..t..t .e.
-  cipher THEGKO INMEEN UTREOE TETOPP IETYCD EOSNAR EGOIIL APPNLI NIPDBN SNNSOH RONTHR NER
-  plain  ..t... .e.tte ...t.t .t.... .t.... t..e.. t..... ...e.. e....e .ee... ..e... et.
-  cipher RBVRFJ FJHGWG UZHWYS HURQWK SALGXH UXHRSL FWZFYR BXRGDP DRXRLF DGRLGH HIJRBH GXV
-  plain  e..e.. ..t... ..t... t.e... .....t ..te.. .....e ..e... .e.e.. ..e..t t..e.t ...
-
-Tables at this point:
-
-[{'H': 'a', 'M': 'e', 'L': 't'}, {'J': 'a', 'L': 'e', 'W': 't'}, {'A': 'a',
-'P': 'e', 'L': 't'}, {'A': 'e', 'H': 't', 'T': 'o', 'X': 'a'}, {'E': 't', 'N':
-'e'}, {'H': 't', 'R': 'e'}]
-
-For the nth time, I started over again. If I have three top letters with the
-same relative frequency, it's best not to assign them, and instead assign those
-that there can be little doubt about, for each of the six tables. That way, I
-can look for very comon words, like "THE". That's what I'm doing now. The
-current situation is:
+After a while:
 
 >>> reb()
-  cipher VZVMKK KLMTBB KVHJHX EQXYZH RAMLBE VPMLYI THHWNX YLMPTU XUGMBE ALBMUX KLLVZU MHG
-  plain  ...e.. .te... ...... ...... ..et.. ..et.. ...... .te... ...e.. .t.e.. .tt... e..
-  cipher JJSJOQ SLZKFE WWMMJJ SLKKUY AWLNXL AAHKLJ LVGADF LUAWND WAUWFD WWLHDU LMLJJW ZXA
-  plain  ...... .e.... tt.... .e.... .te..e ....e. e..... e..t.. t..t.. tte... e.e..t ...
-  cipher FHUVLW WYPBAL ZZSPLA PABAYY ZYOLMA WAVPOV LPSMAH VVUYHL CSVYNP JJPVLP OSYFHM LAC
-  plain  ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...
-  cipher IIUGTM AXLKAT HBWKVA GAEKRT VMTKBH AALHXI WGAYZE WFZTBM XEFLTH DHLLMI XMHIIH XAX
-  plain  ...... e...e. t....e .e.... .....t ee.t.. ..e... ...... .....t .t.... ..t..t .e.
-  cipher THEGKO INMEEN UTREOE TETOPP IETYCD EOSNAR EGOIIL APPNLI NIPDBN SNNSOH RONTHR NER
-  plain  ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...... ...
-  cipher RBVRFJ FJHGWG UZHWYS HURQWK SALGXH UXHRSL FWZFYR BXRGDP DRXRLF DGRLGH HIJRBH GXV
-  plain  e..e.. ..t... ..t... t.e... .....t ..te.. .....e ..e... .e.e.. ..e..t t..e.t ...
+VJFITR ZJHIHB VSUUEV MJVGGR KOLTKF KQWMOJ KSWAIF LLYXNJ MZPLMH TKBKEG BFAAEW BELTNG
+.....e ...... ...... e....e ...... ...... ...e.. te.... e....t ...... ...e.. ......
+KWZHUU VWZBTZ HMSWRH JMPKEW HJLVOY XJAAES ESPGTH QLAAEU XKBETR YKAKOQ ZUYRPW HYYTPK
+.t.t.. .t.... .....t ...... ...... ...e.. .....t .e.e.. .....e ...... ...... ......
+RAZVIS AWYMEA MLOTTL LNLKYG BXMBCX ELAHDH VAWAEU PAAAOX MHVLSH LKPHNR YLOXAS IJVIRL
+...... .t.... ee.... t..... ...... .e.t.t ...e.. ...e.. e....t t..t.e .e.... ......
+TLLWEF HVPGGW HGSAOZ WAMYIF NDAZIY XFHELR YLVWAB LUVFPX MAUZPR PWYTNG TNHBLD UDLMIP
+.e.... ...... ...e.. ...... ...... .....e .e.... t..... e....e .t.... ...... ......
+XWCXND UASEIR GUVFPX MWYLDR BFNTBL EDPHNF AWJDSD LWJHNG BLPLNR MHVLSL UDLMOG XUPIHH
+.t.... .....e ...... et...e ...... ...t.. .t.... tt.t.. .e...e e..... ...... .....t
+KLOXRH LMSMOI LLYHNJ VJFITR ZJHIHB UWMHRH MZLXNG HXAAEX GACXRV X
+.e...t t..... te.t.. .....e ...... .t.t.t e..... ...e.. ......
 >>> tables
 [{'M': 'e', 'L': 't'}, {'L': 'e', 'W': 't'}, {}, {'A': 'e', 'H': 't'}, {}, {'H': 't', 'R': 'e'}]
 
-At "ALBMUX" there is a possibility that "B" is an "h" in table[2]. This is also
-the case at "HURQWK", but in table[1].
+Candidates for the word "THE" might be LKPHNR
+                                       t..t.e
+
+That would be table 4, set N=h
+
+Got to here:
+
+VJFITR ZJHIHB VSUUEV MJVGGR KOLTKF KQWMOJ KSWAIF LLYXNJ MZPLMH TKBKEG BFAAEW BELTNG
+.a...e .a.... ...... ea...e ...... ...... ...e.. te..h. e....t ...... ...e.. ....h.
+KWZHUU VWZBTZ HMSWRH JMPKEW HJLVOY XJAAES ESPGTH QLAAEU XKBETR YKAKOQ ZUYRPW HYYTPK
+.t.t.. .t.... a....t ...... aa.... .a.e.. .....t .e.e.. .....e ...... ...... a.....
+RAZVIS AWYMEA MLOTTL LNLKYG BXMBCX ELAHDH VAWAEU PAAAOX MHVLSH LKPHNR YLOXAS IJVIRL
+.o.... .t.... ee.... t..... ...... .e.t.t .o.e.. .o.e.. e....t t..the .e.... .a....
+TLLWEF HVPGGW HGSAOZ WAMYIF NDAZIY XFHELR YLVWAB LUVFPX MAUZPR PWYTNG TNHBLD UDLMIP
+.e.... a..... a..e.. .o.... ...... .....e .e.... t..... eo...e .t..h. ...... ......
+XWCXND UASEIR GUVFPX MWYLDR BFNTBL EDPHNF AWJDSD LWJHNG BLPLNR MHVLSL UDLMOG XUPIHH
+.t..h. .o...e ...... et...e ...... ...th. .t.... tt.th. .e..he e..... ...... .....t
+KLOXRH LMSMOI LLYHNJ VJFITR ZJHIHB UWMHRH MZLXNG HXAAEX GACXRV X
+.e...t t..... te.th. .a...e .a.... .t.t.t e...h. a..e.. .o....
+>>> tables
+[{'H': 'a', 'M': 'e', 'L': 't'}, {'A': 'o', 'J': 'a', 'L': 'e', 'W': 't'}, {}, {'A': 'e', 'H': 't'}, {'N': 'h'}, {'H': 't', 'R': 'e'}]
+
+I checked the English digrams and TH is the most common, and HE is the second.
+We've got a few HE digrams here. But for the rest, I'll just add TH as in THE
+or HE and see where it leads.
+
+Freqs for table 0:
+
+>>> show_freqs(monos[0])
+   0.1159 M  -  0.1202 E
+   0.1014 L  -  0.0910 T
+   0.0870 H  -  0.0812 A
+   0.0725 X  -  0.0768 O
+   0.0725 V  -  0.0731 I
+   0.0725 K  -  0.0695 N
+   0.0725 B  -  0.0628 S
+   0.0580 U  -  0.0602 R
+   0.0435 Z  -  0.0592 H
+   0.0435 Y  -  0.0432 D
+   0.0435 T  -  0.0398 L
+   0.0435 E  -  0.0288 U
+   0.0290 P  -  0.0271 C
+   0.0290 G  -  0.0261 M
+   0.0290 A  -  0.0230 F
+   0.0145 W  -  0.0211 Y
+   0.0145 R  -  0.0209 W
+   0.0145 Q  -  0.0203 G
+   0.0145 N  -  0.0182 P
+   0.0145 J  -  0.0149 B
+   0.0145 I  -  0.0111 V
+
+The three 0.0725 can be used to compose words like "IN" or "ON". Let's insert
+"?" for those to see where they are, then we'll try some things.

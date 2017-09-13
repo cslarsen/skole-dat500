@@ -245,7 +245,7 @@ if __name__ == "__main__":
     for index in range(cfactor):
         monos.append("".join(s[index] for s in columns))
 
-    def reb():
+    def show():
         p = rebuild(monos, tables, show=False)
         cols = 12
         p = list(split_string(p, cfactor*cols))
@@ -262,5 +262,5 @@ if __name__ == "__main__":
         return sorted(map(lambda (a,b): (b,a), en_digrams.items()), reverse=True)
 
     print("Functions")
-    print("reb() - decode monos using tables for transposition")
+    print("show() - decode monos using tables for transposition")
     print("Variables: ciphertext, monos, tables")
