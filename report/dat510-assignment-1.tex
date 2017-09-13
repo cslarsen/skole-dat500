@@ -1,7 +1,8 @@
 \documentclass[a4paper,english,12pt]{article}
 \input{preamble}
 
-\title{DAT510 --- Assignment 1}
+\title{DAT-510 Security and Vulnerability in Networks}
+\subtitle{Assignment 1}
 \author{Christian Stigen}
 \date{UiS, September \nth{18}, 2017}
 
@@ -9,14 +10,20 @@
 \maketitle
 
 \begin{abstract}
-My abstract, to be written at the end.
+This project presents results and procedures for recovering plaintexts for two
+  cipher systems: two ciphers: The classical Vigenère polyalphabetic
+  substitution cipher, and the educational Simplified DES (SDES) assymetric
+  cipher. The polyalphabetic plaintext was deciphered using the Kasinski method
+  and coincidence counting, mostly by manual work backed by subroutines.  The
+  SDES key was brute-forced in less than 50 ms using lookup tables in highly
+  optimized C++ code with Python bindings. This shows that both systems are not
+  secure enough to be used in real-world systems.
 \end{abstract}
 
-\section{Part I}
+\section{Part I --- Polyalphabetic ciphers}
 
-Below is the plaintext message with spaces added to make each block coincide
-with the length of the key \texttt{TSHTAD}. I have also added a readable
-version.
+Below is the raw and formatted plaintext message. Spaces were added to
+highlight the coincidence with the length of the key \texttt{TSHTAD}.
 
 \begin{verbatim}
 CRYPTO GRAPHY CANBES TRONGO RWEAKC RYPTOG RAPHIC STRENG
@@ -58,16 +65,16 @@ This was fairly simple: The assignment stated that the key length was less than
 ten, so I chopped the text up into $n$ pieces from $3\dots10$ and simply
 searched for multiple occurrences. In pseudo-code:
 
-\verbatim{
-  for keylength in range(3, 10):
-     for start in range(length(ciphertext)):
-        key = ciphertext[start:start+length]
-        positions = ciphertext.findall(key)
-}
+\begin{verbatim}
+for keylength in range(3, 10):
+   for start in range(length(ciphertext)):
+      key = ciphertext[start:start+length]
+      positions = ciphertext.findall(key)
+\end{verbatim}
 
 I found the following repeats:
 
-\verbatim{
+\begin{verbatim}
 pos=  0       'VJFITRZJHIHB' pos=378       'VJFITRZJHIHB' dist=378
 pos=  0        'VJFITRZJHIH' pos=378        'VJFITRZJHIH' dist=378
 pos=  0         'VJFITRZJHI' pos=378         'VJFITRZJHI' dist=378
@@ -106,7 +113,7 @@ KOLTKF
 KQWMOJ
 KSWAIF
 ... 64 more
-}
+\end{verbatim}
 
 TODO: Describe strategy you employed. SHow the details for each of the steps of
 the strategy. Describe any programs you wrote. Show sample output of these
