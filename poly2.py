@@ -178,8 +178,8 @@ def rebuild(parts, tables, show=True):
         after = transpose(part, table)
         decoded.append(after)
         if show:
-            print("  cipher %s" % part)
-            print("  plain  %s" % after)
+            print("  cipher %s" % " ".join(split_string(part, len(parts))))
+            print("  plain  %s" % " ".join(split_string(after, len(parts))))
     return recombine(decoded)
 
 if __name__ == "__main__":

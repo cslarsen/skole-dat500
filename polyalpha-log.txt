@@ -79,18 +79,44 @@ assigning the value "e" for the top letter in each.
 
 ... and so on.
 
->>> reb()
-  cipher VZVMKKKLMTBBKVHJHXEQXYZHRAMLBEVPMLYITHHWNXYLMPTUXUGMBEALBMUXKLLVZUMHG
-  plain  .............................................................
-  cipher JJSJOQSLZKFEWWMMJJSLKKUYAWLNXLAAHKLJLVGADFLUAWNDWAUWFDWWLHDULMLJJWZXA
-  plain  .......e...........e......e..e....e.e.....e.............e...e.e......
-  cipher FHUVLWWYPBALZZSPLAPABAYYZYOLMAWAVPOVLPSMAHVVUYHLCSVYNPJJPVLPOSYFHMLAC
-  plain  ........e......e..e..............e...e...............e..e..e.........
-  cipher IIUGTMAXLKATHBWKVAGAEKRTVMTKBHAALHXIWGAYZEWFZTBMXEFLTHDHLLMIXMHIIHXAX
-  plain  ......e...e......e.e..........ee......e............................e.
-  cipher THEGKOINMEENUTREOETETOPPIETYCDEOSNAREGOIILAPPNLINIPDBNSNNSOHRONTHRNER
-  plain  .......e...e.....................e...........e..e....e.ee.....e...e..
-  cipher RBVRFJFJHGWGUZHWYSHURQWKSALGXHUXHRSLFWZFYRBXRGDPDRXRLFDGRLGHHIJRBHGXV
-  plain  e..e................e............e.......e..e....e.e....e......e.....
+Here is the table after all the top two letters of every alphabet has been
+assigned the characters "e" and "t":
 
+  cipher VZVMKK KLMTBB KVHJHX EQXYZH RAMLBE VPMLYI THHWNX YLMPTU XUGMBE ALBMUX KLLVZU MHG
+  plain  ...e.. .te... ...... ...... ..et.. ..et.. ...... .te... ...e.. .t.e.. .tt... e..
+  cipher JJSJOQ SLZKFE WWMMJJ SLKKUY AWLNXL AAHKLJ LVGADF LUAWND WAUWFD WWLHDU LMLJJW ZXA
+  plain  ...... .e.... tt.... .e.... .te..e ....e. e..... e..t.. t..t.. tte... e.e..t ...
+  cipher FHUVLW WYPBAL ZZSPLA PABAYY ZYOLMA WAVPOV LPSMAH VVUYHL CSVYNP JJPVLP OSYFHM LAC
+  plain  ....t. ..e..t ...et. e..... ...t.. ...e.. te.... .....t .....e ..e.te ...... t..
+  cipher IIUGTM AXLKAT HBWKVA GAEKRT VMTKBH AALHXI WGAYZE WFZTBM XEFLTH DHLLMI XMHIIH XAX
+  plain  ...... e...e. t....e .e.... .....t ee.t.. ..e... ...... .....t .t.... ..t..t .e.
+  cipher THEGKO INMEEN UTREOE TETOPP IETYCD EOSNAR EGOIIL APPNLI NIPDBN SNNSOH RONTHR NER
+  plain  ..t... .e.tte ...t.t .t.... .t.... t..e.. t..... ...e.. e....e .ee... ..e... et.
+  cipher RBVRFJ FJHGWG UZHWYS HURQWK SALGXH UXHRSL FWZFYR BXRGDP DRXRLF DGRLGH HIJRBH GXV
+  plain  e..e.. ..t... ..t... t.e... .....t ..te.. .....e ..e... .e.e.. ..e..t t..e.t ...
 
+There are no obvious errors so far, so I just continued down the frequency
+list. Errors would be triple Es or Ts, or other invalid sequences.
+
+At this point, I spotted a double "aa", which might be wrong. The problem is
+that the spaces have been removed, so it's very hard to see whether a double a
+is an error or not. I'll leave it so far:
+
+  cipher VZVMKK KLMTBB KVHJHX EQXYZH RAMLBE VPMLYI THHWNX YLMPTU XUGMBE ALBMUX KLLVZU MHG
+  plain  ...e.. .te... ..a.a. .....a ..et.. ..et.. .aa... .te... ...e.. .t.e.. .tt... ea.
+  cipher JJSJOQ SLZKFE WWMMJJ SLKKUY AWLNXL AAHKLJ LVGADF LUAWND WAUWFD WWLHDU LMLJJW ZXA
+  plain  aa.a.. .e.... tt..aa .e.... .te..e ....ea e..... e..t.. t..t.. tte... e.eaat ...
+  cipher FHUVLW WYPBAL ZZSPLA PABAYY ZYOLMA WAVPOV LPSMAH VVUYHL CSVYNP JJPVLP OSYFHM LAC
+  plain  ....t. ..e..t ...et. e..... ...t.. ...e.. te.... .....t .....e ..e.te ...... t..
+  cipher IIUGTM AXLKAT HBWKVA GAEKRT VMTKBH AALHXI WGAYZE WFZTBM XEFLTH DHLLMI XMHIIH XAX
+  plain  ...... e...e. t....e .e.... .....t ee.t.. ..e... ...... .....t .t.... ..t..t .e.
+  cipher THEGKO INMEEN UTREOE TETOPP IETYCD EOSNAR EGOIIL APPNLI NIPDBN SNNSOH RONTHR NER
+  plain  ..t... .e.tte ...t.t .t.... .t.... t..e.. t..... ...e.. e....e .ee... ..e... et.
+  cipher RBVRFJ FJHGWG UZHWYS HURQWK SALGXH UXHRSL FWZFYR BXRGDP DRXRLF DGRLGH HIJRBH GXV
+  plain  e..e.. ..t... ..t... t.e... .....t ..te.. .....e ..e... .e.e.. ..e..t t..e.t ...
+
+Tables at this point:
+
+[{'H': 'a', 'M': 'e', 'L': 't'}, {'J': 'a', 'L': 'e', 'W': 't'}, {'A': 'a',
+'P': 'e', 'L': 't'}, {'A': 'e', 'H': 't', 'T': 'o', 'X': 'a'}, {'E': 't', 'N':
+'e'}, {'H': 't', 'R': 'e'}]
