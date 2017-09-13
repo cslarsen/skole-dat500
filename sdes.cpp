@@ -411,7 +411,7 @@ struct bruteforce_result bruteforce_3sdes_key(
   // ciphertext is now reduced to 18 bytes. TripleSDES also seems to have very
   // low entropy, since a good symmetric cipher would use the full range of 256
   // bytes. Of course, it's an educational cipher.
-  unsigned char unique[60];
+  unsigned char unique[length];
   size_t unique_len = 0;
   {
     std::set<unsigned char> unique_bytes;
