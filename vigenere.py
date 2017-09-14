@@ -1,18 +1,10 @@
+#! /usr/bin/env python
+# -*- encoding: utf-8 -*-
+
 """
-Steps:
-Find repeated characters of increasing length. Look for the one that has the
-lowest period, i.e. the lowest distance between the two repeated substrings.
+Attempts to recover the plaintext of a Vigenére polyalphabetic ciphertext.
 
-This should indicate a region where *one* alphabet substition is used. When
-that is found, crack it like an ordinary monoalphabetic cipher. Example:
-
-    ....abc....xabc....
-
-Distance from first abc to next is 8, between them 5. So take the string
-
-abc....x
-
-and crack that by itself as a monoalphabetic section.
+Written by Christian Stigen
 """
 
 import collections
@@ -29,7 +21,7 @@ def english_freq():
         yield letter, count
 
 def make_vigenere_table():
-    """Returns a Vigenere table."""
+    """Returns a Vigenere table. Vastly inefficient code."""
     tbl = {}
     alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     for shift in range(len(alpha)):
@@ -42,6 +34,7 @@ def make_vigenere_table():
     return tbl
 
 def vigenere_encrypt(plaintext, key):
+    """Encrypts Vigenère cipher (vastly inefficient code)."""
     ciphertext = ""
     table = make_vigenere_table()
     plaintext = plaintext.replace(" ", "").upper()
@@ -54,6 +47,7 @@ def vigenere_encrypt(plaintext, key):
     return ciphertext
 
 def vigenere_decrypt(ciphertext, key):
+    """Decrypts Vigenère cipher (vastly inefficient code)."""
     table = make_vigenere_table()
     plaintext = ""
     alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -252,56 +246,43 @@ if __name__ == "__main__":
     print("")
 
     print("Finding monoalphabetic ciphers. Ciphertext arranged in %d columns is:\n" % keylength)
-    columns = list(split_string(ciphertext, keylength))
-    for i, part in enumerate(columns):
-        print("  %s" % part)
-        if i > 5:
-            print("  %s (%d more)" % ("."*keylength, len(columns) - i))
-            break
+    block_print(ciphertext, keylength, 1, stop=5)
+    print("  %s" % ("."*keylength))
+    print("")
 
     # Take character N from every column
-    monos = []
+    columns = []
     tables = []
     for i in range(keylength):
         tables.append({})
 
-    # Create strings from each vertical column, put in monos
+    # Create strings from each vertical column, put in columns
     for index in range(keylength):
-        line = ""
-        for col in columns:
+        column = ""
+        for col in split_string(ciphertext, keylength):
             try:
-                line += col[index]
+                column += col[index]
             except IndexError:
                 pass
-        monos.append("".join(line))
+        columns.append("".join(column))
     mlen = 30
-    if mlen > len(monos[0]):
-        mlen = len(monos[0])//2
-    print("  First column: %*.*s..." % (mlen, mlen, monos[0]))
+    if mlen > len(columns[0]):
+        mlen = len(columns[0])//2
+    print("  First column: %*.*s..." % (mlen, mlen, columns[0]))
     print("")
-
-    def show():
-        p = rebuild(monos, tables, show=False)
-        cols = 12
-        p = list(split_string(p, keylength*cols))
-        c = list(split_string(ciphertext, keylength*cols))
-
-        for plain, ciph in zip(p, c):
-            print(" ".join(split_string(ciph, keylength)))
-            print(" ".join(split_string(plain, keylength)))
 
     # Now, calculate the best coincidence:
     # https://en.wikipedia.org/wiki/Index_of_coincidence
     print("Frequency analysis -- finding best coincidence match for each column:\n")
-    for i in range(len(monos)):
-        cf, shifts = max([(coinc(monos[i], n), n) for n in range(26)])
+    for i in range(len(columns)):
+        cf, shifts = max([(coinc(columns[i], n), n) for n in range(26)])
         print("  Column %d: match %f, shifts %2d" % (i, cf, shifts))
         # Perform shift
-        monos[i] = shift(monos[i], shifts)
+        columns[i] = shift(columns[i], shifts)
     print("")
 
     print("Deduced plaintext using above shifts:\n")
-    plaintext = recombine(monos)
+    plaintext = recombine(columns)
     block_print(plaintext, keylength, 60//(keylength+1), indent="  ")
     print("")
 

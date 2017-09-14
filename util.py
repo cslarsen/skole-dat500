@@ -69,13 +69,16 @@ def split_string(string, length, start=0, tail=True):
     if tail:
         yield string[start:]
 
-def block_print(text, width=8, columns=4, indent="  ", spacing=" "):
+def block_print(text, width=8, columns=4, indent="  ", spacing=" ", stop=None):
     for i, part in enumerate(split_string(text, width)):
         if i == 0:
             sys.stdout.write(indent)
         sys.stdout.write("%s%s" % (part, spacing))
         if (i % columns) == (columns - 1):
-            sys.stdout.write("\n%s" % indent)
+            sys.stdout.write("\n")
+            if (i+1) == stop:
+                break
+            sys.stdout.write(indent)
 
     if (i % columns) != (columns - 1):
         sys.stdout.write("\n")
