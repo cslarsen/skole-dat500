@@ -16,7 +16,7 @@ TARGETS := dat510-assignment-1.pdf
 all: $(TARGETS)
 
 open: all
-	open dat510-assignment-1.pdf
+	$(OPEN) dat510-assignment-1.pdf
 
 %.eps: %.gp data.txt
 	gnuplot $<
