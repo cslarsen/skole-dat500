@@ -328,12 +328,14 @@ def main():
         opts.min_length, opts.max_length))
 
     distances = set()
+    found = set()
     for length in range(opts.max_length, opts.min_length-1, -1): # problem said max 10 keylength
         start = 0
         while start+length < len(ciphertext):
             key = ciphertext[start:start+length]
             positions = list(find_all(ciphertext, key))
-            if len(positions) > 1:
+            if len(positions) > 1 and key not in found:
+                found.add(key)
                 verbose("  Found %-12r at " % key)
                 verbose(", ".join("%3d" % p for p in positions))
 

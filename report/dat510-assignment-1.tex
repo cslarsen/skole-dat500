@@ -17,23 +17,17 @@
   substitution cipher, and the educational \textit{Simplified DES} (SDES) symmetric cipher.
 %
   The Vigenère plaintext was deciphered using the \textit{Kasiski method} for
-  finding key-lengths, while the Caesar alphabets were found by
-  councidence counting: Each mono-alphabet was shifted to attain the highest
-  English letter-frequency correlation. Recombining them produced the
-  plaintext. The key was recovered simply by decrypting the ciphertext with the
-  recovered plaintext.
+  finding key-lengths, while the individual Caesar cipher alphabets were found by
+  \textit{Kerckhoffs method}: Using alphabet shifts with the highest English
+  letter frequency correlation. Recombining the alphabets produced the
+  plaintext directly, while the key was found by simply decrypting the
+  ciphertext with the plaintext.
 %
-  The SDES and TripleSDES keys were found through brute-forcing. While the
-  10-bit SDES was simple to find, the 20-bit TripleSDES was found by splitting
-  the three-part decryption function into separate lookup tables. The set of
-  candidate keys were represented in a memory-efficient bitset. Keys that
-  decrypted the plaintext to non-printable ASCII characters were discarded.
-  The combined C++ and Python program was then able to break the key in less
-  than 50 milliseconds.  Larger key-lengths would most likely be impractical to
-  solve this way.
-%
-  As expected, this shows that both systems are readily broken with modern
-  hardware, and are not secure for real-world usage.
+  The SDES and TripleSDES keys were found through brute-force. The 20-bit
+  TripleSDES key was found in less than 50 milliseconds by decomposing the
+  decryption function and creating two separate lookup tables and encoding key
+  candidates in a memory efficient bitset. Keys that did not produce
+  all-printable ASCII characters were discarded.
 \end{abstract}
 
 \section{Part I --- Polyalphabetic ciphers}
@@ -83,9 +77,9 @@ to guess the key length.
 
 Performing such a search was straight-forward: The problem description stated
 that the key length would not be more than ten letters, so I iterated through
-the ciphertext with a moving window of lengths from ten and down to three.
-Whenever I found a repeat, I recorded the distance between them. Below are
-excerpts from the \texttt{vigenere.py} program output.
+the ciphertext with a moving window of decreasing lengths from ten and down to
+four.  Whenever I found a repeat, I recorded the distance between them. Below
+are excerpts from the \texttt{vigenere.py} program output.
 
 \begin{verbatim}
 Looking for repeated substrings with lengths [4, 10]:
@@ -94,16 +88,16 @@ Looking for repeated substrings with lengths [4, 10]:
   Found 'JFITRZJHIH' at   1, 379 distance 378
   Found 'FITRZJHIHB' at   2, 380 distance 378
   ...
-  Found 'ZJHIHB'     at   6, 384 distance 378
   Found 'UVFPXM'     at 259, 301 distance  42
-  Found 'UVFPXM'     at 259, 301 distance  42
-  Found 'VJFITR'     at   0, 378 distance 378
+  Found 'VJFIT'      at   0, 378 distance 378
+  Found 'JFITR'      at   1, 379 distance 378
+  Found 'FITRZ'      at   2, 380 distance 378
   ...
   Found 'MHVLS'      at 192, 342 distance 150
   Found 'UVFPX'      at 259, 301 distance  42
   Found 'VFPXM'      at 260, 302 distance  42
-  Found 'UVFPX'      at 259, 301 distance  42
-  Found 'VFPXM'      at 260, 302 distance  42
+  ...
+  Found 'UDLM'       at 282, 348 distance  66
 \end{verbatim}
 
 Next, I looked at the recorded distances, trying to find common factors. Of
@@ -124,6 +118,60 @@ the constant key length, each distance should then be a multiple of the key
 length. Therefore I factorized each distance and threw away those that were not
 common to all distances.
 
+Now that I had a possible key length, I organized the ciphertext in columns
+with the same width as the key length.
+
+\begin{verbatim}
+Finding monoalphabetic ciphers. Ciphertext arranged in 6 columns is:
+
+  VJFITR
+  ZJHIHB
+  VSUUEV
+  MJVGGR
+  KOLTKF
+  ......
+
+  First column: VZVMKKKLMTBBKVHJHXEQXYZHRAMLBE...
+\end{verbatim}
+
+The insight here is that if the correct key length has been found, all the
+letters in the same column would have been encrypted with the same key letter.
+As can be seen in the program output above, I arranged the text into a column,
+and then extracted the vertical columns of text. Each such column should then
+correspond to a single Caesar cipher\footnote{This assumes that the Vigenère
+table does not use scrambled alphabets; each alphabet is written in the same
+order, and shifted exactly once per key letter.}.
+
+To break each Caesar cipher, I compared their relative letter frequencies with
+those found in English texts. To find how closely they correlate, or match each
+other, I calculated the \textit{normalized index of coincidence}. I then
+shifted each column alphabetically and calculated its correlation with the
+English frequency distribution.
+A \textit{shift} here means that all As become Bs, all Bs become Cs and so on.
+
+After iterating through all 25 possible shifts, I chose the shift that produced
+the highest correlation. This is called \textit{Kerckhoffs' method}
+\cite{wiki:vigenere}. The best correlations (or normalized index of
+coincidence) is shown in the program output below.
+
+\begin{verbatim}
+Frequency analysis:
+Shifts alphabets for each column to find the best coincidence match
+
+  Column 0 length 70: best match 0.058826 with  7 shifts
+  Column 1 length 69: best match 0.064844 with  8 shifts
+  Column 2 length 69: best match 0.065840 with 19 shifts
+  Column 3 length 69: best match 0.061286 with  7 shifts
+  Column 4 length 69: best match 0.067704 with  0 shifts
+  Column 5 length 69: best match 0.057107 with 23 shifts
+\end{verbatim}
+
+Finally, I recombined each column back to its original --- the reverse of the
+operation mentioned earlier. This produced the plaintext directly.
+
+After I had the plaintext, I recovered the key by simply decrypting the
+ciphertext with the plaintext. That produced the repeated key, which I cut off
+at the known length.
 
 \subsection{Finding each mono-alphabet}
 
