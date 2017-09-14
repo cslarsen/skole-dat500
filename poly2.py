@@ -225,7 +225,14 @@ def coinc(text, shifts):
 def recombine(parts):
     plain = ""
     for index in range(len(parts[0])):
-        plain += "".join(s[index] for s in parts)
+        line = ""
+        for s in parts:
+            try:
+                line += s[index]
+            except IndexError:
+                pass
+        plain += "".join(line)
+        #plain += "".join(s[index] for s in parts)
     return plain
 
 def rebuild(parts, tables, show=True):
@@ -296,10 +303,20 @@ if __name__ == "__main__":
     for i in range(cfactor):
         tables.append({})
 
-    if len(columns[-1]) < cfactor:
-        del columns[-1] # delete tail
+    #if len(columns[-1]) < cfactor:
+        #columns[-1] = "%s%s" % (columns[-1], "?"*(cfactor-len(columns[-1])))
+        #del columns[-1] # delete tail
     for index in range(cfactor):
-        monos.append("".join(s[index] for s in columns))
+        line = ""
+        for col in columns:
+            try:
+                line += col[index]
+            except IndexError:
+                pass
+                #print("************* %s %d" % (col, index))
+                #line += col[0]
+        monos.append("".join(line))
+        #monos.append("".join(s[index] for s in columns))
 
     def show():
         p = rebuild(monos, tables, show=False)
@@ -329,9 +346,9 @@ if __name__ == "__main__":
         # Perform shift
         monos[i] = shift(monos[i], shifts)
 
-    print("\nProposed plaintext after performing above shifts:")
+    print("\nProposed plaintext after performing above shifts:\n")
     plaintext = recombine(monos)
-    block_print(plaintext, cfactor, 60//(cfactor+1))
+    block_print(plaintext, cfactor, 60//(cfactor+1), indent="")
 
     key = vigenere_decrypt(ciphertext, plaintext)[:cfactor]
     print("\nWith above plaintext, key becomes: %s" % key)
