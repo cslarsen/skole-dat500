@@ -9,6 +9,7 @@ else
 	PDFLATEX := pdflatex
 	BIBTEX := bibtex
 	OPEN := open
+	DETEX := detex
 endif
 
 TARGETS := dat510-assignment-1.pdf
