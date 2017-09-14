@@ -57,22 +57,22 @@ def main():
 
     print("TASK 1\n")
 
-    print("Raw key    Plaintext  Ciphertext")
-    print("--------------------------------")
+    print("Raw key     Plaintext  Ciphertext")
+    print("---------------------------------")
 
     for key, plaintext in plaintexts:
         ciphertext = csdes.encrypt(key, plaintext)
-        print("%s %s   %s" % (binary(key, 10), binary(plaintext, 8),
+        print("%s  %s  *%s" % (binary(key, 10), binary(plaintext, 8),
             binary(ciphertext, 8)))
         if csdes.decrypt(key, ciphertext) != plaintext:
             print("WRONG")
-    print("--------------------------------")
+    print("---------------------------------")
 
     for key, ciphertext in ciphertexts:
         plaintext = csdes.decrypt(key, ciphertext)
-        print("%s %s   %s" % (binary(key, 10), binary(plaintext, 8),
+        print("%s *%s   %s" % (binary(key, 10), binary(plaintext, 8),
             binary(ciphertext, 8)))
-    print("--------------------------------")
+    print("---------------------------------")
 
 if __name__ == "__main__":
     verify()
