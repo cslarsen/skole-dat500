@@ -17,7 +17,7 @@
   substitution cipher, and the educational \textit{Simplified DES} (SDES) symmetric cipher.
 %
   The Vigenère plaintext was deciphered using the \textit{Kasiski method} for
-  finding key-lengths, while each corresponding Caesar alphabet was found by
+  finding key-lengths, while the Caesar alphabets were found by
   councidence counting: Each mono-alphabet was shifted to attain the highest
   English letter-frequency correlation. Recombining them produced the
   plaintext. The key was recovered simply by decrypting the ciphertext with the
@@ -83,56 +83,6 @@ This was fairly simple: The assignment stated that the key length was less than
 ten, so I chopped the text up into $n$ pieces from $3\dots10$ and simply
 searched for multiple occurrences. In pseudo-code:
 
-\begin{verbatim}
-for keylength in range(3, 10):
-   for start in range(length(ciphertext)):
-      key = ciphertext[start:start+length]
-      positions = ciphertext.findall(key)
-\end{verbatim}
-
-I found the following repeats:
-
-\begin{verbatim}
-pos=  0       'VJFITRZJHIHB' pos=378       'VJFITRZJHIHB' dist=378
-pos=  0        'VJFITRZJHIH' pos=378        'VJFITRZJHIH' dist=378
-pos=  0         'VJFITRZJHI' pos=378         'VJFITRZJHI' dist=378
-pos=  2         'FITRZJHIHB' pos=380         'FITRZJHIHB' dist=378
-pos=  0          'VJFITRZJH' pos=378          'VJFITRZJH' dist=378
-pos=  0          'VJFITRZJH' pos=378          'VJFITRZJH' dist=378
-pos=  0           'VJFITRZJ' pos=378           'VJFITRZJ' dist=378
-pos=  0            'VJFITRZ' pos=378            'VJFITRZ' dist=378
-pos=  0            'VJFITRZ' pos=378            'VJFITRZ' dist=378
-pos=  0             'VJFITR' pos=378             'VJFITR' dist=378
-pos=  6             'ZJHIHB' pos=384             'ZJHIHB' dist=378
-pos=  0             'VJFITR' pos=378             'VJFITR' dist=378
-pos=  6             'ZJHIHB' pos=384             'ZJHIHB' dist=378
-pos=  0              'VJFIT' pos=378              'VJFIT' dist=378
-pos=  5              'RZJHI' pos=383              'RZJHI' dist=378
-pos=260              'VFPXM' pos=302              'VFPXM' dist=42
-pos=  2              'FITRZ' pos=380              'FITRZ' dist=378
-pos=  7              'JHIHB' pos=385              'JHIHB' dist=378
-pos=  0               'VJFI' pos=378               'VJFI' dist=378
-pos=  4               'TRZJ' pos=382               'TRZJ' dist=378
-pos=  8               'HIHB' pos=386               'HIHB' dist=378
-pos=192               'MHVL' pos=342               'MHVL' dist=150
-pos=260               'VFPX' pos=302               'VFPX' dist=42
-pos=282               'UDLM' pos=348               'UDLM' dist=66
-pos=  2               'FITR' pos=380               'FITR' dist=378
-pos=  6               'ZJHI' pos=384               'ZJHI' dist=378
-Distances: 378 66 42 150
-Common factors: 2 3
-Perhaps the keylength is 6
-Ciphertext in 6 columns
-VJFITR
-ZJHIHB
-VSUUEV
-MJVGGR
-KOLTKF
-KQWMOJ
-KSWAIF
-... 64 more
-\end{verbatim}
-
 TODO: Describe strategy you employed. SHow the details for each of the steps of
 the strategy. Describe any programs you wrote. Show sample output of these
 programs. Show how you transformed that output into your solution.
@@ -145,20 +95,21 @@ programs. Show how you transformed that output into your solution.
     solution.
 \end{itemize}
 
-\section{Part II. Simplified DES}
+\section{Part II --- Simplified DES (SDES)}
 
-\subsection{Task 1: Test cases}
+\subsection{Task 1: SDES}
 
 Implemented SDES\cite{stallings2006cryptography} and completed the following
 table.
 
 \begin{table}[H]
   \centering
-  \begin{tabular}{ccc}
-    \hline \textbf{Raw key} &
-           \textbf{Plaintext} &
-           \textbf{Ciphertext} \\
-    \hline
+  \begin{tabular}{@{}lll@{}}
+    \toprule
+    Key &
+    Plaintext &
+    Ciphertext \\
+    \midrule
     \texttt{0000000000} & \texttt{00000000} & \texttt{\textbf{11110000}} \\
     \texttt{0000011111} & \texttt{11111111} & \texttt{\textbf{11100001}} \\
     \texttt{0010011111} & \texttt{11111100} & \texttt{\textbf{10011101}} \\
@@ -167,24 +118,24 @@ table.
     \texttt{0000011111} & \texttt{\textbf{00000000}} & \texttt{01000011} \\
     \texttt{1000101110} & \texttt{\textbf{00111000}} & \texttt{00011100} \\
     \texttt{1000101110} & \texttt{\textbf{00001100}} & \texttt{11000010} \\
-    \hline
+    \bottomrule
   \end{tabular}
   \label{table:task1}
 \end{table}
 
-\subsection{Task 2: Test cases}
+\subsection{Task 2: TripleSDES}
 
 Implemented TripleSDES code and completed the following table.
 
 \begin{table}[H]
   \centering
-  \begin{tabular}{cccc}
-    \hline 
-      \textbf{Raw key 1} &
-      \textbf{Raw key 2} &
-      \textbf{Plaintext} &
-      \textbf{Ciphertext} \\
-    \hline
+  \begin{tabular}{@{}llll@{}}
+    \toprule
+      Key 1 &
+      Key 2 &
+      Plaintext &
+      Ciphertext \\
+    \midrule
 
              \texttt{1000101110} &
              \texttt{0110101110} &
@@ -225,8 +176,7 @@ Implemented TripleSDES code and completed the following table.
             \texttt{0000000000} &
       \texttt{\textbf{00000000}} &
               \texttt{11110000} \\
-
-      \hline
+      \bottomrule
   \end{tabular}
   \label{table:task2}
 \end{table}
@@ -241,8 +191,9 @@ following result:
 \paragraph{Plaintext}
 \texttt{simplifieddesisnotsecureenoughtoprovideyousufficientsecurity}
 
-\paragraph{Plaintext with manually inserted spaces}
-\texttt{simplified des is not secure enough to provide you sufficient security}
+\begin{center}
+\textit{Simplified DES is not secure enough to provide you sufficient security.}
+\end{center}
 
 Since the key is only 10 bits, I brute-forced it. I started with a set of all
 the possible 1023 keys, then for each byte, I tried to decrypt with each key.
