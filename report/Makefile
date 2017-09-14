@@ -2,8 +2,8 @@ OS := $(shell uname)
 MAIN := bachelor
 
 ifeq ($(OS),Linux)
-	PDFLATEX := /usr/texlive/2013/bin/x86_64-linux/pdflatex
-	BIBTEX := /usr/texlive/2013/bin/x86_64-linux/bibtex
+	PDFLATEX := /opt-rh7/texlive/2017/bin/x86_64-linux/pdflatex
+	BIBTEX := /opt-rh7/texlive/2017/bin/x86_64-linux/bibtex
 	OPEN := xdg-open
 else
 	PDFLATEX := pdflatex
