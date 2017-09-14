@@ -20,7 +20,7 @@ import sys
 
 # local imports
 from poly import find_all, period, english
-from util import readfile, split_string, transpose, normalize
+from util import readfile, split_string, transpose, normalize, block_print
 
 write = sys.stdout.write
 
@@ -199,6 +199,29 @@ def show_freqs(text):
         bar2 = "*"*int(round(10*n2/max2)) if n2>0 else ""
         print("%10s %7.4f %c  - %7.4f %c %-10s" % (bar1, n1, ch1, n2, ch2, bar2))
 
+def coinc(text, shifts):
+    """Coincidence factor."""
+    text = shift(text, shifts)
+    txt = freqs(text)
+    eng = freqs_en()
+
+    # Change it up: Show frequencies by alphabetical entries
+    def rev(pairs):
+        out = {}
+        for a in range(ord("A"), ord("Z")):
+            out[chr(a)] = 0
+        for char, count in pairs:
+            out[char] = count
+        return out
+
+    txt = sorted(rev(txt).items())
+    eng = sorted(rev(eng).items())
+
+    coinc = 0
+    for (ch1, n1), (ch2, n2) in zip(txt, eng):
+        coinc += n1*n2
+    return coinc
+
 def recombine(parts):
     plain = ""
     for index in range(len(parts[0])):
@@ -297,6 +320,22 @@ if __name__ == "__main__":
     def sf(n):
         show_freqs(monos[n])
 
-    print("Functions")
+    # Now, calculate the best coincidence:
+    # https://en.wikipedia.org/wiki/Index_of_coincidence
+    print("Finding best coincidence for each column")
+    for i in range(len(monos)):
+        cf, shifts = max([(coinc(monos[i], n), n) for n in range(26)])
+        print("  Column %d: %f %d" % (i, cf, shifts))
+        # Perform shift
+        monos[i] = shift(monos[i], shifts)
+
+    print("\nProposed plaintext after performing above shifts:")
+    plaintext = recombine(monos)
+    block_print(plaintext, cfactor, 60//(cfactor+1))
+
+    key = vigenere_decrypt(ciphertext, plaintext)[:cfactor]
+    print("\nWith above plaintext, key becomes: %s" % key)
+
+    print("\nFunctions")
     print("show() - decode monos using tables for transposition")
     print("Variables: ciphertext, monos, tables")
