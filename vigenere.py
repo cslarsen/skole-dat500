@@ -7,11 +7,14 @@ Attempts to recover the plaintext of a Vigenére polyalphabetic ciphertext.
 Written by Christian Stigen
 """
 
+import argparse
 import collections
+import operator
+import os
 import sys
 
 # local imports
-from poly import find_all, period, english
+from poly import find_all, english
 from util import readfile, split_string, transpose, normalize, block_print
 
 def english_freq():
@@ -149,13 +152,19 @@ def show_freqs(text):
         bar2 = "*"*int(round(10*n2/max2)) if n2>0 else ""
         print("%10s %7.4f %c  - %7.4f %c %-10s" % (bar1, n1, ch1, n2, ch2, bar2))
 
-def coinc(text, shifts):
-    """Coincidence factor."""
+def coincidence_factor(text, shifts):
+    """Calculates the coincidence factor for a string, based on the English
+    letter frequencies.
+
+    In practical terms, this calcualtes the correlation of the frequency counts
+    in the input string with those found in typical English texsts. If the
+    coincidence factor is high, the frequency distribution is very similar to
+    the English. If it is low, there is a low correlation.
+    """
     text = shift(text, shifts)
     txt = freqs(text)
     eng = freqs_en()
 
-    # Change it up: Show frequencies by alphabetical entries
     def rev(pairs):
         out = {}
         for a in range(ord("A"), ord("Z")):
@@ -172,83 +181,146 @@ def coinc(text, shifts):
         coinc += n1*n2
     return coinc
 
-def recombine(parts):
-    plain = ""
-    for index in range(len(parts[0])):
-        line = ""
-        for s in parts:
+def parse_args():
+    p = argparse.ArgumentParser(
+            description="Recovers plaintext and key from Vigenère ciphertext")
+    p.add_argument("file", default="cipher.txt",
+        help="File with ASCII ciphertext to decipher")
+    p.add_argument("--min-length", default=4, type=int,
+        help="Minimum keylength to scan for")
+    p.add_argument("--max-length", default=10, type=int,
+        help="Maximum keylength to scan for")
+    p.add_argument("-v", "--verbose", default=False, action="store_true",
+        help="Show steps performed to decipher")
+    opts = p.parse_args()
+
+    if not os.path.isfile(opts.file):
+        print("Not a file: %s" % opts.file)
+        sys.exit(1)
+
+    if opts.min_length >= opts.max_length:
+        print("Min/max lengths invalid: %s %s" % (opts.min_length,
+            opts.max_length))
+        sys.exit(1)
+
+    return opts
+
+def is_divisible(divisor, dividend):
+    """Checks if divisor is evenly divisible by dividend, i.e. results in a
+    plain integer."""
+    return (float(divisor)/dividend - divisor//dividend) == 0
+
+def find_common_factors(numbers):
+    """Finds factors that are common to *all* numbers.
+
+    For example, 30 and 70 factorize to 2*3*5 and 7*2*5, but only 2 and 5 are
+    common factors.
+    """
+    common = set()
+    for factor in range(2, max(numbers)):
+        if all(is_divisible(number, factor) for number in numbers):
+            if all(not is_divisible(factor, number) for number in common):
+                common.add(factor)
+    return common
+
+def extract_string_columns(text, length):
+    """Splits input string into n strings of given length, then transposes
+    them so that each output string consists of the characters found in the
+    same positions in the input strings.
+
+    For example:
+
+       string 1: abc
+       string 2: def
+       output 1: ad
+       output 2: be
+       output 3: cf
+    """
+    columns = []
+    for index in range(length):
+        column = ""
+        for col in split_string(text, length):
             try:
-                line += s[index]
+                column += col[index]
             except IndexError:
+                # This happens if any input string is shorter than the others
                 pass
-        plain += "".join(line)
-        #plain += "".join(s[index] for s in parts)
-    return plain
+        columns.append("".join(column))
+    return columns
 
-def rebuild(parts, tables, show=True):
-    decoded = []
-    for part, table in zip(parts, tables):
-        after = transpose(part, table)
-        decoded.append(after)
-        if show:
-            print("  cipher %s" % " ".join(split_string(part, len(parts))))
-            print("  plain  %s" % " ".join(split_string(after, len(parts))))
-    return recombine(decoded)
+def recombine_string_columns(columns, length):
+    """Does the reverse of ``extract_string_columns``."""
+    string = ""
+    for index in range(length):
+        column = ""
+        for col in columns:
+            try:
+                column += col[index]
+            except IndexError:
+                # This happens if any input string is shorter than the others
+                pass
+        string += "".join(column)
+    return string
 
-if __name__ == "__main__":
-    minlength, maxlength = 3, 10 # keylengths
-    assert(minlength < maxlength)
+def main():
+    opts = parse_args()
+    ciphertext = readfile(opts.file)
 
-    filename = "cipher.txt"
-    ciphertext = readfile(filename)
+    def verbose(message):
+        if opts.verbose:
+            sys.stdout.write(message)
 
-    print("Ciphertext in %s:\n" % filename)
-    block_print(ciphertext, 5, 10)
+    print("Ciphertext in %s:\n" % opts.file)
+    block_print(ciphertext, 5, 60//(5+1))
     print("")
 
     # Step 1: Find repeats, look for the lowest distance between two repeats
-    print("Looking for repeated substrings with lengths [%d, %d]:\n" % (
-        minlength, maxlength))
+    verbose("Looking for repeated substrings with lengths [%d, %d]:\n\n" % (
+        opts.min_length, opts.max_length))
+
     distances = set()
-    for length in range(maxlength, minlength, -1): # problem said max 10 keylength
+    for length in range(opts.max_length, opts.min_length-1, -1): # problem said max 10 keylength
         start = 0
         while start+length < len(ciphertext):
             key = ciphertext[start:start+length]
             positions = list(find_all(ciphertext, key))
             if len(positions) > 1:
-                sys.stdout.write("  Found %-12r at " % key)
-                sys.stdout.write(", ".join("%3d" % p for p in positions))
+                verbose("  Found %-12r at " % key)
+                verbose(", ".join("%3d" % p for p in positions))
+
                 for i, pos in enumerate(positions):
                     dist = -1
                     if i > 0:
                         dist = pos - positions[i-1]
                         distances.add(dist)
                     if dist > 0:
-                        sys.stdout.write(" distance %3d" % dist)
-                sys.stdout.write("\n")
+                        verbose(" distance %3d" % dist)
+                verbose("\n")
             start += 1
-    print("")
+    verbose("\n")
 
-    print("Attempting to deduce key length:\n")
-    print("  Set of distances: %s" % " ".join(map(str, distances)))
-    divisible = lambda a, b: float(a)/b - a//b == 0
+    verbose("Attempting to deduce key length:\n\n")
+    verbose("  Set of distances: %s\n" % " ".join(map(str, distances)))
 
-    # Find common factors
-    common = set()
-    for n in range(2, max(distances)):
-        if all(divisible(d, n) for d in distances):
-            if all(not divisible(n, c) for c in common):
-                common.add(n)
-    print("  Common factors:   %s" % " ".join(map(str, common)))
-    keylength = reduce(lambda a,b: a*b, common)
-    print("  Proposed length:  %s = %d" % ("*".join(map(str, common)),
+    common = find_common_factors(distances)
+
+    if len(common) == 0:
+        print("Could not find any common factors for the repated distances:")
+        print(" ".join(map(str, sorted(distances))))
+        print("Try changing the --min-length and --max-length")
+        sys.exit(1)
+
+    keylength = reduce(operator.mul, common)
+    verbose("  Common factors:   %s\n" % " ".join(map(str, common)))
+    verbose("  Proposed length:  %s = %d\n" % ("*".join(map(str, common)),
         keylength))
-    print("")
+    verbose("\n")
 
-    print("Finding monoalphabetic ciphers. Ciphertext arranged in %d columns is:\n" % keylength)
-    block_print(ciphertext, keylength, 1, stop=5)
-    print("  %s" % ("."*keylength))
-    print("")
+    verbose("Finding monoalphabetic ciphers. ")
+    verbose("Ciphertext arranged in %d columns is:\n\n" % keylength)
+    if opts.verbose:
+        block_print(ciphertext, keylength, 1, stop=5)
+    verbose("  %s\n\n" % ("."*keylength))
 
     # Take character N from every column
     columns = []
@@ -257,34 +329,29 @@ if __name__ == "__main__":
         tables.append({})
 
     # Create strings from each vertical column, put in columns
-    for index in range(keylength):
-        column = ""
-        for col in split_string(ciphertext, keylength):
-            try:
-                column += col[index]
-            except IndexError:
-                pass
-        columns.append("".join(column))
-    mlen = 30
-    if mlen > len(columns[0]):
-        mlen = len(columns[0])//2
-    print("  First column: %*.*s..." % (mlen, mlen, columns[0]))
-    print("")
+    columns = extract_string_columns(ciphertext, keylength)
+    mlen = min(30, len(columns[0])//2)
+    verbose("  First column: %*.*s...\n\n" % (mlen, mlen, columns[0]))
 
     # Now, calculate the best coincidence:
     # https://en.wikipedia.org/wiki/Index_of_coincidence
-    print("Frequency analysis -- finding best coincidence match for each column:\n")
+    verbose("Frequency analysis:\n")
+    verbose("Shifts alphabets for each column to find the best coincidence match\n\n")
     for i in range(len(columns)):
-        cf, shifts = max([(coinc(columns[i], n), n) for n in range(26)])
-        print("  Column %d: match %f, shifts %2d" % (i, cf, shifts))
-        # Perform shift
+        factor, shifts = max((coincidence_factor(columns[i], n), n) for n in
+                range(26))
+        verbose("  Column %d length %d: best match %f with %2d shifts\n" % (i,
+            len(columns[i]), factor, shifts))
         columns[i] = shift(columns[i], shifts)
-    print("")
+    verbose("\n")
 
-    print("Deduced plaintext using above shifts:\n")
-    plaintext = recombine(columns)
+    print("Proposed plaintext:\n")
+    plaintext = recombine_string_columns(columns, max(map(len, columns)))
     block_print(plaintext, keylength, 60//(keylength+1), indent="  ")
     print("")
 
     key = vigenere_decrypt(ciphertext, plaintext)[:keylength]
     print("Key for above plaintext: %r" % key)
+
+if __name__ == "__main__":
+    main()
