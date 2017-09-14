@@ -1,10 +1,10 @@
 OS := $(shell uname)
-MAIN := bachelor
 
 ifeq ($(OS),Linux)
 	PDFLATEX := /opt-rh7/texlive/2017/bin/x86_64-linux/pdflatex
 	BIBTEX := /opt-rh7/texlive/2017/bin/x86_64-linux/bibtex
 	OPEN := xdg-open
+	DETEX := /opt-rh7/texlive/2017/bin/x86_64-linux/detex 
 else
 	PDFLATEX := pdflatex
 	BIBTEX := bibtex
@@ -14,6 +14,9 @@ endif
 TARGETS := dat510-assignment-1.pdf
 
 all: $(TARGETS)
+
+check:
+	$(DETEX) dat510-assignment-1.tex | diction -bs
 
 open: all
 	$(OPEN) dat510-assignment-1.pdf
