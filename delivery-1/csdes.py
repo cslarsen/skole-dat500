@@ -16,7 +16,8 @@ import os
 import sys
 
 LIBSDES_PATH = os.getenv("LIBSDES_PATH", os.getcwd())
-LIBSDES_FILE = os.path.join(LIBSDES_PATH, "libsdes.so")
+LIBSDES_BASE = os.getenv("LIBSDES_BASE", "libsdes.so")
+LIBSDES_FILE = os.path.join(LIBSDES_PATH, LIBSDES_BASE)
 
 try:
     libsdes = ctypes.CDLL(LIBSDES_FILE)

@@ -7,16 +7,16 @@ all: $(TARGETS)
 libsdes.so: sdes.cpp
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -o $@ $<
 
-task1:
+part1:
 	$(PYTHON) vigenere.py --verbose cipher-vigenere.txt
 
-task3: all
+part2: all
+	$(PYTHON) task1.py
+	$(PYTHON) task2.py
 	$(PYTHON) bruteforce.py ctx2.txt
-
-task2: all
 	$(PYTHON) bruteforce.py --sdes ctx1.txt
 
-tasks: task1 task2 task3
+tasks: part1 part2
 
 clean:
 	rm -f $(TARGETS)
