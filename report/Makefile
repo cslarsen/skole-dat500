@@ -21,7 +21,7 @@ open: all
 %.eps: %.gp data.txt
 	gnuplot $<
 
-dat510-assignment-1.pdf: dat510-assignment-1.tex preamble.tex
+dat510-assignment-1.pdf: dat510-assignment-1.tex preamble.tex references.bib
 
 %.pdf: %.tex
 	$(PDFLATEX) -halt-on-error dat510-assignment-1.tex

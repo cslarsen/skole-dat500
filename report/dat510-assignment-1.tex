@@ -22,8 +22,9 @@ This project presents results and procedures for recovering plaintexts for two
 
 \section{Part I --- Polyalphabetic ciphers}
 
-Below is the raw and formatted plaintext message. Spaces were added to
-highlight the coincidence with the length of the key \texttt{TSHTAD}.
+Below is the raw and formatted plaintext message recovered from the Vigenère
+cipher\cite{wiki:vigenere, wiki:polyalphabetic}. Spaces were added to highlight
+the coincidence with the length of the key \texttt{TSHTAD}.
 
 \begin{verbatim}
 CRYPTO GRAPHY CANBES TRONGO RWEAKC RYPTOG RAPHIC STRENG
@@ -47,7 +48,8 @@ cryptography before the end of the universe.}
 
 \subsection{Strategy}
 
-I based my approach on the Kasinski method with \textit{coincidence
+I based my approach on the Kasiski examination\cite{dalkilic2000interactive,
+wiki:kasiski.examination} with \textit{coincidence
 counting}\cite{coincidence.friedman}. Briefly,
 
 \begin{itemize}
