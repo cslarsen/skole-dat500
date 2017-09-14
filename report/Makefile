@@ -24,8 +24,10 @@ open: all
 dat510-assignment-1.pdf: dat510-assignment-1.tex preamble.tex
 
 %.pdf: %.tex
-	$(PDFLATEX) $<
-	$(PDFLATEX) $<
+	$(PDFLATEX) -halt-on-error dat510-assignment-1.tex
+	$(BIBTEX) dat510-assignment-1 # NOTE: No extension
+	$(PDFLATEX) -halt-on-error dat510-assignment-1.tex
+	$(PDFLATEX) -halt-on-error dat510-assignment-1.tex
 
 clean:
 	rm -f $(TARGETS) $(TARGETS:.pdf=.aux) $(TARGETS:.pdf=.log) $(TARGETS:.pdf=.out)
