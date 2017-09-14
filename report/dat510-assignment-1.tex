@@ -64,9 +64,74 @@ cryptography before the end of the universe.}
 
 \subsection{Strategy}
 
-I based my approach on the Kasiski examination \cite{dalkilic2000interactive,
-wiki:kasiski.examination} with \textit{coincidence
-counting} \cite{coincidence.friedman}. Briefly,
+The strategy was first to find the key length using the Kasiski method
+\cite{dalkilic2000interactive, wiki:kasiski.examination}, and then use
+frequency analysis to find each individual mono-alphabet required to recover
+the plaintext.
+
+It is important to note that the goal was solely to decipher the given
+ciphertext, not to make a general program to solve all Vigenère ciphers.
+
+I will now describe each step in more detail.
+
+\subsection{Finding the key length}
+
+The very first step was to find repeated substrings in the ciphertext. A repeat
+section of the ciphertext could mean that it was encrypted using the same part
+of the key. In other words, by finding enough of these, it should be possible
+to guess the key length.
+
+Performing such a search was straight-forward: The problem description stated
+that the key length would not be more than ten letters, so I iterated through
+the ciphertext with a moving window of lengths from ten and down to three.
+Whenever I found a repeat, I recorded the distance between them. Below are
+excerpts from the \texttt{vigenere.py} program output.
+
+\begin{verbatim}
+Looking for repeated substrings with lengths [4, 10]:
+
+  Found 'VJFITRZJHI' at   0, 378 distance 378
+  Found 'JFITRZJHIH' at   1, 379 distance 378
+  Found 'FITRZJHIHB' at   2, 380 distance 378
+  ...
+  Found 'ZJHIHB'     at   6, 384 distance 378
+  Found 'UVFPXM'     at 259, 301 distance  42
+  Found 'UVFPXM'     at 259, 301 distance  42
+  Found 'VJFITR'     at   0, 378 distance 378
+  ...
+  Found 'MHVLS'      at 192, 342 distance 150
+  Found 'UVFPX'      at 259, 301 distance  42
+  Found 'VFPXM'      at 260, 302 distance  42
+  Found 'UVFPX'      at 259, 301 distance  42
+  Found 'VFPXM'      at 260, 302 distance  42
+\end{verbatim}
+
+Next, I looked at the recorded distances, trying to find common factors. Of
+course, many of the repeated substrings could have been mere coincidences.
+Fortunatley, for this ciphertext, all the distances contained common factors.
+
+\begin{verbatim}
+Attempting to deduce key length:
+
+  Set of distances: 378 66 42 150
+  Common factors:   2 3
+  Proposed length:  2*3 = 6
+\end{verbatim}
+
+The idea here is that since the key is repeated over the ciphertext, each
+duplicate substring would represent the same passage of plaintext. Because of
+the constant key length, each distance should then be a multiple of the key
+length. Therefore I factorized each distance and threw away those that were not
+common to all distances.
+
+
+\subsection{Finding each mono-alphabet}
+
+I used \textit{coincidence counting} \cite{coincidence.friedman} to
+find how many places each mono-alphabet (or Caesar cipher) would have to be
+shifted to attain the maximum correlation with the letter frequency found in
+typical English texts.
+
 
 \begin{itemize}
   \item Find repeating words and the distances between them
