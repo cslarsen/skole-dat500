@@ -232,7 +232,7 @@ if __name__ == "__main__":
                     if dist > 0:
                         sys.stdout.write(" distance %3d" % dist)
                 sys.stdout.write("\n")
-            start += length
+            start += 1
     print("")
 
     print("Attempting to deduce key length:\n")
