@@ -10,14 +10,28 @@
 \maketitle
 
 \begin{abstract}
-This project presents results and procedures for recovering plaintexts for two
-  cipher systems: two ciphers: The classical Vigenère polyalphabetic
-  substitution cipher, and the educational Simplified DES (SDES) assymetric
-  cipher. The polyalphabetic plaintext was deciphered using the Kasinski method
-  and coincidence counting, mostly by manual work backed by subroutines.  The
-  SDES key was brute-forced in less than 50 ms using lookup tables in highly
-  optimized C++ code with Python bindings. This shows that both systems are not
-  secure enough to be used in real-world systems.
+  This report presents procedures and results for recovering plaintexts and keys
+  for two cipher systems --- The classical \textit{Vigenère polyalphabetic}
+  substitution cipher, and the educational \textit{Simplified DES} (SDES) asymmetric cipher.
+%
+  The Vigenère plaintext was deciphered using the \textit{Kasinski method} for
+  finding key-lengths, while each corresponding Caesar alphabet was found by
+  councidence counting: Each mono-alphabet was shifted to attain the highest
+  English letter-frequency correlation. Recombining them produced the
+  plaintext. The key was recovered simply by decrypting the ciphertext with the
+  recovered plaintext.
+%
+  The SDES and TripleSDES keys were found through brute-forcing. While the
+  10-bit SDES was simple to find, the 20-bit TripleSDES was found by splitting
+  the three-part decryption function into separate lookup tables. The set of
+  candidate keys were represented in a memory-efficient bitset. Keys that
+  decrypted the plaintext to non-printable ASCII characters were discarded.
+  The combined C++ and Python program was then able to break the key in less
+  than 50 milliseconds.  Larger key-lengths would most likely be impractical to
+  solve this way.
+%
+  As expected, this shows that both systems are readily broken with modern
+  hardware, and are not secure for real-world usage.
 \end{abstract}
 
 \section{Part I --- Polyalphabetic ciphers}
