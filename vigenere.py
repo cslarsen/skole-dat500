@@ -22,50 +22,6 @@ import sys
 from poly import find_all, period, english
 from util import readfile, split_string, transpose, normalize, block_print
 
-write = sys.stdout.write
-
-en_digrams = {
-    "th": 1.52,
-    "he": 1.28,
-    "in": 0.94,
-    "er": 0.94,
-    "an": 0.82,
-    "re": 0.68,
-    "nd": 0.63,
-    "at": 0.59,
-    "on": 0.57,
-    "nt": 0.56,
-    "ha": 0.56,
-    "es": 0.56,
-    "st": 0.55,
-    "en": 0.55,
-    "ed": 0.53,
-    "to": 0.52,
-    "it": 0.50,
-    "ou": 0.50,
-    "ea": 0.47, # cutoff to save time
-    "hi": 0.46,
-    "is": 0.46,
-    "or": 0.43,
-    "ti": 0.34,
-    "as": 0.33,
-    "te": 0.27,
-    "et": 0.19,
-    "ng": 0.18,
-    "of": 0.16,
-    "al": 0.09,
-    "de": 0.09,
-    "se": 0.08,
-    "le": 0.08,
-    "sa": 0.06,
-    "si": 0.05,
-    "ar": 0.04,
-    "ve": 0.04,
-    "ra": 0.04,
-    "ld": 0.02,
-    "ur": 0.02,
-}
-
 def english_freq():
     total = sum(count for (letter, count) in english.items())
     en = dict((float(count)/total, c) for (c,count) in english.items())
@@ -246,37 +202,41 @@ def rebuild(parts, tables, show=True):
     return recombine(decoded)
 
 if __name__ == "__main__":
-    ciphertext = readfile("cipher.txt")
+    minlength, maxlength = 3, 10 # keylengths
+    assert(minlength < maxlength)
 
-    print("Ciphertext:")
-    for i, part in enumerate(split_string(ciphertext, 5)):
-        write("%s " % part)
-        if ((i+1) % 5) == 0:
-            write("\n")
+    filename = "cipher.txt"
+    ciphertext = readfile(filename)
+
+    print("Ciphertext in %s:\n" % filename)
+    block_print(ciphertext, 5, 10)
     print("")
 
     # Step 1: Find repeats, look for the lowest distance between two repeats
-    lowest = 0
-    mono = ""
+    print("Looking for repeated substrings with lengths [%d, %d]:\n" % (
+        minlength, maxlength))
     distances = set()
-    for length in range(len(ciphertext), 3, -1):
+    for length in range(maxlength, minlength, -1): # problem said max 10 keylength
         start = 0
         while start+length < len(ciphertext):
             key = ciphertext[start:start+length]
             positions = list(find_all(ciphertext, key))
             if len(positions) > 1:
+                sys.stdout.write("  Found %-12r at " % key)
+                sys.stdout.write(", ".join("%3d" % p for p in positions))
                 for i, pos in enumerate(positions):
                     dist = -1
                     if i > 0:
                         dist = pos - positions[i-1]
                         distances.add(dist)
-                    write("pos=%3d %20r %s" % (pos,
-                        ciphertext[pos:pos+length],
-                            "dist=%d" % dist if dist>0 else ""))
-                write("\n")
+                    if dist > 0:
+                        sys.stdout.write(" distance %3d" % dist)
+                sys.stdout.write("\n")
             start += length
+    print("")
 
-    print("Distances: %s" % " ".join(map(str, distances)))
+    print("Attempting to deduce key length:\n")
+    print("  Set of distances: %s" % " ".join(map(str, distances)))
     divisible = lambda a, b: float(a)/b - a//b == 0
 
     # Find common factors
@@ -285,74 +245,65 @@ if __name__ == "__main__":
         if all(divisible(d, n) for d in distances):
             if all(not divisible(n, c) for c in common):
                 common.add(n)
-    print("Common factors: %s" % " ".join(map(str, common)))
-    cfactor = reduce(lambda a,b: a*b, common)
-    print("Perhaps the keylength is %d" % cfactor)
+    print("  Common factors:   %s" % " ".join(map(str, common)))
+    keylength = reduce(lambda a,b: a*b, common)
+    print("  Proposed length:  %s = %d" % ("*".join(map(str, common)),
+        keylength))
+    print("")
 
-    print("Ciphertext in %d columns" % cfactor)
-    columns = list(split_string(ciphertext, cfactor))
+    print("Finding monoalphabetic ciphers. Ciphertext arranged in %d columns is:\n" % keylength)
+    columns = list(split_string(ciphertext, keylength))
     for i, part in enumerate(columns):
-        print(part)
+        print("  %s" % part)
         if i > 5:
-            print("... %d more" % (len(columns) - i))
+            print("  %s (%d more)" % ("."*keylength, len(columns) - i))
             break
 
     # Take character N from every column
     monos = []
     tables = []
-    for i in range(cfactor):
+    for i in range(keylength):
         tables.append({})
 
-    #if len(columns[-1]) < cfactor:
-        #columns[-1] = "%s%s" % (columns[-1], "?"*(cfactor-len(columns[-1])))
-        #del columns[-1] # delete tail
-    for index in range(cfactor):
+    # Create strings from each vertical column, put in monos
+    for index in range(keylength):
         line = ""
         for col in columns:
             try:
                 line += col[index]
             except IndexError:
                 pass
-                #print("************* %s %d" % (col, index))
-                #line += col[0]
         monos.append("".join(line))
-        #monos.append("".join(s[index] for s in columns))
+    mlen = 30
+    if mlen > len(monos[0]):
+        mlen = len(monos[0])//2
+    print("  First column: %*.*s..." % (mlen, mlen, monos[0]))
+    print("")
 
     def show():
         p = rebuild(monos, tables, show=False)
         cols = 12
-        p = list(split_string(p, cfactor*cols))
-        c = list(split_string(ciphertext, cfactor*cols))
+        p = list(split_string(p, keylength*cols))
+        c = list(split_string(ciphertext, keylength*cols))
 
         for plain, ciph in zip(p, c):
-            print(" ".join(split_string(ciph, cfactor)))
-            print(" ".join(split_string(plain, cfactor)))
-
-    def reset():
-        tables = [{}, {}, {}, {}, {}, {}]
-
-    def endigs():
-        return sorted(map(lambda (a,b): (b,a), en_digrams.items()), reverse=True)
-
-    def sf(n):
-        show_freqs(monos[n])
+            print(" ".join(split_string(ciph, keylength)))
+            print(" ".join(split_string(plain, keylength)))
 
     # Now, calculate the best coincidence:
     # https://en.wikipedia.org/wiki/Index_of_coincidence
-    print("Finding best coincidence for each column")
+    print("Frequency analysis -- finding best coincidence match for each column:\n")
     for i in range(len(monos)):
         cf, shifts = max([(coinc(monos[i], n), n) for n in range(26)])
-        print("  Column %d: %f %d" % (i, cf, shifts))
+        print("  Column %d: match %f, shifts %2d" % (i, cf, shifts))
         # Perform shift
         monos[i] = shift(monos[i], shifts)
+    print("")
 
-    print("\nProposed plaintext after performing above shifts:\n")
+    print("Deduced plaintext using above shifts:\n")
     plaintext = recombine(monos)
-    block_print(plaintext, cfactor, 60//(cfactor+1), indent="")
+    block_print(plaintext, keylength, 60//(keylength+1), indent="  ")
+    print("")
 
-    key = vigenere_decrypt(ciphertext, plaintext)[:cfactor]
-    print("\nWith above plaintext, key becomes: %s" % key)
-
-    print("\nFunctions")
-    print("show() - decode monos using tables for transposition")
-    print("Variables: ciphertext, monos, tables")
+    key = vigenere_decrypt(ciphertext, plaintext)[:keylength]
+    print("Key for above plaintext: %r" % key)
