@@ -39,7 +39,7 @@
 \section{Part I --- Polyalphabetic ciphers}
 
 Below is the raw and formatted plaintext message recovered from the Vigenère
-cipher\cite{wiki:vigenere, wiki:polyalphabetic}. Spaces were added to highlight
+cipher \cite{wiki:vigenere, wiki:polyalphabetic}. Spaces were added to highlight
 the coincidence with the length of the key \texttt{TSHTAD}.
 
 \begin{verbatim}
@@ -64,9 +64,9 @@ cryptography before the end of the universe.}
 
 \subsection{Strategy}
 
-I based my approach on the Kasiski examination\cite{dalkilic2000interactive,
+I based my approach on the Kasiski examination \cite{dalkilic2000interactive,
 wiki:kasiski.examination} with \textit{coincidence
-counting}\cite{coincidence.friedman}. Briefly,
+counting} \cite{coincidence.friedman}. Briefly,
 
 \begin{itemize}
   \item Find repeating words and the distances between them
@@ -99,10 +99,10 @@ programs. Show how you transformed that output into your solution.
 
 \subsection{Task 1: SDES}
 
-Implemented SDES\cite{stallings2006cryptography} and completed the following
-table.
+Implemented SDES \cite{stallings2006cryptography} and completed table
+\vref{table:task1}.
 
-\begin{table}[H]
+\begin{table}
   \centering
   \begin{tabular}{@{}lll@{}}
     \toprule
@@ -120,14 +120,15 @@ table.
     \texttt{1000101110} & \texttt{\textbf{00001100}} & \texttt{11000010} \\
     \bottomrule
   \end{tabular}
+  \caption{SDES encryption and decryption results for task 1.}
   \label{table:task1}
 \end{table}
 
 \subsection{Task 2: TripleSDES}
 
-Implemented TripleSDES code and completed the following table.
+Implemented TripleSDES code and completed table \vref{table:task2}.
 
-\begin{table}[H]
+\begin{table}
   \centering
   \begin{tabular}{@{}llll@{}}
     \toprule
@@ -178,6 +179,7 @@ Implemented TripleSDES code and completed the following table.
               \texttt{11110000} \\
       \bottomrule
   \end{tabular}
+  \caption{TripleSDES encryption and decryption results for task 2.}
   \label{table:task2}
 \end{table}
 
