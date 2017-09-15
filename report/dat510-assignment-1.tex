@@ -275,6 +275,8 @@ a table of plain- and ciphertexts. Both results are shown in table
 
 \subsection{Task 3: Recovering SDES plaintext and key}
 
+The SDES and TripleSDES keys are given in table \vref{table:keys}.
+
 Using the implementation of SDES, the key was found with simple brute-force:
 Being only 10 bits, a simple iteration through all possible keys was simple.
 To detect if a key was valid, I checked that all the decrypted bytes were in
@@ -302,14 +304,19 @@ work as well, but a contrived range may provide false results.
   \centering
   \begin{tabular}{@{}lrrr@{}}
     \toprule
-     & Binary & Hexadecimal & Decimal \\
+    \textbf{SDES} & Binary & Hexadecimal & Decimal \\
     \midrule
-    Key 1 & 1111101010 & 0x3ea & 1002 \\
-    Key 2 & 0101011111 & 0x15f &  351 \\
+    Key & \texttt{1111101010} & 0x3ea & 1002 \\
+
+    \toprule
+    \textbf{TripleSDES} & Binary & Hexadecimal & Decimal \\
+    \midrule
+    Key 1 & \texttt{1111101010} & 0x3ea & 1002 \\
+    Key 2 & \texttt{0101011111} & 0x15f &  351 \\
     \bottomrule
   \end{tabular}
-  \caption{TripleSDES keys}
-  \label{table:3sdes}
+  \caption{Recovered SDES and TripleSDES keys}
+  \label{table:keys}
 \end{table}
 
 The plaintext was exactly the same as above:
