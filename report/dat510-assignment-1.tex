@@ -59,7 +59,7 @@ cryptography before the end of the universe.}
 
 The strategy was first to find the key length using the Kasiski method
 \cite{dalkilic2000interactive, wiki:kasiski.examination}, and then use
-frequency analysis to find each individual mono-alphabet required to recover
+frequency analysis to find each individual monoalphabet required to recover
 the plaintext.
 
 It is important to note that the goal was solely to decipher the given
@@ -143,10 +143,10 @@ order, and shifted exactly once per key letter.}.
 
 To break each Caesar cipher, I compared their relative letter frequencies with
 those found in English texts. To find how closely they correlate, or match each
-other, I calculated the \textit{normalized index of coincidence}. I then
-shifted each column alphabetically and calculated its correlation with the
-English frequency distribution.
-A \textit{shift} here means that all As become Bs, all Bs become Cs and so on.
+other, I calculated the \textit{normalized index of coincidence}
+\cite{wiki:coincidence}. I then shifted each column alphabetically and
+calculated its correlation with the English frequency distribution.  A
+\textit{shift} here means that all As become Bs, all Bs become Cs and so on.
 
 After iterating through all 25 possible shifts, I chose the shift that produced
 the highest correlation. This is called \textit{Kerckhoffs' method}
@@ -165,39 +165,19 @@ Shifts alphabets for each column to find the best coincidence match
   Column 5 length 69: best match 0.057107 with 23 shifts
 \end{verbatim}
 
+The correlation was taken from \cite{wiki:coincidence} and computed with
+\[
+  \sum_{i=1}^{c} n_i f_i
+\]
+where $n_i$ is the frequency of the $i$th letter in the column, and $f_i$ the
+frequency of the \textit{same letter} in normal English texts.
+
 Finally, I recombined each column back to its original --- the reverse of the
 operation mentioned earlier. This produced the plaintext directly.
 
 After I had the plaintext, I recovered the key by simply decrypting the
 ciphertext with the plaintext. That produced the repeated key, which I cut off
 at the known length.
-
-\subsection{Finding each mono-alphabet}
-
-I used \textit{coincidence counting} \cite{coincidence.friedman} to
-find how many places each mono-alphabet (or Caesar cipher) would have to be
-shifted to attain the maximum correlation with the letter frequency found in
-typical English texts.
-
-
-\begin{itemize}
-  \item Find repeating words and the distances between them
-  \item Find common factors between all the distances; their product may be the
-    key length
-  \item Use frequency analysis with coincidence counting to recover the
-    plaintext message
-  \item Decrypt Use frequency analysis to decipher the message
-\end{itemize}
-
-\paragraph{Finding repeated words}
-
-This was fairly simple: The assignment stated that the key length was less than
-ten, so I chopped the text up into $n$ pieces from $3\dots10$ and simply
-searched for multiple occurrences. In pseudo-code:
-
-TODO: Describe strategy you employed. SHow the details for each of the steps of
-the strategy. Describe any programs you wrote. Show sample output of these
-programs. Show how you transformed that output into your solution.
 
 \begin{itemize}
   \item The plaintext message you managed to decipher
