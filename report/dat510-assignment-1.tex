@@ -197,47 +197,34 @@ at the known length.
 
 \section{Part II --- Simplified DES (SDES)}
 
-\subsection{Task 1: SDES}
-
-Implemented SDES \cite{stallings2006cryptography} and completed table
-\vref{table:task1}.
-
-\begin{table}
-  \centering
-  \begin{tabular}{@{}lll@{}}
-    \toprule
-    Key &
-    Plaintext &
-    Ciphertext \\
-    \midrule
-    \texttt{0000000000} & \texttt{00000000} & \texttt{\textbf{11110000}} \\
-    \texttt{0000011111} & \texttt{11111111} & \texttt{\textbf{11100001}} \\
-    \texttt{0010011111} & \texttt{11111100} & \texttt{\textbf{10011101}} \\
-    \texttt{0010011111} & \texttt{10100101} & \texttt{\textbf{10010000}} \\
-    \texttt{1111111111} & \texttt{\textbf{11111111}} & \texttt{00001111} \\
-    \texttt{0000011111} & \texttt{\textbf{00000000}} & \texttt{01000011} \\
-    \texttt{1000101110} & \texttt{\textbf{00111000}} & \texttt{00011100} \\
-    \texttt{1000101110} & \texttt{\textbf{00001100}} & \texttt{11000010} \\
-    \bottomrule
-  \end{tabular}
-  \caption{SDES encryption and decryption results for task 1.}
-  \label{table:task1}
-\end{table}
-
-\subsection{Task 2: TripleSDES}
-
-Implemented TripleSDES code and completed table \vref{table:task2}.
+The two first tasks were to implement SDES and TripleSDES (3SDES) and complete
+a table of plain- and ciphertexts. Both results are shown in table
+\vref{table:sdes}.
 
 \begin{table}
   \centering
   \begin{tabular}{@{}llll@{}}
     \toprule
+    \multicolumn{4}{c}{\textbf{Task 1}} \\
+    Key & &
+    Plaintext &
+    Ciphertext \\
+    \midrule
+    \texttt{0000000000} & & \texttt{00000000} & \texttt{\textbf{11110000}} \\
+    \texttt{0000011111} & & \texttt{11111111} & \texttt{\textbf{11100001}} \\
+    \texttt{0010011111} & & \texttt{11111100} & \texttt{\textbf{10011101}} \\
+    \texttt{0010011111} & & \texttt{10100101} & \texttt{\textbf{10010000}} \\
+    \texttt{1111111111} & & \texttt{\textbf{11111111}} & \texttt{00001111} \\
+    \texttt{0000011111} & & \texttt{\textbf{00000000}} & \texttt{01000011} \\
+    \texttt{1000101110} & & \texttt{\textbf{00111000}} & \texttt{00011100} \\
+    \texttt{1000101110} & & \texttt{\textbf{00001100}} & \texttt{11000010} \\
+    \toprule
+    \multicolumn{4}{c}{\textbf{Task 2}} \\
       Key 1 &
       Key 2 &
       Plaintext &
       Ciphertext \\
     \midrule
-
              \texttt{1000101110} &
              \texttt{0110101110} &
                \texttt{11010111} &
@@ -277,10 +264,10 @@ Implemented TripleSDES code and completed table \vref{table:task2}.
             \texttt{0000000000} &
       \texttt{\textbf{00000000}} &
               \texttt{11110000} \\
-      \bottomrule
+    \bottomrule
   \end{tabular}
-  \caption{TripleSDES encryption and decryption results for task 2.}
-  \label{table:task2}
+  \caption{Results of SDES and TripleSDES encryption and decryption.}
+  \label{table:sdes}
 \end{table}
 
 \subsection{Task 3: Cracking SDES and TripleDES}
