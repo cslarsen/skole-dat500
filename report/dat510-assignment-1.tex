@@ -273,32 +273,23 @@ a table of plain- and ciphertexts. Both results are shown in table
   \label{table:sdes}
 \end{table}
 
-\subsection{Task 3: Recovering SDES plaintext and key}
+\subsection{Task 3: Recovering SDES and TripleSDES keys}
 
 The SDES and TripleSDES keys are given in table \vref{table:keys}.
 
-Using the implementation of SDES, the key was found with simple brute-force:
-Being only 10 bits, a simple iteration through all possible keys was simple.
-To detect if a key was valid, I checked that all the decrypted bytes were in
-the printable ASCII range of 32--126. Keys that did not meet this criterium
-were discarded. For the challenge ciphertext, only one key matched.
+Both keys were found through brute-force: Iterating through all possible keys,
+I decrypted the ciphertext, discarding keys that did not produce all
+ASCII-printable bytes in the range 32--126.
 
-The key was found to be \texttt{1111101010} or \texttt{0x3ea}, while the
-plaintext was
+The plaintext for both ciphertexts were exactly the same:
+
 \begin{verbatim}
 simplifieddesisnotsecureenoughtoprovideyousufficientsecurity
 \end{verbatim}
+
 \begin{center}
 \textit{Simplified DES is not secure enough to provide you sufficient security.}
 \end{center}
-
-\subsection{Task 3: Recovering TripleSDES plaintext and key}
-
-A TripleSDES key is 20 bits, meaning that there are $2^{20}$ possible keys, or
-around a million. That is a low number, so again I chose to brute-force all
-possible keys, with the exact same approach as for SDES: Filter out keys that
-do not decrypt all bytes to printable ASCII in the range 32--126. Other ranges
-work as well, but a contrived range may provide false results.
 
 \begin{table}
   \centering
@@ -319,19 +310,40 @@ work as well, but a contrived range may provide false results.
   \label{table:keys}
 \end{table}
 
-The plaintext was exactly the same as above:
+The TripleSDES keys were found in \textit{less than 50 milliseconds} with a highly optimized
+C++ library, using Python as a front-end. I opted not to look at any existing
+literature on how to crack it, and how to speed it up.
+
+What I did was to split the three-part decryption function up in two lookup
+tables and keep key candidates were kept in a memory efficient bitset. One
+lookup table was completely pre-generated, while the other was generated in the
+outer-loop for each 10-bit key. This trades CPU time with increased memory
+usage, although the tables took less than a megabyte of memory.
+
+Furthermore, the ciphertext was reduced to unique bytes, to spend as little
+time in the innerloop as needed. The innerloop contained the separated
+TripleSDES decryption calls:
+
 \begin{verbatim}
-simplifieddesisnotsecureenoughtoprovideyousufficientsecurity
+uint8_t byte = unique[n];
+byte = decrypted[byte];     // decrypt(k1, byte)
+byte = encrypted[k2][byte]; // encrypt(k2, byte);
+byte = decrypted[byte];     // decrypt(k1, byte)
 \end{verbatim}
 
-The two keys were found in \textit{less than 50 milliseconds} with a highly optimized
-C++ library, using Python as a front-end.
+After finishing the implementation, I read about \textit{meet-in-the-middle}
+attacks (MITM) \cite{wiki:mitm, wiki:mitm2}. I believe that with the approach I
+took, I could implement that as well, possibly further reducing the running
+time.
 
 \section{Conclusion}
 
-A short paragraph that restates the objective from your introduction and
-relates it to your results and discussion describes any future improvements on
-your techniques that you would recommend.
+The task was to break ciphers and recover keys for the classical Vigenère
+polyalphabetic substitution cipher and the educational SDES and TripleSDES
+symmetric ciphers. I have shown that both ciphers are easily broken in less
+than 50 ms on modern hardware. Future improvements would be to implement a
+meet-in-the-middle-attack for TripleSDES, but may not be needed for keys that
+are only 20 bits.
 
 \bibliography{references}
 \bibliographystyle{ieeetr}
