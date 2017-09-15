@@ -22,6 +22,6 @@ eng <- data.frame(
 )
 
 par(mfrow=c(3,1))
-barplot(as.matrix(col1), ylab="relative frequency", xlab="Unshifted column, low correlation", las=3)
-barplot(as.matrix(eng), ylab="relative frequency", xlab="English", las=3)
-barplot(as.matrix(col2), ylab="relative frequency", xlab="Shifted Column, high correlation", las=3)
+barplot(as.matrix(col1), ylab="relative frequency", xlab="Unshifted column")
+barplot(as.matrix(eng), ylab="relative frequency", xlab="English")
+barplot(as.matrix(col2), ylab="relative frequency", xlab="Shifted Column")
