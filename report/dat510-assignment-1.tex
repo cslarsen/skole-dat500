@@ -197,6 +197,8 @@ at the known length.
 
 \section{Part II --- Simplified DES}
 
+\subsection{Tasks 1 and 2}
+
 The two first tasks were to implement Simplified DES (SDES)
 \cite{stallings2006cryptography} and TripleSDES in code, and use it to complete
 a table of plain- and ciphertexts. Both results are shown in table
@@ -271,60 +273,52 @@ a table of plain- and ciphertexts. Both results are shown in table
   \label{table:sdes}
 \end{table}
 
-\subsection{Recovering SDES plaintext and key}
+\subsection{Task 3: Recovering SDES plaintext and key}
 
-Using the implementation of SDES, the key was found with simple brute-force: It
-is only 1024 bits, so I only needed to iterate through all keys. To detect if a
-key was valid, I checked that all the decrypted bytes were in the printable ASCII
-range of 32--126. Keys that did not meet this criterium were discarded. For the
-challenge ciphertext, only one key matched.
+Using the implementation of SDES, the key was found with simple brute-force:
+Being only 10 bits, a simple iteration through all possible keys was simple.
+To detect if a key was valid, I checked that all the decrypted bytes were in
+the printable ASCII range of 32--126. Keys that did not meet this criterium
+were discarded. For the challenge ciphertext, only one key matched.
 
 The key was found to be \texttt{1111101010} or \texttt{0x3ea}, while the
 plaintext was
 \begin{verbatim}
 simplifieddesisnotsecureenoughtoprovideyousufficientsecurity
 \end{verbatim}
-or with spaces and capitalization
 \begin{center}
 \textit{Simplified DES is not secure enough to provide you sufficient security.}
 \end{center}
 
-Since the key is only 10 bits, I brute-forced it. I started with a set of all
-the possible 1023 keys, then for each byte, I tried to decrypt with each key.
-Assuming that the output text would be ASCII, I checked if the output byte was
-within the printable ASCII range of 32--126. If it wasn't, the key was
-immediately removed from the set. When the set contained a single key, I
-stopped and printed the output.
+\subsection{Task 3: Recovering TripleSDES plaintext and key}
 
-\subsection{Recovering TripleSDES plaintext and key}
+A TripleSDES key is 20 bits, meaning that there are $2^{20}$ possible keys, or
+around a million. That is a low number, so again I chose to brute-force all
+possible keys, with the exact same approach as for SDES: Filter out keys that
+do not decrypt all bytes to printable ASCII in the range 32--126. Other ranges
+work as well, but a contrived range may provide false results.
 
-\paragraph{TripleSDES encrypted file} named \texttt{cxt2.txt}
+\begin{table}
+  \centering
+  \begin{tabular}{@{}lrrr@{}}
+    \toprule
+     & Binary & Hexadecimal & Decimal \\
+    \midrule
+    Key 1 & 1111101010 & 0x3ea & 1002 \\
+    Key 2 & 0101011111 & 0x15f &  351 \\
+    \bottomrule
+  \end{tabular}
+  \caption{TripleSDES keys}
+  \label{table:3sdes}
+\end{table}
 
-\paragraph{Key 1} 1002 / 0x3ea / 0b1111101010 (same as the above key)
-\paragraph{Key 2} 351 / 0x15f / 0b1111101010
-\paragraph{Plaintext}
-\texttt{simplifieddesisnotsecureenoughtoprovideyousufficientsecurity} (same as
-above)
+The plaintext was exactly the same as above:
+\begin{verbatim}
+simplifieddesisnotsecureenoughtoprovideyousufficientsecurity
+\end{verbatim}
 
-This time, there are two 10-bit keys, giving the 20-bit space of possible keys.
-I used the exact same strategy as above, but used a JIT-compiler to make it
-break the ciphertext in around 2.5 seconds (using pypy).
-
-The filtering mechanism was exactly the same: Remove keys that do not provide
-output in the possible output space.
-
-The running time was slower, but since it still ran in reasonable time and gave
-the correct result, I didn't employ any smarter way to break it. A possible way
-to do that would be to split up the three-part decryption into distinct parts.
-At least the last step, decrypting the final part, I could have filtered that
-alone on all possible input bytes. However, that would mean I would have to
-traverse all 10-bit keys on all 8-bit inputs, so it would do it in $2^{18}$.
-
-An alternative route would be to use a language like C to break it, which would
-not be smarter in any way, just purely faster.
-
-Had the task been to search a larger space, I would surely have figured out a
-smarter way to break it.
+The two keys were found in \textit{less than 50 milliseconds} with a highly optimized
+C++ library, using Python as a front-end.
 
 \section{Conclusion}
 
