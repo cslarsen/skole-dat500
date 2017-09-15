@@ -121,7 +121,8 @@ Now that I had a possible key length, I organized the ciphertext in columns
 with the same width as the key length.
 
 \begin{verbatim}
-Finding monoalphabetic ciphers. Ciphertext arranged in 6 columns is:
+Finding monoalphabetic ciphers. Ciphertext arranged in
+6 columns is:
 
   VJFITR
   ZJHIHB
@@ -155,7 +156,8 @@ coincidence) is shown in the program output below.
 
 \begin{verbatim}
 Frequency analysis:
-Shifts alphabets for each column to find the best coincidence match
+Shifts alphabets for each column to find the best coincidence
+match
 
   Column 0 length 70: best match 0.058826 with  7 shifts
   Column 1 length 69: best match 0.064844 with  8 shifts
@@ -165,12 +167,25 @@ Shifts alphabets for each column to find the best coincidence match
   Column 5 length 69: best match 0.057107 with 23 shifts
 \end{verbatim}
 
-The correlation was taken from \cite{wiki:coincidence} and computed with
+The correlation function, taken from \cite{wiki:coincidence}, was
 \[
   \sum_{i=1}^{c} n_i f_i
 \]
 where $n_i$ is the frequency of the $i$th letter in the column, and $f_i$ the
-frequency of the \textit{same letter} in normal English texts.
+frequency of the \textit{same letter} in normal English texts. The point is to
+match the frequency distribution pattern. This is best shown in figure
+\vref{figure:freqs}.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=\textwidth]{freqs.pdf}
+  \caption{The lower plot shows how the column letter frequency is better
+  correlated with the English after shifting it seven places to the right.}
+  \label{figure:freqs}
+\end{figure}
+
+By shifting the alphabets, which basically means moving horizontally or
+vertically in the Vigenère table, we can get a better correlation.
 
 Finally, I recombined each column back to its original --- the reverse of the
 operation mentioned earlier. This produced the plaintext directly.

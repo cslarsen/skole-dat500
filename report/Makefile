@@ -12,9 +12,12 @@ else
 	DETEX := detex
 endif
 
-TARGETS := dat510-assignment-1.pdf
+TARGETS := freqs.pdf dat510-assignment-1.pdf
 
 all: $(TARGETS)
+
+freqs.pdf: freqs.R
+	Rscript $< && mv Rplots.pdf $@
 
 check:
 	$(DETEX) dat510-assignment-1.tex | diction -bs
@@ -25,7 +28,7 @@ open: all
 %.eps: %.gp data.txt
 	gnuplot $<
 
-dat510-assignment-1.pdf: dat510-assignment-1.tex preamble.tex references.bib
+dat510-assignment-1.pdf: freqs.pdf dat510-assignment-1.tex preamble.tex references.bib
 
 %.pdf: %.tex
 	$(PDFLATEX) -halt-on-error dat510-assignment-1.tex
