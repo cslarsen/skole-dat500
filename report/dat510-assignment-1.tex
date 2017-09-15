@@ -195,9 +195,10 @@ After I had the plaintext, I recovered the key by simply decrypting the
 ciphertext with the plaintext. That produced the repeated key, which I cut off
 at the known length.
 
-\section{Part II --- Simplified DES (SDES)}
+\section{Part II --- Simplified DES}
 
-The two first tasks were to implement SDES and TripleSDES (3SDES) and complete
+The two first tasks were to implement Simplified DES (SDES)
+\cite{stallings2006cryptography} and TripleSDES in code, and use it to complete
 a table of plain- and ciphertexts. Both results are shown in table
 \vref{table:sdes}.
 
@@ -270,16 +271,20 @@ a table of plain- and ciphertexts. Both results are shown in table
   \label{table:sdes}
 \end{table}
 
-\subsection{Task 3: Cracking SDES and TripleDES}
+\subsection{Recovering SDES plaintext and key}
 
-\paragraph{SDES encrypted file} named \texttt{cxt1.txt} was decrypted with the
-following result:
+Using the implementation of SDES, the key was found with simple brute-force: It
+is only 1024 bits, so I only needed to iterate through all keys. To detect if a
+key was valid, I checked that all the decrypted bytes were in the printable ASCII
+range of 32--126. Keys that did not meet this criterium were discarded. For the
+challenge ciphertext, only one key matched.
 
-\paragraph{Key} \texttt{1111101010} or \texttt{0x3ea}
-
-\paragraph{Plaintext}
-\texttt{simplifieddesisnotsecureenoughtoprovideyousufficientsecurity}
-
+The key was found to be \texttt{1111101010} or \texttt{0x3ea}, while the
+plaintext was
+\begin{verbatim}
+simplifieddesisnotsecureenoughtoprovideyousufficientsecurity
+\end{verbatim}
+or with spaces and capitalization
 \begin{center}
 \textit{Simplified DES is not secure enough to provide you sufficient security.}
 \end{center}
@@ -290,6 +295,8 @@ Assuming that the output text would be ASCII, I checked if the output byte was
 within the printable ASCII range of 32--126. If it wasn't, the key was
 immediately removed from the set. When the set contained a single key, I
 stopped and printed the output.
+
+\subsection{Recovering TripleSDES plaintext and key}
 
 \paragraph{TripleSDES encrypted file} named \texttt{cxt2.txt}
 
