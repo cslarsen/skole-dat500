@@ -12,7 +12,11 @@ else
 	DETEX := detex
 endif
 
-TARGETS := freqs.pdf dat510-assignment-1.pdf
+TARGETS := \
+	assignment-1.pdf \
+	assignment-2.pdf
+
+CURRENT := dat510-assignment-2.pdf
 
 all: $(TARGETS)
 
@@ -20,21 +24,21 @@ freqs.pdf: freqs.R
 	Rscript $< && mv Rplots.pdf $@
 
 check:
-	$(DETEX) dat510-assignment-1.tex | diction -bs
+	$(DETEX) $(CURRENT:.pdf=.text) | diction -bs
 
-open: all
-	$(OPEN) dat510-assignment-1.pdf
+open: $(CURRENT)
+	$(OPEN) $(CURRENT)
 
 %.eps: %.gp data.txt
 	gnuplot $<
 
-dat510-assignment-1.pdf: freqs.pdf dat510-assignment-1.tex preamble.tex references.bib
+assignment-1.pdf: freqs.pdf
 
-%.pdf: %.tex
-	$(PDFLATEX) -halt-on-error dat510-assignment-1.tex
-	$(BIBTEX) dat510-assignment-1 # NOTE: No extension
-	$(PDFLATEX) -halt-on-error dat510-assignment-1.tex
-	$(PDFLATEX) -halt-on-error dat510-assignment-1.tex
+%.pdf: %.tex %.bib preamble.tex
+	$(PDFLATEX) -halt-on-error $<
+	$(BIBTEX) $(<:.tex=)
+	$(PDFLATEX) -halt-on-error $<
+	$(PDFLATEX) -halt-on-error $<
 
 clean:
 	rm -f $(TARGETS) $(TARGETS:.pdf=.aux) $(TARGETS:.pdf=.log) $(TARGETS:.pdf=.out)
