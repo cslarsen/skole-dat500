@@ -1,14 +1,14 @@
-def counter(n=0):
+def counter(n=0, mod=256):
     """Yields numbers but swaps two and two numbers:
 
     0,2,1,4,3,6,5,8,...
     """
-    yield n
+    yield n % mod
     n += 2
     while True:
-        yield n
+        yield n % mod
         n -= 1
-        yield n
+        yield n % mod
         n += 3
 
 for i,n in enumerate(counter()):
