@@ -13,5 +13,5 @@ def counter(n=0, mod=256):
 
 for i,n in enumerate(counter()):
     print("%20s %d" % (bin(n)[2:], n))
-    if i > 100:
+    if i > 300:
         break
