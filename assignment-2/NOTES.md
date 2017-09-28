@@ -6,3 +6,10 @@ Papers and links to read
 
   * https://www.2uo.de/myths-about-urandom/
     Explains myths about /dev/random and /dev/urandom
+
+TODOs
+=====
+
+Try to verify that the CSPRNG is good. Perhaps there is a suite of tools for
+checking for good CSPRNGs? That should be part of the report, with output
+samples.
