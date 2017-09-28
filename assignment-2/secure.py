@@ -32,6 +32,9 @@ Steps to be performed:
 
     step 7: upon receiving the encrypted file from A, B uses the same key K and
         symmetric cipher to decrypt it and obtain A's file in clear form.
+
+CAN use existing symmetric ciphers (SDES, TripleSDES, etc)
+CANNOT use libs for CSPRNG and DH Key Exchange
 """
 
 import argparse
@@ -45,6 +48,23 @@ def parse_args():
     return opts
 
 def main(opts):
+    pass
+
+def create_keypair():
+    pass
+
+def encrypt(key, plaintext):
+    pass
+
+def decrypt(key, ciphertext):
+    pass
+
+def get_global_parameters():
+    # TODO:
+    # - Display cyclic group and public parameters
+    # - Display public keys of A and B
+    # - Display shared key Kab shared by A and B
+    # - Display secret key K to be used to encryption/decryption
     pass
 
 if __name__ == "__main__":
