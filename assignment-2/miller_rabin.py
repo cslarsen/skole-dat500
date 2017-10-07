@@ -28,7 +28,7 @@ def pow_mod(base, exponent, modulus):
         if (exponent & 1) == 1:
             result = base*result % modulus
 
-        exponent /= 2
+        exponent >>= 1
         base = base**2 % modulus
 
     return result
@@ -52,11 +52,12 @@ def probably_prime(n, accuracy):
 
     # Now write n-1 as d*2^s by factoring powers of 2 from n-1
     s = 0
-    m = n-1
-    while not (m & 1):
+    m = n - 1
+    while (m & 1) == 0:
         s += 1
-        m /= 2
-    d = (n-1) / (1<<s)
+        m >>= 1
+    # Integer division
+    d = (n-1) // (1<<s)
 
     for i in range(accuracy):
         a = random.randint(2, n-2)
