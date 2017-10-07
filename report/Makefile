@@ -16,7 +16,7 @@ TARGETS := \
 	assignment-1.pdf \
 	assignment-2.pdf
 
-CURRENT := dat510-assignment-2.pdf
+CURRENT := assignment-2.pdf
 
 all: $(TARGETS)
 

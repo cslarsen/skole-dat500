@@ -11,9 +11,43 @@
 \begin{abstract}
 \end{abstract}
 
+\section{Choice of programming language}
+Because this is a student project, speed is not a primary concern. Therefore I
+have opted to use the Python programming language, because it is very flexible,
+and comes with bignum integers built-in. This is required for computing with
+large numbers, for example 512-bit prime numbers and above.
+
+For a production system, I would probably have chosen a
+language such as C or C++, but that would require a bignum library such as GMP
+\cite{wiki:gmp}.
+
 \section{Choice of CSPRNG}
 I have chosen to use the Blum Blum Shub \cite{bbs} pseudo-random number
-generator.
+generator. This section will give details on the implementation.
+
+The first step is to find two large prime numbers $p$ and $q$. I have
+implemented the Miller-Rabin \cite{miller.rabin} primality test to generate
+them.
+%
+If the bit length is 512, I select a random integer between $2^{512-1}$ and
+$2^{512}-1$, then perform the Miller-Rabin test with an appropriate accuracy
+setting. The accuracy setting is discussed in \cite{damgaard1993average}, which
+provides a method to select the accuracy based on a desired error bound. I have
+not implemented an automatic selection of the accuracy parameter in the code,
+however. In the paper, they state that a $k=600$-bit number with $t=1$
+iteration, the upper bound for the probability that the Miller-Rabin test
+actually produces a composite number is $p_{600, 1} \leqslant 2^{-75}$.
+
+If the test is negative, I try another number. If it is true, I accept
+it. However, the Miller-Rabin primality test is \textit{probabilistic}. While
+it will always be correct if it says a number is not prime, it may give false
+positives, saying a number is \textit{probably} prime, but cannot be certain
+about it. At this point in the code, I do not perform any further checks on the
+number. This is a weakness of the algorithm that should be addressed in a
+production system.
+
+The primes $p$ and $q$ must be congruent to $4 (mod 3)$, meaning that $p mod 4
+== 3$ and likewise for $q$.
 
 \bibliography{assignment-2}
 \bibliographystyle{ieeetr}
