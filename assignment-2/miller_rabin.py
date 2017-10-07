@@ -92,6 +92,12 @@ def find_prime(bits, accuracy):
             return candidate
 
 if __name__ == "__main__":
-    print("Finding possible 512-bit prime number")
-    for n in range(10):
-        print(find_prime(512, 500))
+    num = 10
+    print("Finding %d possible 512-bit prime numbers" % num)
+
+    for n in range(num):
+        candidate = find_prime(512, 500)
+        print("Decimal:\n%d" % candidate)
+        print("Binary:\n%s" % bin(candidate)[2:])
+        print("Bits: %d" % len(bin(candidate)[2:]))
+        print("")
