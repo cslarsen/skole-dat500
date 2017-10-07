@@ -60,16 +60,22 @@ class BlumBlumShub(object):
     def __iter__(self):
         return self
 
+    def _next(self):
+        # Note that the very first number (the seed) is never returned
+        self.x = self.x**2 % self.m
+        return self.x
+
     def __next__(self):
-        output = 0
-        for n in range(self.bits):
-            previous = self.x
-            self.x = self.x**2 % self.m
-            output = (output<<1) | (previous & 1)
-        return output
+        # Computes the next random number by taking the LSB of the next
+        # generated number.
+        n = 0
+        for _ in range(self.bits):
+            n <<= 1
+            n |= self._next() & 1
+        return n
 
     def next(self):
-        # Python 2 compatibility
+        # Function provided for Python 2 compatibility
         return self.__next__()
 
     @staticmethod
@@ -127,7 +133,5 @@ if __name__ == "__main__":
 
     print("Known numbers:")
     bbs = BlumBlumShub(3, 11, 19)
-    for index, number in enumerate(BlumBlumShub(3, 11, 19)):
-        if index > 10:
-            break
-        print(number)
+    for i in range(10):
+        print(bbs._next())
