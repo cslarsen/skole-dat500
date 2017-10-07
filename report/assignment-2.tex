@@ -31,7 +31,18 @@ them.
 %
 If the bit length is 512, I select a random integer between $2^{512-1}$ and
 $2^{512}-1$, then perform the Miller-Rabin test with an appropriate accuracy
-setting. The accuracy setting is discussed in \cite{damgaard1993average}, which
+setting. There are two things to consider here: The choice of pseud-random
+number generator (PRNG) for choosing a candidate, and the accuracy setting of
+the Miller-Rabin test.
+
+\paragraph{The PRNG} for choosing a candidate prime is done with the built-in
+\texttt{random.randint} function in Python. This is not a cryptographically
+secure pseud-random number generator (CSPRNG). One could investigate whether a
+non-CSPRNG would weaken the BBS algorithm. But the number of primes between
+$2^{512-1}$ and $2^{512}-1$ is \textit{huge} \cite{wiki:prime.counting}, so I
+have chosen not to investigate this issue any further.
+
+\paragraph{The accuracy setting} is discussed in \cite{damgaard1993average}, which
 provides a method to select the accuracy based on a desired error bound. I have
 not implemented an automatic selection of the accuracy parameter in the code,
 however. In the paper, they state that a $k=600$-bit number with $t=1$
