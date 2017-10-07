@@ -12,14 +12,17 @@
 \end{abstract}
 
 \section{Choice of programming language}
-Because this is a student project, speed is not a primary concern. Therefore I
-have opted to use the Python programming language, because it is very flexible,
-and comes with bignum integers built-in. This is required for computing with
-large numbers, for example 512-bit prime numbers and above.
+Writing a secure, production-ready cryptography system is a serious
+undertaking. While security is paramount, such a system should operate quickly
+as well. This being a student project, I have chosen flexibility above
+speed. Aspects concerning the security of the implementation have been noted
+throughout this report.
 
-For a production system, I would probably have chosen a
-language such as C or C++, but that would require a bignum library such as GMP
-\cite{wiki:gmp}.
+I have chosen to use Python as the sole programming language, mostly because it
+comes with big integer support built-in. A faster language, such as C or C++,
+would require to use the GMP library \cite{wiki:gmp} for implementing bignums.
+This requires installing additional packages, and I have therefore chosen not
+to use those languages in this project.
 
 \section{Choice of CSPRNG}
 I have chosen to use the Blum Blum Shub \cite{bbs} pseudo-random number
