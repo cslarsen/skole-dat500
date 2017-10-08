@@ -8,6 +8,7 @@ https://github.com/cslarsen/miller-rabin/blob/master/miller-rabin.cpp
 Written by Christian Stigen
 """
 
+import math
 import random
 
 def pow_mod(base, exponent, modulus):
@@ -33,6 +34,11 @@ def pow_mod(base, exponent, modulus):
 
     return result
 
+def estimate_accuracy(bits):
+    # Using knowledge of density of prime numbers around 2^bits. Half of them
+    # are even, so divide by two. Should give a good estimate on the number of
+    # trials required.
+    return int(math.ceil(0.5*math.log(2**bits)))
 
 def probably_prime(n, accuracy):
     """Performs the Miller-Rabin primality test.
@@ -81,8 +87,12 @@ def probably_prime(n, accuracy):
     # n is probably prime
     return True
 
-def find_prime(bits, accuracy):
+def find_prime(bits, accuracy=None):
     """Finds a random prime number with the given number of bits."""
+    if accuracy is None:
+        # Use the knowledge of density of prime numbers around 2^bits
+        accuracy = estimate_accuracy(bits)
+
     a = 1 << (bits-1)
     b = 1 << bits
     while True:

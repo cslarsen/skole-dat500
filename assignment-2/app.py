@@ -1,10 +1,21 @@
-def get_global_params():
-    pass
+import miller_rabin
+
+def get_global_params(bits):
+    # Domain parameters
+    # Choose a prime q so that p=2q+1 is also prime
+
+    accuracy = miller_rabin.estimate_accuracy(bits)
+
+    while True:
+        q = miller_rabin.find_prime(bits, accuracy)
+        p = 2*q + 1
+        if miller_rabin.probably_prime(p, accuracy):
+            return q, p
 
 def dh_exchange(address, puba):
     pass
 
-def generate_keypair(params):
+def generate_keypair(p, q):
     return None, None
 
 def create_csprng(seed):
@@ -21,9 +32,13 @@ def send(address, data):
 
 def main():
     bob = "some remote host"
-    params = get_global_params()
+    bits = 512
+    q, p = get_global_params(bits)
+    print("Global parameters:")
+    print("  q = 0x%x = %d" % (q, q))
+    print("  p = 2q+1 = 0x%x = %d" % (p, p))
 
-    priva, puba = generate_keypair(params)
+    priva, puba = generate_keypair(p, q)
     pubb = dh_exchange(bob, puba)
 
     Kab = create_shared_key(puba, pubb)
