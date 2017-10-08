@@ -123,13 +123,13 @@ def main():
     log("\n")
 
     print("Global parameters")
+    print("  g = %d (generator)" % generator)
+    print("")
     show("q", q)
     print("  prime(q, %d): %s" % (acc, primeq))
     print("")
     show("p (2q+1)", p)
     print("  prime(p, %d): %s" % (acc, primep))
-    print("")
-    print("  g = %d (generator)" % generator)
     print("")
 
     print("Blum Blum Shub parameters")

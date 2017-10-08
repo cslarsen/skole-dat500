@@ -1,3 +1,12 @@
-- sjekk factorable.com
-- fix python3 compatibility
+- cyclic group... ser ut som jeg skal velge denne selv
+  - finn ut om primitive root
+- implementer resten! dvs stream cipher
+  - hvis tid: bruk chacha20
+  - hvis ikke: sdes.. men den tar bare 20-bit noekkel... mao maa jeg ta 20 bit
+  om gangen fra noekkelen da.. proever det foerst
 
+husk:
+- sjekk python3 kompat foer levering
+
+hvis tid:
+- sjekk factorable.com
