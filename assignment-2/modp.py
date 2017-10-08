@@ -81,7 +81,7 @@ if __name__ == "__main__":
             prime = mr.probably_prime(n, acc)
             print("Prime acc=%d ? %s" % (acc, prime))
             if not prime:
-                break
+                sys.exit(1)
         h = (n - 1) // 2
         print("")
         print("(value-1) // 2:\n")
@@ -92,7 +92,7 @@ if __name__ == "__main__":
             prime = mr.probably_prime(h, acc)
             print("Prime acc=%d ? %s" % (acc, prime))
             if not prime:
-                break
+                sys.exit(1)
         print("")
         i = (n - 1) // 2
         print("")
@@ -104,5 +104,5 @@ if __name__ == "__main__":
             prime = mr.probably_prime(i, acc)
             print("Prime acc=%d ? %s" % (acc, prime))
             if not prime:
-                break
+                sys.exit(1)
         print("")
