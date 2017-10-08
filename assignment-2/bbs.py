@@ -4,6 +4,7 @@ Implementation of the Blum Blum Shub algorithm.
 Written by Christian Stigen
 """
 
+import math
 from miller_rabin import probably_prime, find_prime
 
 def is_coprime(a, b):
@@ -91,7 +92,7 @@ class BlumBlumShub(object):
                   random seed from /dev/urandom.
         """
         if accuracy is None:
-            accuracy = prime_bits
+            accuracy = int(math.ceil(0.5*math.log(2**prime_bits)))
 
         if seed in (0, 1):
             raise ValueError("The seed cannot be zero or one")
