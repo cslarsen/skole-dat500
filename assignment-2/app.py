@@ -1,16 +1,22 @@
-import miller_rabin
+import math
+import miller_rabin as mr
 
 def get_global_params(bits):
     # Domain parameters
     # Choose a prime q so that p=2q+1 is also prime
 
-    accuracy = miller_rabin.estimate_accuracy(bits)
+    acc1 = mr.estimate_accuracy(bits-1)
+    acc2 = mr.estimate_accuracy(bits)
 
     while True:
-        q = miller_rabin.find_prime(bits, accuracy)
+        q = mr.find_prime(bits-1, acc1)
         p = 2*q + 1
-        if miller_rabin.probably_prime(p, accuracy):
+        if mr.probably_prime(p, acc2):
             return q, p
+
+def numbits(n):
+    """Returns the number of bits requires to represent n."""
+    return int(math.ceil(math.log(n, 2)))
 
 def dh_exchange(address, puba):
     pass
@@ -38,9 +44,11 @@ def main():
     print("Global parameters:")
     print("  q = 0x%x" % q)
     print("    = %d" % q)
+    print("     (%d bits)" % numbits(q))
     print("  p = 2q+1")
     print("    = 0x%x" % p)
     print("    = %d" % p)
+    print("     (%d bits)" % numbits(p))
 
     priva, puba = generate_keypair(p, q)
     pubb = dh_exchange(bob, puba)
