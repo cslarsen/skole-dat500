@@ -30,6 +30,13 @@ would require to use the GMP library \cite{wiki:gmp} for implementing bignums.
 This requires installing additional packages, and I have therefore chosen not
 to use those languages in this project.
 
+\subsection{Choice of global parameters}
+While the implementation contains code for choosing $p$ and $q$ for the
+Diffie-Hellman key exchange, I have chosen numbers, with a generator $g$, from
+\cite{rfc3526}. The arguments were originally made for use with the IKE key
+exchange protocol (using Diffie-Hellman), and have been found ot have good
+number theoretic security properties.
+
 \subsection{Choice of CSPRNG}
 I have chosen to use the Blum Blum Shub \cite{bbs} pseudo-random number
 generator. This section will give details on the implementation.

@@ -56,7 +56,7 @@ def send(address, data):
 
 def main():
     bob = "some remote host"
-    bits = 64
+    bits = 128
     print("Finding global %d-bit parameters" % bits)
     q, p, fval= get_global_params(bits)
     #q = 761

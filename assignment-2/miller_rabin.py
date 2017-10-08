@@ -99,6 +99,12 @@ def find_prime(bits, accuracy=None):
         # NOTE: We are using an insecure random number generator here. Does it
         # matter? Probably not, but worth noting.
         candidate = random.randint(a, b)
+        if candidate & 1 == 0:
+            # Minor speed up: Skip even numbers
+            continue
+        if not probably_prime(candidate, 5):
+            # Another one: Try a few rounds with Miller-Rabin
+            continue
         if probably_prime(candidate, accuracy):
             return candidate
 
