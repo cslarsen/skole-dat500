@@ -94,7 +94,7 @@ def find_prime(bits, accuracy=None):
         accuracy = estimate_accuracy(bits)
 
     a = 1 << (bits-1)
-    b = 1 << bits
+    b = (1 << bits) - 1
     while True:
         # NOTE: We are using an insecure random number generator here. Does it
         # matter? Probably not, but worth noting.

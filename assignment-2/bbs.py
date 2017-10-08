@@ -14,8 +14,8 @@ def is_coprime(a, b):
     a, b = min(a, b), max(a, b)
 
     # Do not use floating point ops here, because then we drop accuracy
-    div = b // a
-    return div*a != b
+    quotient = b // a
+    return quotient*a != b
 
 def create_seed(length):
     # Read three bytes and use that to produce a 20-bit seed
