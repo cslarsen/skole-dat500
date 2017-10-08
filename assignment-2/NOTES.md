@@ -23,3 +23,8 @@ trials. For vaar del er 512 bits da 177 trials minst.
 
 Se appendix i Stallings, staar der hvordan man gjoer ting.
 Feks side 688 gir oss key exchange.
+
+SE DENNE
+https://crypto.stackexchange.com/questions/1963/how-large-should-a-diffie-hellman-p-be
+Viser hvor store tall man maa ha paa diffie-hellman exchange, og forklarer
+hvorfor vi maa ha p=2q+1, ogsaa hvordan velge primitive root

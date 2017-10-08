@@ -16,11 +16,14 @@ def get_global_params(bits):
     acc1 = mr.estimate_accuracy(bits-1)
     acc2 = mr.estimate_accuracy(bits)
 
+    # TODO: Fix this
+    fval = random.randint(2, 100000)
+
     while True:
         q = mr.find_prime(bits-1, acc1)
         p = 2*q + 1 # used to prevent small subgroup attacks, se Stallings
         if mr.probably_prime(p, acc2):
-            return q, p
+            return q, p, fval
 
 def numbits(n):
     """Returns the number of bits requires to represent n."""
@@ -29,12 +32,12 @@ def numbits(n):
 def dh_exchange(address, puba):
     pass
 
-def generate_keypair(p, q, priv=None):
+def generate_keypair(fval, p, q, priv=None):
     # NOTE: need to look into 2 here, F(3) => 2 but F(2) => 1!!!!
     if priv is None:
         priv = random.randint(2, q-1)
     F = GF(p)
-    g = F(3)
+    g = F(fval)
     print("g^q = %s" % g**q)
     pub = g**priv
     return priv, pub
@@ -53,9 +56,9 @@ def send(address, data):
 
 def main():
     bob = "some remote host"
-    bits = 256
+    bits = 64
     print("Finding global %d-bit parameters" % bits)
-    q, p = get_global_params(bits)
+    q, p, fval= get_global_params(bits)
     #q = 761
     #p = 2*q + 1
 
@@ -69,12 +72,12 @@ def main():
     print("    = %d" % p)
     print("      (%d bits)" % numbits(p))
     print("      prime(p): %s" % is_prime(p))
+    print("  fval = 0x%x" % fval)
+    print("       = %d" % fval)
     print("")
 
-    F = GF(p)
-    g = F(3)
     #priva, puba = generate_keypair(p, q, 312)
-    priva, puba = generate_keypair(p, q)
+    priva, puba = generate_keypair(fval, p, q)
     print("Keys for Alice")
     print("  privkey = 0x%x" % priva)
     print("          = %d" % priva)
@@ -83,7 +86,7 @@ def main():
     print("")
 
     #privb, pubb = generate_keypair(p, q, 24)
-    privb, pubb = generate_keypair(p, q)
+    privb, pubb = generate_keypair(fval, p, q)
     print("Keys for Bob")
     print("  privkey = 0x%x" % privb)
     print("          = %d" % privb)
