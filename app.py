@@ -1,7 +1,7 @@
 def get_global_params():
     pass
 
-def dh_exchange(params, puba):
+def dh_exchange(address, puba):
     pass
 
 def generate_keypair(params):
@@ -13,7 +13,7 @@ def create_csprng(seed):
 def encrypt(prng, plain):
     pass
 
-def create_shared_key(params, puba, pubb):
+def create_shared_key(puba, pubb):
     pass
 
 def send(address, data):
@@ -22,12 +22,14 @@ def send(address, data):
 def main():
     bob = "some remote host"
     params = get_global_params()
+
     priva, puba = generate_keypair(params)
-    pubb = dh_exchange(params, puba)
-    Kab = create_shared_key(params, puba, pubb)
+    pubb = dh_exchange(bob, puba)
+
+    Kab = create_shared_key(puba, pubb)
     csprng = create_csprng(Kab)
-    # now perform encryption
-    plain = "hello"
+
+    plain = "hello world"
     cipher = encrypt(csprng, plain)
     send(cipher, bob)
 
