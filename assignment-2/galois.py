@@ -1,6 +1,6 @@
 from miller_rabin import pow_mod
 
-class Mod(object):
+class IntMod(object):
     """Modulus integral arithmetic.
 
     Do not attempt to use this with floats, they will be converted to integers
@@ -14,21 +14,21 @@ class Mod(object):
         self.val = value % self.mod
 
     def __add__(self, n):
-        return Mod(self.val + int(n), self.mod)
+        return IntMod(self.val + int(n), self.mod)
 
     def __mul__(self, n):
-        return Mod(self.val * int(n), self.mod)
+        return IntMod(self.val * int(n), self.mod)
 
     def __sub__(self, n):
-        return Mod(self.val - int(n), self.mod)
+        return IntMod(self.val - int(n), self.mod)
 
     def __pow__(self, exponent):
         # We absolutely must do it this way, otherwise it will be too slow!
         result = pow_mod(self.val, int(exponent), self.mod)
-        return Mod(result, self.mod)
+        return IntMod(result, self.mod)
 
     def __div__(self, n):
-        return Mod(self.val / int(n), self.mod)
+        return IntMod(self.val / int(n), self.mod)
 
     def __eq__(self, n):
         return self.val == int(n)
@@ -47,7 +47,7 @@ class Mod(object):
 
 def GF(p):
     """Constructor for a finite Galois Field."""
-    return lambda n: Mod(n, p)
+    return lambda n: IntMod(n, p)
 
 def test():
     q = 761
