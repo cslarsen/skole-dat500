@@ -13,7 +13,7 @@ def is_prime(n, accuracy=None):
         accuracy = mr.estimate_accuracy(numbits(n))
     return mr.probably_prime(n, accuracy)
 
-def block_print(number, columns=6, indent="  "):
+def block_print(number, columns=6, indent="    "):
     modp.block_print(hex(number)[2:-1], columns=columns, indent=indent)
 
 def get_global_params(bits):
@@ -65,18 +65,18 @@ def log(message):
     sys.stdout.write(message)
     sys.stdout.flush()
 
-def show(label, number, decimal=False):
+def show(label, number, decimal=False, indent="  "):
     number = int(number)
-    print("%s (%d bits)" % (label, numbits(number)))
+    print("%s%s (%d bits)" % (indent, label, numbits(number)))
 
     if decimal:
-        print("Hex:")
+        print("%sHex:" % indent)
 
     block_print(number)
 
     if decimal:
         print("")
-        print("Decimal:")
+        print("%sDecimal:" % indent)
         print(number)
 
 def main():
@@ -124,10 +124,10 @@ def main():
 
     print("Global parameters")
     show("q", q)
-    print("      prime(q, %d): %s" % (acc, primeq))
+    print("  prime(q, %d): %s" % (acc, primeq))
     print("")
     show("p (2q+1)", p)
-    print("      prime(p, %d): %s" % (acc, primep))
+    print("  prime(p, %d): %s" % (acc, primep))
     print("")
     print("  g = %d (generator)" % generator)
     print("")
@@ -140,11 +140,13 @@ def main():
     show("m (Blum number)", bbs.m)
     print("")
 
+    print("Alice's keys")
     show("Alice privkey", priva)
     print("")
     show("Alice pubkey", puba)
     print("")
 
+    print("Bob's keys")
     show("Bob privkey", privb)
     print("")
     show("Bob pubkey", pubb)
