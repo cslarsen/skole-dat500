@@ -1,3 +1,5 @@
+from miller_rabin import pow_mod
+
 class Mod(object):
     """Modulus arithmetic."""
     def __init__(self, value, modulus):
@@ -16,8 +18,10 @@ class Mod(object):
     def __sub__(self, n):
         return Mod(self.val - n, self.mod)
 
-    def __pow__(self, n):
-        return Mod(self.val ** n, self.mod)
+    def __pow__(self, exponent):
+        # We absolutely must do it this way, otherwise it will be too slow!
+        result = pow_mod(self.val, exponent, self.mod)
+        return Mod(result, self.mod)
 
     def __div__(self, n):
         return Mod(self.val / n, self.mod)
