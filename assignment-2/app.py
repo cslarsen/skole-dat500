@@ -32,11 +32,15 @@ def send(address, data):
 
 def main():
     bob = "some remote host"
-    bits = 512
+    bits = 256
+    print("Finding global %d-bit parameters" % bits)
     q, p = get_global_params(bits)
     print("Global parameters:")
-    print("  q = 0x%x = %d" % (q, q))
-    print("  p = 2q+1 = 0x%x = %d" % (p, p))
+    print("  q = 0x%x" % q)
+    print("    = %d" % q)
+    print("  p = 2q+1")
+    print("    = 0x%x" % p)
+    print("    = %d" % p)
 
     priva, puba = generate_keypair(p, q)
     pubb = dh_exchange(bob, puba)
