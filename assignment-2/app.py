@@ -2,6 +2,7 @@ import math
 import random
 
 # Local imports
+from bbs import BlumBlumShub
 from galois import GF
 import miller_rabin as mr
 
@@ -16,8 +17,8 @@ def get_global_params(bits):
     acc1 = mr.estimate_accuracy(bits-1)
     acc2 = mr.estimate_accuracy(bits)
 
-    # TODO: Fix this
-    generator = 2 #random.randint(2, 100000)
+    # TODO: This is not entirely correct
+    generator = 2
 
     while True:
         q = mr.find_prime(bits-1, acc1)
@@ -32,10 +33,10 @@ def numbits(n):
 def dh_exchange(address, puba):
     pass
 
-def generate_keypair(generator, p, q, priv=None):
+def generate_keypair(prng, generator, p, q, priv=None):
     if priv is None:
         # Allow to use a predefined private key
-        priv = random.randint(2, q-1)
+        priv = prng.randint(2, q-1)
 
     F = GF(p)
     g = F(generator)
@@ -56,9 +57,9 @@ def send(address, data):
 
 def main():
     bob = "some remote host"
-    bits = 256
-    print("Finding global %d-bit parameters" % bits)
-    q, p, generator= get_global_params(bits)
+    bits = 128
+    print("=== Finding global %d-bit parameters ===" % bits)
+    q, p, generator = get_global_params(bits)
     #q = 761
     #p = 2*q + 1
 
@@ -75,22 +76,39 @@ def main():
     print("      generator = %d" % generator)
     print("")
 
+    print("Initializing Blum Blum Shub CSPRNG")
+    bbs = BlumBlumShub.create(bits)
+    print("  p = 0x%x" % bbs.p)
+    print("    = %d" % bbs.p)
+    print("      (%d bits)" % numbits(int(bbs.p)))
+    print("  q = 0x%x" % bbs.q)
+    print("    = %d" % bbs.q)
+    print("      (%d bits)" % numbits(int(bbs.q)))
+    print("  m = 0x%x" % bbs.m)
+    print("      %d" % bbs.m)
+    print("      (%d bits)" % numbits(int(bbs.m)))
+    print("")
+
     #priva, puba = generate_keypair(p, q, 312)
-    priva, puba = generate_keypair(generator, p, q)
+    priva, puba = generate_keypair(bbs, generator, p, q)
     print("Keys for Alice")
     print("  privkey = 0x%x" % priva)
     print("          = %d" % priva)
+    print("            (%d bits)" % numbits(int(priva)))
     print("  pubkey  = 0x%x" % puba)
     print("          = %d" % puba)
+    print("            (%d bits)" % numbits(int(puba)))
     print("")
 
     #privb, pubb = generate_keypair(p, q, 24)
-    privb, pubb = generate_keypair(generator, p, q)
+    privb, pubb = generate_keypair(bbs, generator, p, q)
     print("Keys for Bob")
     print("  privkey = 0x%x" % privb)
     print("          = %d" % privb)
+    print("            (%d bits)" % numbits(int(privb)))
     print("  pubkey  = 0x%x" % pubb)
     print("          = %d" % pubb)
+    print("            (%d bits)" % numbits(int(pubb)))
     print("")
 
     #pubb = dh_exchange(bob, puba)
@@ -101,6 +119,7 @@ def main():
     print("Bob shared key  : %d" % bobKab)
     if aliceKab == bobKab:
         print("Shared key (hex): 0x%x" % aliceKab)
+        print("                  (%d bits)" % numbits(int(aliceKab)))
 
     assert(aliceKab == bobKab)
 

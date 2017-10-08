@@ -85,10 +85,23 @@ if __name__ == "__main__":
         h = (n - 1) // 2
         print("")
         print("(value-1) // 2:\n")
+        print(h)
         block_print(hex(h)[2:-1], columns=6, indent="")
         print("")
         for acc in (1, 10, 100):
             prime = mr.probably_prime(h, acc)
+            print("Prime acc=%d ? %s" % (acc, prime))
+            if not prime:
+                break
+        print("")
+        i = (n - 1) // 2
+        print("")
+        print("2*value + 1:\n")
+        print(i)
+        block_print(hex(i)[2:-1], columns=6, indent="")
+        print("")
+        for acc in (1, 10, 100):
+            prime = mr.probably_prime(i, acc)
             print("Prime acc=%d ? %s" % (acc, prime))
             if not prime:
                 break

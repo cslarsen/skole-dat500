@@ -66,18 +66,34 @@ class BlumBlumShub(object):
         self.x = self.x**2 % self.m
         return self.x
 
-    def __next__(self):
-        # Computes the next random number by taking the LSB of the next
-        # generated number.
+    def _next_bits(self, bits):
         n = 0
-        for _ in range(self.bits):
+        for _ in range(bits):
             n <<= 1
             n |= self._next() & 1
         return n
 
+    def __next__(self):
+        # Computes the next random number by taking the LSB of the next
+        # generated number.
+        return self._next_bits(self.bits)
+
     def next(self):
         # Function provided for Python 2 compatibility
         return self.__next__()
+
+    def randint(self, start, stop):
+        """Returns a uniformly random number in the given, inclusive range."""
+        if stop <= start:
+            raise ValueError("stop must be higher than start")
+
+        # Number of bits we need
+        bits = int(math.ceil(math.log(stop, 2)))
+
+        while True:
+            n = self._next_bits(bits)
+            if start <= n <= stop:
+                return n
 
     @staticmethod
     def create(prime_bits, accuracy=None, bits=8, seed=None):
