@@ -55,7 +55,7 @@ void initialize_seed(const size_t bytes)
 mpz_class randint(const mpz_class& lowest, const mpz_class& highest)
 {
   if (!rnd)
-    initialize_seed(512/8);
+    initialize_seed(256/8);
   return rnd->get_z_range(highest - lowest) + lowest;
 }
 
@@ -123,16 +123,16 @@ int main()
   for (;;) {
     mpz_class q = randint(low, high);
 
+    // Skip even numbers
+    if ((q & 1) == 0)
+      continue;
+
     // Speed up by simple check
     if (!prob_prime(q, 5))
       continue;
 
     if (prob_prime(q, accuracy)) {
       mpz_class p = 2*q + 1;
-
-      // Speed up with simple check
-      if (!prob_prime(p, 5))
-        continue;
 
       if (prob_prime(p, accuracy)) {
         std::cout << q << std::endl;
