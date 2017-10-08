@@ -53,7 +53,7 @@ def send(address, data):
 
 def main():
     bob = "some remote host"
-    bits = 64
+    bits = 256
     print("Finding global %d-bit parameters" % bits)
     q, p = get_global_params(bits)
     #q = 761
@@ -78,7 +78,7 @@ def main():
     print("Keys for Alice")
     print("  privkey = 0x%x" % priva)
     print("          = %d" % priva)
-    print("  pubkey = 0x%x" % puba)
+    print("  pubkey  = 0x%x" % puba)
     print("          = %d" % puba)
     print("")
 
@@ -87,7 +87,7 @@ def main():
     print("Keys for Bob")
     print("  privkey = 0x%x" % privb)
     print("          = %d" % privb)
-    print("  pubkey = 0x%x" % pubb)
+    print("  pubkey  = 0x%x" % pubb)
     print("          = %d" % pubb)
     print("")
 
