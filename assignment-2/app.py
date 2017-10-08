@@ -1,5 +1,6 @@
 import math
 import random
+import sys
 
 # Local imports
 from bbs import BlumBlumShub
@@ -55,15 +56,35 @@ def create_shared_key(pubkey, privkey):
 def send(address, data):
     pass
 
+def log(message):
+    sys.stdout.write(message)
+    sys.stdout.flush()
+
 def main():
     bob = "some remote host"
     bits = 128
-    print("=== Finding global %d-bit parameters ===" % bits)
+
+    log("Finding global %d-bit parameters ... " % bits)
     q, p, generator = get_global_params(bits)
+    log("\n")
     #q = 761
     #p = 2*q + 1
 
-    print("Global parameters:")
+    log("Finding Blum Blum Shub q and p=2q+1 %d-bit primes ... " % bits)
+    bbs = BlumBlumShub.create(bits)
+    log("\n")
+
+    log("Generating %d-bit keypair for Alice ... " % bits)
+    #priva, puba = generate_keypair(p, q, 312)
+    priva, puba = generate_keypair(bbs, generator, p, q)
+    log("\n")
+
+    log("Generating %d-bit keypair for Bob ... " % bits)
+    #privb, pubb = generate_keypair(p, q, 24)
+    privb, pubb = generate_keypair(bbs, generator, p, q)
+    log("\n")
+
+    print("Global parameters")
     print("  q = 0x%x" % q)
     print("    = %d" % q)
     print("      (%d bits)" % numbits(q))
@@ -73,11 +94,10 @@ def main():
     print("    = %d" % p)
     print("      (%d bits)" % numbits(p))
     print("      prime(p): %s" % is_prime(p))
-    print("      generator = %d" % generator)
+    print("  g = %d (generator)" % generator)
     print("")
 
-    print("Initializing Blum Blum Shub CSPRNG")
-    bbs = BlumBlumShub.create(bits)
+    print("Blum Blum Shub parameters")
     print("  p = 0x%x" % bbs.p)
     print("    = %d" % bbs.p)
     print("      (%d bits)" % numbits(int(bbs.p)))
@@ -85,12 +105,10 @@ def main():
     print("    = %d" % bbs.q)
     print("      (%d bits)" % numbits(int(bbs.q)))
     print("  m = 0x%x" % bbs.m)
-    print("      %d" % bbs.m)
+    print("    = %d" % bbs.m)
     print("      (%d bits)" % numbits(int(bbs.m)))
     print("")
 
-    #priva, puba = generate_keypair(p, q, 312)
-    priva, puba = generate_keypair(bbs, generator, p, q)
     print("Keys for Alice")
     print("  privkey = 0x%x" % priva)
     print("          = %d" % priva)
@@ -100,8 +118,6 @@ def main():
     print("            (%d bits)" % numbits(int(puba)))
     print("")
 
-    #privb, pubb = generate_keypair(p, q, 24)
-    privb, pubb = generate_keypair(bbs, generator, p, q)
     print("Keys for Bob")
     print("  privkey = 0x%x" % privb)
     print("          = %d" % privb)
