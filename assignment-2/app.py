@@ -5,6 +5,10 @@ import random
 from galois import GF
 import miller_rabin as mr
 
+def is_prime(n):
+    accuracy = mr.estimate_accuracy(numbits(n))
+    return mr.probably_prime(n, accuracy)
+
 def get_global_params(bits):
     # Domain parameters
     # Choose a prime q so that p=2q+1 is also prime
@@ -51,23 +55,26 @@ def main():
     bob = "some remote host"
     bits = 64
     print("Finding global %d-bit parameters" % bits)
-    #q, p = get_global_params(bits)
-    q = 761
-    p = 2*q + 1
+    q, p = get_global_params(bits)
+    #q = 761
+    #p = 2*q + 1
 
     print("Global parameters:")
     print("  q = 0x%x" % q)
     print("    = %d" % q)
-    print("     (%d bits)" % numbits(q))
+    print("      (%d bits)" % numbits(q))
+    print("      prime(q): %s" % is_prime(q))
     print("  p = 2q+1")
     print("    = 0x%x" % p)
     print("    = %d" % p)
-    print("     (%d bits)" % numbits(p))
+    print("      (%d bits)" % numbits(p))
+    print("      prime(p): %s" % is_prime(p))
     print("")
 
     F = GF(p)
     g = F(3)
-    priva, puba = generate_keypair(p, q, 312)
+    #priva, puba = generate_keypair(p, q, 312)
+    priva, puba = generate_keypair(p, q)
     print("Keys for Alice")
     print("  privkey = 0x%x" % priva)
     print("          = %d" % priva)
@@ -75,7 +82,8 @@ def main():
     print("          = %d" % puba)
     print("")
 
-    privb, pubb = generate_keypair(p, q, 24)
+    #privb, pubb = generate_keypair(p, q, 24)
+    privb, pubb = generate_keypair(p, q)
     print("Keys for Bob")
     print("  privkey = 0x%x" % privb)
     print("          = %d" % privb)
@@ -89,7 +97,6 @@ def main():
     bobKab = create_shared_key(privb, puba)
     print("Alice shared key: %d" % aliceKab)
     print("Bob shared key  : %d" % bobKab)
-    print(" (type: %s)" % type(bobKab))
 
     assert(aliceKab == bobKab)
 
