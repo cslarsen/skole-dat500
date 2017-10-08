@@ -10,7 +10,7 @@ def get_global_params(bits):
 
     while True:
         q = mr.find_prime(bits-1, acc1)
-        p = 2*q + 1
+        p = 2*q + 1 # used to prevent small subgroup attacks, se Stallings
         if mr.probably_prime(p, acc2):
             return q, p
 
