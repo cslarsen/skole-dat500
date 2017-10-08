@@ -20,3 +20,6 @@ Min miller-rabin implementasjon bruker repeats, dvs KNUT98. Jeg bruker faktisk
 random numbers i koden. At alternativ ville vaert aa bruke AKS primality test,
 som er deterministisk. Men den er mindre effektiv. Har ogsaa at 0.5ln2^200 = 69
 trials. For vaar del er 512 bits da 177 trials minst.
+
+Se appendix i Stallings, staar der hvordan man gjoer ting.
+Feks side 688 gir oss key exchange.
