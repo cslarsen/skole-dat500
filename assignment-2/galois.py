@@ -1,7 +1,11 @@
 from miller_rabin import pow_mod
 
 class Mod(object):
-    """Modulus arithmetic."""
+    """Modulus integral arithmetic.
+
+    Do not attempt to use this with floats, they will be converted to integers
+    using ``int``.
+    """
     def __init__(self, value, modulus):
         self.mod = modulus
         self.val = value % self.mod
@@ -10,27 +14,27 @@ class Mod(object):
         self.val = value % self.mod
 
     def __add__(self, n):
-        return Mod(self.val + n, self.mod)
+        return Mod(self.val + int(n), self.mod)
 
     def __mul__(self, n):
-        return Mod(self.val * n, self.mod)
+        return Mod(self.val * int(n), self.mod)
 
     def __sub__(self, n):
-        return Mod(self.val - n, self.mod)
+        return Mod(self.val - int(n), self.mod)
 
     def __pow__(self, exponent):
         # We absolutely must do it this way, otherwise it will be too slow!
-        result = pow_mod(self.val, exponent, self.mod)
+        result = pow_mod(self.val, int(exponent), self.mod)
         return Mod(result, self.mod)
 
     def __div__(self, n):
-        return Mod(self.val / n, self.mod)
+        return Mod(self.val / int(n), self.mod)
 
     def __eq__(self, n):
-        return self.val == n
+        return self.val == int(n)
 
     def __neq__(self, n):
-        return self.val != n
+        return self.val != int(n)
 
     def __repr__(self):
         return "%d (mod %d)" % (self.val, self.mod)
@@ -38,11 +42,25 @@ class Mod(object):
     def __str__(self):
         return str(self.val)
 
+    def __int__(self):
+        return self.val
+
 def GF(p):
     """Constructor for a finite Galois Field."""
     return lambda n: Mod(n, p)
 
+def test():
+    q = 761
+    p = 2*q + 1
+    F = GF(p)
+    g = F(3)
+    x = 312
+    X = g**x
+    print("got %d" % X)
+    print(" or %r" % X)
+
 if __name__ == "__main__":
+    test()
     # Example usage
     q = 761
     p = 2*q + 1

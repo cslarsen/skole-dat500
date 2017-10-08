@@ -25,9 +25,10 @@ def numbits(n):
 def dh_exchange(address, puba):
     pass
 
-def generate_keypair(p, q):
+def generate_keypair(p, q, priv=None):
     # NOTE: need to look into 2 here, F(3) => 2 but F(2) => 1!!!!
-    priv = random.randint(2, q-1)
+    if priv is None:
+        priv = random.randint(2, q-1)
     F = GF(p)
     g = F(3)
     print("g^q = %s" % g**q)
@@ -40,8 +41,8 @@ def create_csprng(seed):
 def encrypt(prng, plain):
     pass
 
-def create_shared_key(g, puba, pubb):
-    return g**puba
+def create_shared_key(pubkey, privkey):
+    return privkey**pubkey
 
 def send(address, data):
     pass
@@ -50,7 +51,10 @@ def main():
     bob = "some remote host"
     bits = 64
     print("Finding global %d-bit parameters" % bits)
-    q, p = get_global_params(bits)
+    #q, p = get_global_params(bits)
+    q = 761
+    p = 2*q + 1
+
     print("Global parameters:")
     print("  q = 0x%x" % q)
     print("    = %d" % q)
@@ -63,30 +67,33 @@ def main():
 
     F = GF(p)
     g = F(3)
-    priva, puba = generate_keypair(p, q)
+    priva, puba = generate_keypair(p, q, 312)
     print("Keys for Alice")
     print("  privkey = 0x%x" % priva)
     print("          = %d" % priva)
-    print("  pubkey = 0x%x" % puba.val)
-    print("          = %d" % puba.val)
+    print("  pubkey = 0x%x" % puba)
+    print("          = %d" % puba)
     print("")
 
-    privb, pubb = generate_keypair(p, q)
+    privb, pubb = generate_keypair(p, q, 24)
     print("Keys for Bob")
     print("  privkey = 0x%x" % privb)
     print("          = %d" % privb)
-    print("  pubkey = 0x%x" % pubb.val)
-    print("          = %d" % pubb.val)
+    print("  pubkey = 0x%x" % pubb)
+    print("          = %d" % pubb)
     print("")
 
-    pubb = dh_exchange(bob, puba)
+    #pubb = dh_exchange(bob, puba)
 
-    aliceKab = create_shared_key(g, puba, pubb)
-    bobKab = create_shared_key(g, pubb, puba)
-    print("Alice shared key: %d" % aliceKab.val)
-    print("Bob shared key  : %d" % bobKab.val)
+    aliceKab = create_shared_key(priva, pubb)
+    bobKab = create_shared_key(privb, puba)
+    print("Alice shared key: %d" % aliceKab)
+    print("Bob shared key  : %d" % bobKab)
+    print(" (type: %s)" % type(bobKab))
 
-    csprng = create_csprng(Kab)
+    assert(aliceKab == bobKab)
+
+    csprng = create_csprng(aliceKab)
 
     plain = "hello world"
     cipher = encrypt(csprng, plain)
