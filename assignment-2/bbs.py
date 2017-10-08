@@ -20,10 +20,16 @@ def is_coprime(a, b):
 def create_seed(length):
     # Read three bytes and use that to produce a 20-bit seed
     with open("/dev/urandom", "rb") as f:
-        bytes = f.read(length)
+        rbytes = f.read(length)
         seed = 0
         for n in range(length):
-            seed = seed << 8 | ord(bytes[n])
+            byte = rbytes[n]
+            if isinstance(byte, int):
+                # Python 3.x
+                seed = (seed << 8) | byte
+            else:
+                # Python 2.x
+                seed = (seed << 8) | ord(rbytes[n])
         return seed
 
 class BlumBlumShub(object):
