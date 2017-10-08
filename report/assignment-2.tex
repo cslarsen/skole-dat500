@@ -11,7 +11,13 @@
 \begin{abstract}
 \end{abstract}
 
-\section{Choice of programming language}
+\section{Introduction}
+The objective in this project is to create a complete program for performing
+key exchange and send encrypted data between two actors.
+
+\section{Design and implementation}
+
+\subsection{Choice of programming language}
 Writing a secure, production-ready cryptography system is a serious
 undertaking. While security is paramount, such a system should operate quickly
 as well. This being a student project, I have chosen flexibility above
@@ -24,7 +30,7 @@ would require to use the GMP library \cite{wiki:gmp} for implementing bignums.
 This requires installing additional packages, and I have therefore chosen not
 to use those languages in this project.
 
-\section{Choice of CSPRNG}
+\subsection{Choice of CSPRNG}
 I have chosen to use the Blum Blum Shub \cite{bbs} pseudo-random number
 generator. This section will give details on the implementation.
 
@@ -62,6 +68,12 @@ production system.
 
 The primes $p$ and $q$ must be congruent to $4 (mod 3)$, meaning that $p mod 4
 == 3$ and likewise for $q$.
+
+\section{Test results}
+
+\section{Discussion}
+
+\section{Conclusion}
 
 \bibliography{assignment-2}
 \bibliographystyle{ieeetr}
