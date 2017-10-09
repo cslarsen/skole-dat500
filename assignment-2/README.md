@@ -45,3 +45,13 @@ started.
 To see other options for controlling which IKE cyclic group to use, see
 
     $ python app.py --help
+
+Other programs
+==============
+
+To see the C++ version of the Miller-Rabin primality tester, run the following
+commands:
+
+    $ make primes
+    $ time ./primes
+

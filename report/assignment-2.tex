@@ -55,6 +55,12 @@ More specifically, the program would consist of three major parts:
   \item and a symmetric cipher.
 \end{itemize}
 
+The challenge is to chain all those pieces together in a coherent whole.  This
+includes choosing good parameters for the Diffie-Hellman exchange, choosing a
+suitable CSPRNG for key generation and for generating the stream cipher key.
+Our goal is to produce a working communication system that, while being
+primarily an educational project, also observes good security practices.
+
 \section{Design and implementation}
 The program consists of the following parts:
 \begin{itemize}
@@ -164,8 +170,39 @@ The primes $p$ and $q$ must be congruent to $4 (mod 3)$, meaning that $p mod 4
 == 3$ and likewise for $q$.
 
 \section{Test results}
+One of the earliest issues I ran into was the poor performance of Python.
+Finding large prime numbers is very time consuming. After implementing the
+Miller-Rabin primality tester, it seemed to take a long time to generate large
+keypairs that are resistant to subgoup attacks. That is, to find two prime
+numbers $p$ and $q$ so that $p = 2q+1$ quickly became a bottle-neck when
+searching for primes on the order of 256 bits and above.
+
+Even though Python seems to use the GNU MP library (GMP) for bignums, I decided
+to rewrite the Miller-Rabin primality tester in C++. The code for this can be
+found in the file \texttt{primes.cpp}. It is hard to measure the speed, since
+one may get lucky with a run and quickly find two prime numbers that satisfy
+the above condition. But on average, the C++ version seemed to be at least
+twice as fast, if not more. However, I found that the number of rounds (or
+\textit{accuracy}) in the Miller-Rabin algorithm would slow down the algorithm
+significantly. I then changed the code to skip quickly skip even numbers, and
+then perform a small number of rounds for an initial test of the prime numbers.
+This improved performance so much that it was viable to use 256 and even 512
+bit primes in Python.
 
 \section{Discussion}
+I demonstrated how to implement a secure, public-key communication using
+Diffie-Hellman for key exchange and a shared seed for a CSPRNG to create stream
+cipher keys.
+
+While Blum Blum Shub (BBS) is good for generating keys, it is slow and not a good fit
+for generating many stream cipher keys. Using a faster stream cipher in CTR or
+OFB mode would have been a better choice for that part, for example the
+ChaCha20 \cite{chacha20} stream cipher. Another problem with BBS was sharing
+the Diffie-Hellman parameters $q$ and $p$, which \textit{may} weaken the whole
+system because the space of suitable primes may be considerably reduced. That
+would be worthwhile to investigate in more detail. Lastly, issues related to
+network communication such as timing and synchronization of the two CSPRNGs was
+a practical matter that should deserve more attention.
 
 \section{Conclusion}
 
