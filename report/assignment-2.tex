@@ -37,6 +37,22 @@ Diffie-Hellman key exchange, I have chosen numbers, with a generator $g$, from
 exchange protocol (using Diffie-Hellman), and have been found ot have good
 number theoretic security properties.
 
+In \cite{dh.params} we see that choosing good parameters for the Diffie-Hellman
+key exchange is very hard to make right. Because of that, many public key
+cryptography systems in use today reuse parameters from well-known, predefined
+groups that are available publicly. The problem is that those groups may
+potentially have been broken by large organizations, and thus the key exchanges
+may be prone to attacks. This particularly applies to the groups with a low
+number of bits. The recommendation in the paper is to use at least 2048-bit
+groups today, and use ones that have been well chosen. 
+
+In particular, \cite{dh.params} warns about generating the parameters yourself,
+precisely because it is so hard to make it right and choose good, secure
+parameters. Because of that, I have chosen to use DH parameters from
+\cite{rfc3526}. To show that I am able to generate parameters myself, I have
+done so in the function \texttt{generate\_dh\_params} in the file
+\texttt{app.py}.
+
 \subsection{Choice of CSPRNG}
 I have chosen to use the Blum Blum Shub \cite{bbs} pseudo-random number
 generator. This section will give details on the implementation.

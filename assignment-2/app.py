@@ -17,14 +17,21 @@ def is_prime(n, accuracy=None):
 def block_print(number, columns=6, indent="    "):
     modp.block_print(hex(number)[2:-1], columns=columns, indent=indent)
 
-def get_global_params(bits):
+def generate_dh_params(bits):
+    """Generates Diffie-Hellman global parameters p and q.
+
+    Returns:
+        A tuple of integers (q, p, generator)
+    """
     # Domain parameters
     # Choose a prime q so that p=2q+1 is also prime
 
     acc1 = mr.estimate_accuracy(bits-1)
     acc2 = mr.estimate_accuracy(bits)
 
-    # TODO: This is not entirely correct
+    # TODO: This is not entirely correct. At least it should be tested, albeit
+    # the space is too big to enumerate exhaustively. Need more efficient
+    # methods.
     generator = 2
 
     while True:
@@ -93,19 +100,10 @@ def log(message):
     sys.stdout.write(message)
     sys.stdout.flush()
 
-def show(label, number, decimal=False, indent="  "):
+def show(label, number, indent="  "):
     number = int(number)
     print("%s%s (%d bits)" % (indent, label, numbits(number)))
-
-    if decimal:
-        print("%sHex:" % indent)
-
-    block_print(number)
-
-    if decimal:
-        print("")
-        print("%sDecimal:" % indent)
-        print(number)
+    block_print(number, indent=indent*2)
 
 def read_file(filename):
     with open(filename, "rb") as f:
@@ -116,7 +114,7 @@ def main():
     bits = 128
 
     log("Finding global %d-bit parameters ... " % bits)
-    #q, p, generator = get_global_params(bits)
+    #q, p, generator = generate_dh_params(bits)
     group = modp.groups[2048]
     p = group["value"]
     q = (p - 1) // 2

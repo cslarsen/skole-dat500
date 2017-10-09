@@ -53,17 +53,6 @@ def GF(p):
     return lambda n: IntMod(n, p)
 
 def test():
-    q = 761
-    p = 2*q + 1
-    F = GF(p)
-    g = F(3)
-    x = 312
-    X = g**x
-    print("got %d" % X)
-    print(" or %r" % X)
-
-if __name__ == "__main__":
-    test()
     # Example usage
     q = 761
     p = 2*q + 1
@@ -83,4 +72,3 @@ if __name__ == "__main__":
     check(Y, 1304)
     check(Y**x, 541)
     check(X**y, 541)
-
