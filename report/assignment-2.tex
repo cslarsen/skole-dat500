@@ -26,8 +26,11 @@
   %
   The program communicates over an TCP/IP socket. After the key exchange has
   been finished, an chat window opens. The two parties can then proceed to chat
-  securely over a public channel. However, the two CSPRNGs may be susceptible
-  to synchronization issues. That part is out of scope for this project.
+  securely over a public channel. However, networking is a big topic and
+  details around stability are out of scope for this project. In particular,
+  the two CSPRNGs are susceptible to synchronization issues if the message rate
+  is high. Reseeding, while a security issue, has also been deemed out of
+  scope.
   %
   While working as advertised, this student project has a few obvious
   weaknesses: A real system would not use the educational TripleSDES stream
