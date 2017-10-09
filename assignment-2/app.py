@@ -1,3 +1,10 @@
+"""
+DAT-510 Assignment 2, autumn 2017
+
+All code written by Christian Stigen
+"""
+
+import hashlib # only used for SHA1 sums
 import math
 import random
 import sys
@@ -69,8 +76,8 @@ def encrypt_with_csprng(q, p, seed, plaintext):
     prng = bbs.BlumBlumShub(seed=seed, bits=10, q=q, p=p)
     ciphertext = ""
     for plainbyte in plaintext:
-        k1 = prng.get_random_bits(10)
-        k2 = prng.get_random_bits(10)
+        k1 = prng.next()
+        k2 = prng.next()
         cipherbyte = csdes.triplesdes_encrypt(k1, k2, plainbyte)
         ciphertext = ciphertext + chr(cipherbyte)
     return ciphertext
@@ -79,8 +86,8 @@ def decrypt_with_csprng(q, p, seed, ciphertext):
     prng = bbs.BlumBlumShub(seed=seed, bits=10, q=q, p=p)
     plaintext = ""
     for cipherbyte in map(ord, ciphertext):
-        k1 = prng.get_random_bits(10)
-        k2 = prng.get_random_bits(10)
+        k1 = prng.next()
+        k2 = prng.next()
         plainbyte = csdes.triplesdes_decrypt(k1, k2, cipherbyte)
         plaintext = plaintext + chr(plainbyte)
     return plaintext
@@ -111,7 +118,7 @@ def read_file(filename):
 
 def main():
     bob = "some remote host"
-    bits = 128
+    bits = 512
 
     log("Finding global %d-bit parameters ... " % bits)
     #q, p, generator = generate_dh_params(bits)
@@ -208,22 +215,38 @@ def main():
     log("Initializing %d-bit Blum Blum Shub with shared key as seed ... " % bits)
     csprng = create_csprng(Kab, bits)
     log("\n")
-    key = csprng.get_random_bits(20)
-    show("20-bit TriplSDES key", key)
+    seed = csprng.get_random_bits(bits)
+    show("%d-bit Blum Blum Shub seed for symmetric cipher" % bits, seed)
+    print("")
 
+    filename = "plaintext"
+    print("Reading plaintext from file %r" % filename)
     plaintext = read_file("plaintext")
-    origplain = plaintext
-    print("Plaintext: %r" % plaintext)
-    plaintext = map(ord, plaintext)
+    print("")
 
-    ciphertext = encrypt_with_csprng(q, p, key, plaintext)
-    print("Ciphertext: %r" % ciphertext)
-    # TODO: sha1sum
-    #send(cipher, bob)
-    plainagain = decrypt_with_csprng(q, p, key, ciphertext)
-    print("Plaintext: %r" % plainagain)
-    assert(origplain == plainagain)
-    print("ROUNDTRIP OK")
+    prior_sha1 = hashlib.sha1(plaintext).hexdigest()
+    print("Plaintext (SHA1 %s):\n%r" % (prior_sha1, plaintext))
+    print("")
+
+    ciphertext = encrypt_with_csprng(q, p, seed, map(ord, plaintext))
+    print("Ciphertext:\n%r" % ciphertext)
+    print("")
+
+    decrypted = decrypt_with_csprng(q, p, seed, ciphertext)
+    post_sha1 = hashlib.sha1(decrypted).hexdigest()
+    print("Decrypted plaintext (SHA1 %s):\n%r" % (post_sha1, decrypted))
+    print("")
+
+    print("Results")
+    if prior_sha1 == post_sha1:
+        print("  SHA1 sums equal")
+    else:
+        print("  SHA1 sums NOT equal")
+
+    if decrypted == plaintext:
+        print("  Plaintexts are equal")
+    else:
+        print("  Plaintexts are NOT equal")
 
 if __name__ == "__main__":
     main()
