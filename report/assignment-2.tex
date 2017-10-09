@@ -223,7 +223,27 @@ and I used that as the default group. I also added asserts in the code for the
 above conditions. An example program that tests the IKE numbers can be seen in
 \texttt{modp.py}.
 
-\begin{lstlisting}[caption={Finding prime numbres}, label=verb:dh.primes]
+The most pressing issue was to demonstrate the encrypted chat. Below is a
+transcript from two terminals chatting which each other on the same machine,
+using port 3333.
+
+\begin{lstlisting}
+*** Entering encrypted chat. Hit CTRL+D to exit ***
+
+You: Encrypted reply: '7\xc4\xe0\xb5i\xe3\x98\x1c\xf3\xbch\xfd\x11'
+Decrypted reply: Hello, world!
+It works!
+Encrypted message: '8JC\xb0b\rc\x06\xcc'
+You:
+\end{lstlisting}
+
+\begin{lstlisting}
+*** Entering encrypted chat. Hit CTRL+D to exit ***
+
+You: Hello, world!
+Encrypted message: '7\xc4\xe0\xb5i\xe3\x98\x1c\xf3\xbch\xfd\x11'
+You: Encrypted reply: '8JC\xb0b\rc\x06\xcc'
+Decrypted reply: It works!
 \end{lstlisting}
 
 \section{Discussion}
