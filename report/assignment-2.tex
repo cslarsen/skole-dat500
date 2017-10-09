@@ -160,8 +160,8 @@ while True:
         return candidate
 \end{lstlisting}
 
-\subsection{Choice of CSPRNG}
-I have chosen to use the Blum Blum Shub \cite{bbs} pseudo-random number
+\subsection{Choice of the Blum Blum Shub CSPRNG}
+I have chosen to use the Blum Blum Shub \cite{bbs} (BBS) pseudo-random number
 generator. This section will give details on the implementation.
 
 The first step is to find two large prime numbers $p$ and $q$. I have
@@ -196,8 +196,9 @@ about it. At this point in the code, I do not perform any further checks on the
 number. This is a weakness of the algorithm that should be addressed in a
 production system.
 
-The primes $p$ and $q$ must be congruent to $4 (mod 3)$, meaning that $p mod 4
-== 3$ and likewise for $q$.
+The primes $p$ and $q$ must be congruent to $4 (\textrm{mod} 3)$, meaning that
+$p \textrm{mod} 4 == 3$ and likewise for $q$. This posed an interesting
+challenge for using the BBS generator. They must also be coprime to the seed.
 
 \section{Test results}
 One of the earliest issues I ran into was the poor performance of Python.
@@ -206,6 +207,24 @@ Miller-Rabin primality tester, it seemed to take a long time to generate large
 keypairs that are resistant to subgoup attacks. That is, to find two prime
 numbers $p$ and $q$ so that $p = 2q+1$ quickly became a bottle-neck when
 searching for primes on the order of 256 bits and above.
+
+An interesting challenge was incorporating the Blum Blum Shub generator for the
+stream cipher. At that point in the code, I already had a shared key to use as
+seed. But I couldn't create two different $p$ and $q$ parameters for Alice and
+Bob. What I did was to just reuse the $p$ and $q$ found in the Diffie-Hellman
+parameters. I wrote a program that tested all the IKE parameters for the
+required conditions:
+\begin{gather*}
+  p = 2q+1 \\
+  p (\textrm{mod} 4) = q (\textrm{mod} 4) = 3
+\end{gather*}
+Testing with all the IKE groups, I found that the 2048-bit group fit the bill,
+and I used that as the default group. I also added asserts in the code for the
+above conditions. An example program that tests the IKE numbers can be seen in
+\texttt{modp.py}.
+
+\begin{lstlisting}[caption={Finding prime numbres}, label=verb:dh.primes]
+\end{lstlisting}
 
 \section{Discussion}
 Even though Python seems to use the GNU MP library (GMP) for bignums, I decided
@@ -220,7 +239,6 @@ then perform a small number of rounds for an initial test of the prime numbers.
 This improved performance so much that it was viable to use 256 and even 512
 bit primes in Python.
 
-Another thing I did not pursue was to dynamically generate the
 
 \section{Conclusion}
 I demonstrated how to implement a secure, public-key communication using
