@@ -13,8 +13,7 @@ You will need a *UNIX* system with:
 
   * A C++11 compiler for the SDES back-end code, preferably gcc or clang.
   * GNU Make to build the C++ code
-  * Python 2.7 or 3+, to run the SDES front-end and the other programs. It only
-    uses standard libraries.
+  * Python 2.7 only --- Python 3 is not fully supported
 
 The C++ code can be compiled on Windows as well, but I don't have access to it,
 so I haven't been able to test the code. But, in general, what you need to make
@@ -27,3 +26,22 @@ How to build the shared library
 ===============================
 
 On a UNIX system, just type `make` and `libsdes.so` should be built.
+
+How to run the program
+=======================
+
+Start the client by specifying an open port number to listen to:
+
+    $ python app.py --port=3333
+
+On another machine (or in another window on the same machine), start a client
+with:
+
+    $ python app.py --remote-host=127.0.0.1 --port=3333
+
+After a while, key exchange will take place. Next, an encrypted chat session is
+started.
+
+To see other options for controlling which IKE cyclic group to use, see
+
+    $ python app.py --help
