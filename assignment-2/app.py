@@ -5,7 +5,7 @@ All code written by Christian Stigen
 """
 
 import argparse
-import json
+import pickle
 import math
 import random
 import socket
@@ -57,11 +57,11 @@ class Connection(object):
 
     def exchange_keys(self, remote, buflen=4096):
         log("Sending our public key\n")
-        remote.send(json.dumps({"pubkey": int(self.pubkey)}))
+        remote.send(pickle.dumps({"pubkey": int(self.pubkey)}))
         print("")
 
         log("Receiving remote public key\n")
-        reply = json.loads(remote.recv(buflen))
+        reply = pickle.loads(remote.recv(buflen))
         if "pubkey" in reply:
             remote_pubkey = reply["pubkey"]
             remote_pubkey = IntMod(remote_pubkey, self.pubkey.mod)
@@ -308,5 +308,10 @@ def main(opts):
         net.start_client()
 
 if __name__ == "__main__":
+    if sys.version_info.major >= 3:
+        print("WARNING: This program currently only supports Python 2.7")
+        print("         You have Python 3. It will stop at the chat part!")
+        print("")
+
     opts = parse_args()
     main(opts)
