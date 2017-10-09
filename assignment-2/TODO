@@ -1,3 +1,12 @@
+next
+- incorporate bbs with p q global params (in progress)
+- 20-bit rolling key with sdes
+- json over tcp/ip.. see if it works
+- clarify choice of global params, must have a good section on it
+  - try to see if g=2 is a generator in intmod by trying possibilities.. or,
+  for example, find a fast way to find it
+
+
 TODO naa:
 - shared key skal vaere seed til prng..
   - bruker bbs.. det eneste med den er at shared key maa vaere coprime til m
@@ -16,3 +25,6 @@ husk:
 
 hvis tid:
 - sjekk factorable.com
+
+CITATIONS
+- subgroup attack paa diffie hellman

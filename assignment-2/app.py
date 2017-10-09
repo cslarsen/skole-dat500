@@ -3,7 +3,7 @@ import random
 import sys
 
 # Local imports
-from bbs import BlumBlumShub
+import bbs
 from galois import GF
 import csdes
 import miller_rabin as mr
@@ -51,12 +51,32 @@ def generate_keypair(prng, generator, p, q, priv=None):
     return priv, pub
 
 def create_csprng(seed, bits):
-    return BlumBlumShub.create(prime_bits=bits, seed=int(seed))
+    return bbs.BlumBlumShub.create(prime_bits=bits, seed=int(seed))
 
 def encrypt(key, plaintext):
     k1 = (key & 0b11111111110000000000) >> 10
     k2 =  key & 0b1111111111
     return csdes.triplesdes_encrypt_buffer(k1, k2, plaintext)
+
+def encrypt_with_csprng(q, p, seed, plaintext):
+    prng = bbs.BlumBlumShub(seed=seed, bits=10, q=q, p=p)
+    ciphertext = ""
+    for plainbyte in plaintext:
+        k1 = prng.get_random_bits(10)
+        k2 = prng.get_random_bits(10)
+        cipherbyte = csdes.triplesdes_encrypt(k1, k2, plainbyte)
+        ciphertext = ciphertext + chr(cipherbyte)
+    return ciphertext
+
+def decrypt_with_csprng(q, p, seed, ciphertext):
+    prng = bbs.BlumBlumShub(seed=seed, bits=10, q=q, p=p)
+    plaintext = ""
+    for cipherbyte in map(ord, ciphertext):
+        k1 = prng.get_random_bits(10)
+        k2 = prng.get_random_bits(10)
+        plainbyte = csdes.triplesdes_decrypt(k1, k2, cipherbyte)
+        plaintext = plaintext + chr(plainbyte)
+    return plaintext
 
 def decrypt(key, ciphertext):
     k1 = (key & 0b11111111110000000000) >> 10
@@ -100,13 +120,21 @@ def main():
     group = modp.groups[2048]
     p = group["value"]
     q = (p - 1) // 2
+
+    # Require resistance to sub-group attacks
     assert(2*q + 1 == p)
+
+    # Require usability with Blum Blum Shub CSPRNG
+    assert(p != q)
+    assert((q % 4) == 3)
+    assert((p % 4) == 3)
+
     generator = group["generator"]
     log("\n")
     #q = 761
     #p = 2*q + 1
 
-    acc = 100
+    acc = 10
     log("Checking if q is prime (%d rounds) ... " % acc)
     primeq = is_prime(q, acc)
     log("%s\n" % primeq)
@@ -120,17 +148,17 @@ def main():
         raise ValueError("p is not prime: %d" % q)
 
     log("Finding Blum Blum Shub q and p=2q+1 %d-bit primes ... " % bits)
-    bbs = BlumBlumShub.create(bits)
+    csprng_key = bbs.BlumBlumShub.create(bits)
     log("\n")
 
     log("Generating %d-bit keypair for Alice ... " % bits)
     #priva, puba = generate_keypair(p, q, 312)
-    priva, puba = generate_keypair(bbs, generator, p, q)
+    priva, puba = generate_keypair(csprng_key, generator, p, q)
     log("\n")
 
     log("Generating %d-bit keypair for Bob ... " % bits)
     #privb, pubb = generate_keypair(p, q, 24)
-    privb, pubb = generate_keypair(bbs, generator, p, q)
+    privb, pubb = generate_keypair(csprng_key, generator, p, q)
     log("\n")
     log("\n")
 
@@ -145,11 +173,11 @@ def main():
     print("")
 
     print("Blum Blum Shub parameters")
-    show("p", bbs.p)
+    show("p", csprng_key.p)
     print("")
-    show("q", bbs.q)
+    show("q", csprng_key.q)
     print("")
-    show("m (Blum number)", bbs.m)
+    show("m (Blum number)", csprng_key.m)
     print("")
 
     print("Alice's keys")
@@ -174,17 +202,29 @@ def main():
         show("Shared key", Kab)
         print("")
 
+        if not bbs.is_coprime(Kab, q):
+            print("WARNING: Global parameter q is not coprime to shared key")
+        if not bbs.is_coprime(Kab, p):
+            print("WARNING: Global parameter p is not coprime to shared key")
+
     log("Initializing %d-bit Blum Blum Shub with shared key as seed ... " % bits)
     csprng = create_csprng(Kab, bits)
     log("\n")
     key = csprng.get_random_bits(20)
     show("20-bit TriplSDES key", key)
 
-    plain = read_file("plaintext")
-    cipher = encrypt(key, plain)
+    plaintext = read_file("plaintext")
+    origplain = plaintext
+    print("Plaintext: %r" % plaintext)
+    plaintext = map(ord, plaintext)
+
+    ciphertext = encrypt_with_csprng(q, p, key, plaintext)
+    print("Ciphertext: %r" % ciphertext)
+    # TODO: sha1sum
     #send(cipher, bob)
-    plainagain = decrypt(key, cipher)
-    assert(plain == plainagain)
+    plainagain = decrypt_with_csprng(q, p, key, ciphertext)
+    print("Plaintext: %r" % plainagain)
+    assert(origplain == plainagain)
     print("ROUNDTRIP OK")
 
 if __name__ == "__main__":

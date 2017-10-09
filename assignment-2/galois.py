@@ -30,6 +30,9 @@ class IntMod(object):
     def __div__(self, n):
         return IntMod(self.val / int(n), self.mod)
 
+    def __floordiv__(self, n):
+        return IntMod(self.val // int(n), self.mod)
+
     def __eq__(self, n):
         return self.val == int(n)
 
