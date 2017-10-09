@@ -12,10 +12,37 @@
 \end{abstract}
 
 \section{Introduction}
-The objective in this project is to create a complete program for performing
-key exchange and send encrypted data between two actors.
+The objective in this project was to create a program for securely sending data
+between two parties \textit{Alice} and \textit{Bob} over an insecure channel.
+
+In the project description, the requirement was to use public key cryptography
+to establish a shared key. The key would then seed a cryptographically secure
+pseudo-random number generator (CSPRNG), which would then create a shared,
+secret key for encrypting and decrypting data with a stream cipher.
+
+More specifically, the program would consist of three major parts:
+\begin{itemize}
+  \item The Diffie-Hellman key exchange \cite{dh},
+  \item a cryptographically secure pseudo-random number generator (CSPRNG)
+  \item and a symmetric cipher.
+\end{itemize}
 
 \section{Design and implementation}
+The program consists of the following parts:
+\begin{itemize}
+  \item The Diffie-Hellman \cite{dh} (DH) key exchange
+    \begin{itemize}
+      \item Selection and verification of global DH parameters $p, q, g$
+      \item Generation of private and public keys using a random Blum Blum Shub CSPRNG
+      \item Computing a shared key $K_{ab}$ between Alice and Bob
+    \end{itemize}
+  \item Establishing a common key $K$ with another Blum Blum Shub CSPRNG. It
+    reuses the parameters $p$ and $q$ and uses the shared key $K_{ab}$ as its
+    seed.
+  \item Encrypting or decrypting the data using TripleSDES stream cipher
+    \cite{sdes}, where each byte is using a separate 20-bit key from the
+    CSPRNG.
+\end{itemize}
 
 \subsection{Choice of programming language}
 Writing a secure, production-ready cryptography system is a serious
