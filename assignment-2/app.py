@@ -4,6 +4,7 @@ DAT-510 Assignment 2, autumn 2017
 All code written by Christian Stigen
 """
 
+import argparse
 import hashlib # only used for SHA1 sums
 import math
 import random
@@ -116,13 +117,28 @@ def read_file(filename):
     with open(filename, "rb") as f:
         return f.read()
 
-def main():
-    bob = "some remote host"
-    bits = 512
+def parse_args():
+    p = argparse.ArgumentParser()
+
+    p.add_argument("-b", "--bits", type=int, default=512,
+            help="Number of bits for Blum Blum Shub (default 512)")
+
+    p.add_argument("--filename", type=str, default="plaintext",
+            help="File to send between the two parties")
+
+    p.add_argument("--group", type=int, default=2048,
+            help="IKE cyclic group to use: %s (default 2048)" %
+                ", ".join(map(str, modp.groups.keys())))
+
+    opts = p.parse_args()
+    return opts
+
+def main(opts):
+    bits = opts.bits
 
     log("Finding global %d-bit parameters ... " % bits)
     #q, p, generator = generate_dh_params(bits)
-    group = modp.groups[2048]
+    group = modp.groups[opts.group]
     p = group["value"]
     q = (p - 1) // 2
 
@@ -167,7 +183,7 @@ def main():
     log("\n")
     log("\n")
 
-    print("Global parameters")
+    print("Global Diffie-Hellman (mod p) parameters")
     print("  g = %d (generator)" % generator)
     print("")
     show("q", q)
@@ -219,9 +235,8 @@ def main():
     show("%d-bit Blum Blum Shub seed for symmetric cipher" % bits, seed)
     print("")
 
-    filename = "plaintext"
-    print("Reading plaintext from file %r" % filename)
-    plaintext = read_file("plaintext")
+    print("Reading plaintext from file %r" % opts.filename)
+    plaintext = read_file(opts.filename)
     print("")
 
     prior_sha1 = hashlib.sha1(plaintext).hexdigest()
@@ -249,4 +264,5 @@ def main():
         print("  Plaintexts are NOT equal")
 
 if __name__ == "__main__":
-    main()
+    opts = parse_args()
+    main(opts)

@@ -13,12 +13,12 @@
   system between two parties.
   %
   Each party generates private and public keys using the Blum Blum Shub
-  PRNG, with 256-bit primes that are resistant to subgroup attacks. Suitable
+  PRNG, with 512-bit primes that are resistant to subgroup attacks. Suitable
   Blum numbers are found through trial Miller-Rabin primality tests.
   %
   A shared key is established between the parties with the \textit{mod p}
   Diffie-Hellman key exchange, using recommended and publicly scrutinized
-  1536-bit parameters from the IKE protocol.
+  2048-bit parameters from the IKE protocol.
   %
   The shared key then seeds another Blum Blum Shub PRNG to create a common
   sequence of 20-bit keys for use with the TripleSDES stream cipher, used to
