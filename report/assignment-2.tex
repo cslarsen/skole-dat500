@@ -24,6 +24,11 @@
   sequence of 20-bit keys for use with the TripleSDES stream cipher, used to
   encrypt and decrypt messages.
   %
+  The program communicates over an TCP/IP socket. After the key exchange has
+  been finished, an chat window opens. The two parties can then proceed to chat
+  securely over a public channel. However, the two CSPRNGs may be susceptible
+  to synchronization issues. That part is out of scope for this project.
+  %
   While working as advertised, this student project has a few obvious
   weaknesses: A real system would not use the educational TripleSDES stream
   cipher. Furthermore, by reuses the Diffie-Hellman parameters in the Blum Blum
