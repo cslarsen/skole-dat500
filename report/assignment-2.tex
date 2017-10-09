@@ -117,7 +117,7 @@ parameters. Because of that, I have chosen to use DH parameters from
 done so in the function \texttt{generate\_dh\_params} in the file
 \texttt{app.py}. An example output is given in listing \vref{verb:dh.ex}.
 
-\begin{lstlisting}[caption={Finding Diffie-Hellman parameters}, label=verb:dh.ex]
+\begin{lstlisting}[caption={Example Diffie-Hellman parameters}, label=verb:dh.ex]
 Example 8-bit Diffie-Hellman global parameters:
          q = 83
            = 0x53
@@ -131,6 +131,33 @@ Example 16-bit Diffie-Hellman global parameters:
   p (2q+1) = 61379
            = 0xefc3
    found g = 3
+\end{lstlisting}
+
+The main loop for finding $p$ and $q$ is
+\begin{lstlisting}[caption={Finding Diffie-Hellman parameters}, label=verb:dh.find]
+while True:
+    q = mr.find_prime(bits-1, acc1)
+    p = 2*q + 1 # used to prevent small subgroup attacks, se Stallings
+    if mr.probably_prime(p, acc2):
+        return q, p, generator
+\end{lstlisting}
+The \texttt{mr.find\_{}prime} function is part of the \texttt{miller\_{}rabin.py}
+module.  It simply selects random numbers and test if they are prime with the
+Miller-Rabin algorithm. To speed it up, I first tested with only five rounds.
+This is because Miller-Rabin is a Monte Carlo algorithm, meaning I can get
+false positives, but nevern false negatives. Thus, if it says a number is
+composite, it absolutely is.
+\begin{lstlisting}[caption={Finding prime numbres}, label=verb:dh.primes]
+while True:
+    candidate = random.randint(a, b)
+    if candidate & 1 == 0:
+        # Minor speed up: Skip even numbers
+        continue
+    if not probably_prime(candidate, 5):
+        # Another one: Try a few rounds with Miller-Rabin
+        continue
+    if probably_prime(candidate, accuracy):
+        return candidate
 \end{lstlisting}
 
 \subsection{Choice of CSPRNG}
