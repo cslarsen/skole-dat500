@@ -300,6 +300,22 @@ struct buffer* triplesdes_decrypt_buffer(
 }
 
 extern "C"
+struct buffer* triplesdes_encrypt_buffer(
+    const uint16_t k1,
+    const uint16_t k2,
+    const uint32_t length,
+    const uint8_t* plaintext)
+{
+  struct buffer* out = malloc_buffer(length);
+  out->length = length;
+
+  for ( size_t n = 0; n < length; ++n )
+    out->data[n] = triplesdes_encrypt(k1, k2, plaintext[n]);
+
+  return out;
+}
+
+extern "C"
 struct buffer* sdes_decrypt_buffer(
     const uint16_t key,
     const uint32_t length,

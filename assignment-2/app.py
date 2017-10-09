@@ -5,6 +5,7 @@ import sys
 # Local imports
 from bbs import BlumBlumShub
 from galois import GF
+import csdes
 import miller_rabin as mr
 import modp
 
@@ -49,11 +50,18 @@ def generate_keypair(prng, generator, p, q, priv=None):
     pub = g**priv
     return priv, pub
 
-def create_csprng(seed):
-    pass
+def create_csprng(seed, bits):
+    return BlumBlumShub.create(prime_bits=bits, seed=int(seed))
 
-def encrypt(prng, plain):
-    pass
+def encrypt(key, plaintext):
+    k1 = (key & 0b11111111110000000000) >> 10
+    k2 =  key & 0b1111111111
+    return csdes.triplesdes_encrypt_buffer(k1, k2, plaintext)
+
+def decrypt(key, ciphertext):
+    k1 = (key & 0b11111111110000000000) >> 10
+    k2 =  key & 0b1111111111
+    return csdes.triplesdes_decrypt_buffer(k1, k2, ciphertext)
 
 def create_shared_key(pubkey, privkey):
     return privkey**pubkey
@@ -78,6 +86,10 @@ def show(label, number, decimal=False, indent="  "):
         print("")
         print("%sDecimal:" % indent)
         print(number)
+
+def read_file(filename):
+    with open(filename, "rb") as f:
+        return f.read()
 
 def main():
     bob = "some remote host"
@@ -162,11 +174,18 @@ def main():
         show("Shared key", Kab)
         print("")
 
-    csprng = create_csprng(aliceKab)
+    log("Initializing %d-bit Blum Blum Shub with shared key as seed ... " % bits)
+    csprng = create_csprng(Kab, bits)
+    log("\n")
+    key = csprng.get_random_bits(20)
+    show("20-bit TriplSDES key", key)
 
-    plain = "hello world"
-    cipher = encrypt(csprng, plain)
-    send(cipher, bob)
+    plain = read_file("plaintext")
+    cipher = encrypt(key, plain)
+    #send(cipher, bob)
+    plainagain = decrypt(key, cipher)
+    assert(plain == plainagain)
+    print("ROUNDTRIP OK")
 
 if __name__ == "__main__":
     main()

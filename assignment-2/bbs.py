@@ -72,7 +72,7 @@ class BlumBlumShub(object):
         self.x = self.x**2 % self.m
         return self.x
 
-    def _next_bits(self, bits):
+    def get_random_bits(self, bits):
         n = 0
         for _ in range(bits):
             n <<= 1
@@ -82,7 +82,7 @@ class BlumBlumShub(object):
     def __next__(self):
         # Computes the next random number by taking the LSB of the next
         # generated number.
-        return self._next_bits(self.bits)
+        return self.get_random_bits(self.bits)
 
     def next(self):
         # Function provided for Python 2 compatibility
@@ -97,7 +97,7 @@ class BlumBlumShub(object):
         bits = int(math.ceil(math.log(stop, 2)))
 
         while True:
-            n = self._next_bits(bits)
+            n = self.get_random_bits(bits)
             if start <= n <= stop:
                 return n
 

@@ -95,6 +95,18 @@ def triplesdes_decrypt_buffer(k1, k2, ciphertext):
     plaintext = "".join(chr(c) for c in result.contents.data[:length])
     return plaintext
 
+_triplesdes_encrypt_buffer = libsdes.triplesdes_encrypt_buffer
+_triplesdes_encrypt_buffer.argtypes = [ctypes.c_uint16, ctypes.c_uint16,
+        ctypes.c_uint32, ctypes.POINTER(ctypes.c_uint8)]
+_triplesdes_encrypt_buffer.restype = ctypes.POINTER(Buffer)
+
+def triplesdes_encrypt_buffer(k1, k2, ciphertext):
+    raw = (ctypes.c_uint8*len(ciphertext)).from_buffer_copy(ciphertext)
+    result = _triplesdes_encrypt_buffer(k1, k2, len(raw), raw)
+    length = result.contents.length
+    plaintext = "".join(chr(c) for c in result.contents.data[:length])
+    return plaintext
+
 _sdes_decrypt_buffer = libsdes.sdes_decrypt_buffer
 _sdes_decrypt_buffer.argtypes = [ctypes.c_uint16, ctypes.c_uint32,
         ctypes.POINTER(ctypes.c_uint8)]

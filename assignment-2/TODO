@@ -1,3 +1,9 @@
+TODO naa:
+- shared key skal vaere seed til prng..
+  - bruker bbs.. det eneste med den er at shared key maa vaere coprime til m
+  - oops, trenger p og q, ellers finner den disse selv.. det blir ikke likt!
+
+
 - cyclic group... ser ut som jeg skal velge denne selv
   - finn ut om primitive root
 - implementer resten! dvs stream cipher
