@@ -24,11 +24,11 @@
   sequence of 20-bit keys for use with the TripleSDES stream cipher, used to
   encrypt and decrypt messages.
   %
-  While working as advertised, this student project shows that a production
-  system would require much faster processing to be secure. It also reuses the
-  Diffie-Hellman parameters with the Blum Blum Shub generator, reducing the
-  space of suitable primes in a way that could theoretically weaken the entire
-  system.
+  While working as advertised, this student project has a few obvious
+  weaknesses: A real system would not use the educational TripleSDES stream
+  cipher. Furthermore, by reuses the Diffie-Hellman parameters in the Blum Blum
+  Shub stream cipher key generator, the space of suitable primes is reduced,
+  possibly weakening the system.
 \end{abstract}
 
 \section{Introduction}
