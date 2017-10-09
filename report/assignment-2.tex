@@ -9,6 +9,26 @@
 \maketitle
 
 \begin{abstract}
+  This report presents an implementation of a secure, public key communication
+  program between two parties. 
+  %
+  Each participant generates private and public keys using the Blum Blum Shub
+  PRNG, with 256-bit primes that are resistant to subgroup attacks. Suitable
+  Blum numbers are found through trial Miller-Rabin primality testing runs.
+  %
+  A shared key is established between the parties with the \textit{mod p}
+  Diffie-Hellman key exchange, using recommended and publicly scrutinized
+  1536-bit parameters from the IKE protocol.
+  %
+  The shared key then seeds another Blum Blum Shub PRNG to create a common
+  sequence of 20-bit keys for use with the TripleSDES stream cipher, used to
+  encrypt and decrypt messages.
+  %
+  While working as advertised, this student project shows that a production
+  system would require much faster processing to be secure. It also reuses the
+  Diffie-Hellman parameters with the Blum Blum Shub generator, reducing the
+  space of suitable primes in a way that could theoretically weaken the entire
+  system.
 \end{abstract}
 
 \section{Introduction}
