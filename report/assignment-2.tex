@@ -51,7 +51,23 @@ precisely because it is so hard to make it right and choose good, secure
 parameters. Because of that, I have chosen to use DH parameters from
 \cite{rfc3526}. To show that I am able to generate parameters myself, I have
 done so in the function \texttt{generate\_dh\_params} in the file
-\texttt{app.py}.
+\texttt{app.py}. An example output is given in listing \vref{verb:dh.ex}.
+
+\begin{lstlisting}[caption="Finding Diffie-Hellman parameters", label=verb:dh.ex]
+Example 8-bit Diffie-Hellman global parameters:
+         q = 83
+           = 0x53
+  p (2q+1) = 167
+           = 0xa7
+   found g = 2
+
+Example 16-bit Diffie-Hellman global parameters:
+         q = 30689
+           = 0x77e1
+  p (2q+1) = 61379
+           = 0xefc3
+   found g = 3
+\end{lstlisting}
 
 \subsection{Choice of CSPRNG}
 I have chosen to use the Blum Blum Shub \cite{bbs} pseudo-random number
