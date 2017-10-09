@@ -200,6 +200,22 @@ The primes $p$ and $q$ must be congruent to $4 (\textrm{mod} 3)$, meaning that
 $p \textrm{mod} 4 == 3$ and likewise for $q$. This posed an interesting
 challenge for using the BBS generator. They must also be coprime to the seed.
 
+\subsection{Implementing the stream cipher}
+I simply chose to use my TripleSDES implementation from the previous assignment
+for this task. Being an educational cipher, it is not considered secure. But it
+is good for demonstrating the whole system.
+
+TripleSDES takes two 10-bit numbers as keys. After generating the shared key, I
+initialized a BBS generator with the shared key as seed. The other parameters
+$p$ and $q$ were taken from the pre-agreed, global Diffie-Hellman parameters.
+Then, for each byte in the plaintext, I generated two 10-bit keys using the BBS
+CSPRNG, and used those as keys. I have neglected to look into the problem of
+reseeding, which a good encryption system should do from time to time. The nice
+thing with using new keys for each byte is that two equal plaintext messages
+will encrypt to different ciphertext messages. Of course, their lengths will be
+the same, so a future system should pad it with random bytes or something like
+that to hide the message length.
+
 \section{Test results}
 One of the earliest issues I ran into was the poor performance of Python.
 Finding large prime numbers is very time consuming. After implementing the
