@@ -62,7 +62,7 @@ Our goal is to produce a working communication system that, while being
 primarily an educational project, also observes good security practices.
 
 \section{Design and implementation}
-The program consists of the following parts:
+In the final implementation I decided to use the following parts:
 \begin{itemize}
   \item The Diffie-Hellman \cite{dh} (DH) key exchange
     \begin{itemize}
@@ -76,7 +76,10 @@ The program consists of the following parts:
   \item Encrypting or decrypting the data using TripleSDES stream cipher
     \cite{sdes}, where each byte is using a separate 20-bit key from the
     CSPRNG.
+  \item A simple TCP/IP socket to perform the key exchange and open a secure
+    chat room for the two parties.
 \end{itemize}
+I will now cover each of the above parts in more detail.
 
 \subsection{Choice of programming language}
 Writing a secure, production-ready cryptography system is a serious
@@ -91,7 +94,7 @@ would require to use the GMP library \cite{wiki:gmp} for implementing bignums.
 This requires installing additional packages, and I have therefore chosen not
 to use those languages in this project.
 
-\subsection{Choice of global parameters}
+\subsection{Choice of global Diffie-Hellman parameters}
 While the implementation contains code for choosing $p$ and $q$ for the
 Diffie-Hellman key exchange, I have chosen numbers, with a generator $g$, from
 \cite{rfc3526}. The arguments were originally made for use with the IKE key
@@ -177,6 +180,7 @@ keypairs that are resistant to subgoup attacks. That is, to find two prime
 numbers $p$ and $q$ so that $p = 2q+1$ quickly became a bottle-neck when
 searching for primes on the order of 256 bits and above.
 
+\section{Discussion}
 Even though Python seems to use the GNU MP library (GMP) for bignums, I decided
 to rewrite the Miller-Rabin primality tester in C++. The code for this can be
 found in the file \texttt{primes.cpp}. It is hard to measure the speed, since
@@ -189,7 +193,9 @@ then perform a small number of rounds for an initial test of the prime numbers.
 This improved performance so much that it was viable to use 256 and even 512
 bit primes in Python.
 
-\section{Discussion}
+Another thing I did not pursue was to dynamically generate the
+
+\section{Conclusion}
 I demonstrated how to implement a secure, public-key communication using
 Diffie-Hellman for key exchange and a shared seed for a CSPRNG to create stream
 cipher keys.
@@ -203,8 +209,6 @@ system because the space of suitable primes may be considerably reduced. That
 would be worthwhile to investigate in more detail. Lastly, issues related to
 network communication such as timing and synchronization of the two CSPRNGs was
 a practical matter that should deserve more attention.
-
-\section{Conclusion}
 
 \bibliography{assignment-2}
 \bibliographystyle{ieeetr}
