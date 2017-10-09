@@ -200,6 +200,13 @@ The primes $p$ and $q$ must be congruent to $4 (\textrm{mod} 3)$, meaning that
 $p \textrm{mod} 4 == 3$ and likewise for $q$. This posed an interesting
 challenge for using the BBS generator. They must also be coprime to the seed.
 
+\subsection{Communication channel}
+I simply used a TCP/IP socket to communicate. One process will be a server, and
+the other will be a client. They serialize their publickeys using the
+\texttt{pickle} module in Python to send the public keys. The shared key is
+then computed by exponentiationg the private and public keys. This is shown in
+the program output.
+
 \subsection{Implementing the stream cipher}
 I simply chose to use my TripleSDES implementation from the previous assignment
 for this task. Being an educational cipher, it is not considered secure. But it
