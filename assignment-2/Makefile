@@ -1,4 +1,4 @@
-CXXFLAGS := -W -Wall --std=c++11 -fvisibility=default -O3 -march=native -I/usr/local/include -L/usr/local/lib -lgmp -lgmpxx
+CXXFLAGS := -W -Wall --std=c++11 -fvisibility=default -O3 -march=native
 TARGETS := libsdes.so
 PYTHON := python
 
