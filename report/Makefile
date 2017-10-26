@@ -14,9 +14,10 @@ endif
 
 TARGETS := \
 	assignment-1.pdf \
-	assignment-2.pdf
+	assignment-2.pdf \
+	assignment-3.pdf
 
-CURRENT := assignment-2.pdf
+CURRENT := assignment-3.pdf
 
 all: $(TARGETS)
 
